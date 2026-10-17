@@ -1,0 +1,9 @@
+node_modules/
+.state/
+work/
+.generated/
+dist/
+*.log
+.env
+.env.*
+Thumbs.db
