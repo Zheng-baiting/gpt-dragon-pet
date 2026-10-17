@@ -1,0 +1,15 @@
+{
+  "name": "gpt-dragon-pet",
+  "version": "0.1.0",
+  "description": "A white dragon companion for your coding desk, inspired by dsh-pet.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/launch.cjs",
+    "test": "node scripts/build.mjs && node --test test/*.test.mjs",
+    "smoke": "node scripts/launch.cjs --smoke-test"
+  },
+  "engines": {"node": ">=24"},
+  "license": "MIT"
+}
