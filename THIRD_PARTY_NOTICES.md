@@ -5,4 +5,5 @@
 - 上游代码采用 MIT；其图片、动画、字体、提示词与源视频有独立的非商业使用限制。依赖包中的这些媒体不因代码 MIT 而变为可商用。本项目不将上游鲸鱼娘动画打包发布为 GPT 动作，也不会用它们替代缺失的 GPT 娘素材。`vendor/dsh-pet/` 保留同一发布提交的四个素材处理脚本、全部动作提示词与原许可证；GPT 版本提示词由原配方适配，仍限非商业使用，并保留原项目署名和链接。
 - `assets/gpt-reference.png`、`assets/gpt-video-reference.png`、`assets/sheets/`、`assets/basic/` 与 `assets/basic-preview.gif` 为基于用户指定同人参考生成并在本地合成的非官方 Q 版白龙娘素材，仅用于个人非商业同人桌面美化。用户原始附件与鲸鱼娘参考帧未打包或公开。参考角色、原画及相关标识的权利属于各自权利人；本仓库不声称取得其商业授权。
 - OpenAI、ChatGPT、GPT、DeepSeek 等名称与标识属于其各自权利人。本项目与上述主体没有官方隶属、合作或背书关系。
+- `assets/webm/待机呼吸休闲.webm` 为豆包 Seedance 2.0 Mini 生成并在本地提取角色、抠像和补帧的 AI 动画；使用同一非官方 Q 版定稿与 dsh-pet 动作配方。`assets/sources/` 保留带“豆包 AI 生成”标记的源片、实际提示词和制作记录。该派生媒体同样仅限个人非商业同人用途，不声称取得参考角色的商业授权。
 - Electron 与其组件保留发行包附带的各自许可证。下载和解压均使用上游已依赖的 `@electron/get` 与 `@electron-internal/extract-zip`，不将运行时作为仓库文件上传。

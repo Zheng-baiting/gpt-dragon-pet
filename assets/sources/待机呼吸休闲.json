@@ -1,0 +1,37 @@
+{
+  "name": "待机呼吸休闲",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/待机呼吸休闲-doubao.mp4",
+  "sourceSha256": "d58a38db4027890a6a890f5077837b6b54261166bbed8d1743eae442825d7e0a",
+  "prompt": "assets/sources/待机呼吸休闲-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/待机呼吸休闲.webm",
+  "outputSha256": "ae5f291f8350a2d31a91ff1f5c683ec83572890aa423badd71e0d3bc23b7b3c7",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central character region x=320,y=96,width=640,height=576, padded back to original 1280x720 coordinates",
+    "Original dsh-pet HSV chroma key and standing normalization",
+    "White/lavender character green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      198,
+      60,
+      435,
+      334
+    ],
+    "greenSpillFraction": 1.2120835335768383e-05,
+    "loopAlphaMeanDifference": 1.8427690972222222,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed the source contact sheet and processed frames: full character, consistent identity, blinking and head turns; original marked source retained."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

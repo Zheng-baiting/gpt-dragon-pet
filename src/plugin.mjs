@@ -10,7 +10,7 @@ const tools = [
   { name: 'get_gpt_pet_status', description: '查看 GPT 娘原版底座的运行状态和已导入视频数量；不读取聊天、账户或额度。',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: true } },
-  { name: 'show_gpt_pet', description: '显示小只 Q 版 GPT 白龙娘，默认带眨眼呼吸和点击招手。preview=false 请求完整动作模式；缺视频时明确失败。',
+  { name: 'show_gpt_pet', description: '显示小只 Q 版 GPT 白龙娘，预览优先使用已导入的正式待机，点击时招手。preview=false 请求完整动作模式；缺视频时明确失败。',
     inputSchema: { type: 'object', properties: { preview: { type: 'boolean', default: true } }, additionalProperties: false } },
   { name: 'hide_gpt_pet', description: '关闭本项目的 GPT 娘窗口，保留文件和设置。',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
@@ -42,7 +42,7 @@ async function call(name, args) {
   for (let i = 0; i < 60; i++) {
     if (failed) throw failed;
     const current = await status(preview);
-    if (current) return { ok: true, preview, port: current.port, message: preview ? 'Q 版基础动画：眨眼呼吸、点击招手；完整动作视频待制作。' : '完整动作模式。' };
+    if (current) return { ok: true, preview, port: current.port, message: preview ? 'Q 版预览：已导入的正式待机优先使用，点击时招手；完整动作库尚未齐全。' : '完整动作模式。' };
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   throw Error('桌宠尚未就绪。请执行 npm run runtime:install，并检查 .runtime 中的 engine.log。');

@@ -86,7 +86,7 @@ def reference():
     print(str(target))
 
 
-def retime(source, target):
+def retime(source, target, despill=False):
     metadata = info(source)
     if (metadata['width'], metadata['height'], metadata['r_frame_rate']) != (640, 360, '24/1'):
         raise ValueError('补帧输入必须是原管线的 640×360、24 fps 成品。')
@@ -102,14 +102,14 @@ def retime(source, target):
         data = read_exact(decoder.stdout, 640*360*4)
         if len(data) != 640*360*4:
             raise ValueError('视频没有完整帧。')
-        first = Image.frombytes('RGBA', (640, 360), data)
+        first = clean_edge(data) if despill else Image.frombytes('RGBA', (640, 360), data)
         while True:
             data = read_exact(decoder.stdout, 640*360*4)
             if not data:
                 break
             if len(data) != 640*360*4:
                 raise ValueError('视频帧不完整。')
-            second = Image.frombytes('RGBA', (640, 360), data)
+            second = clean_edge(data) if despill else Image.frombytes('RGBA', (640, 360), data)
             pair = prepare_pair(first, second)
             for phase in range(5):
                 frame = first if phase == 0 else interpolate(pair, phase/5).convert('RGBA')
@@ -130,6 +130,14 @@ def retime(source, target):
                 process.wait(timeout=5)
     assert_alpha(target)
     return count
+
+
+def clean_edge(data):
+    # This white/lavender character has no green parts. Remove key/4:2:0 spill
+    # before optical flow so green contours cannot spread into intermediate frames.
+    frame = np.frombuffer(data, np.uint8).reshape(360, 640, 4).copy()
+    frame[..., 1] = np.minimum(frame[..., 1], np.maximum(frame[..., 0], frame[..., 2]))
+    return Image.fromarray(frame)
 
 
 def review(video, target):
@@ -196,11 +204,11 @@ def process(name, source, green):
     encoding = original('encode_thumbs.py')
     encoding.CRF = 18
     encoding.convert_video(normalized, original_clip)
-    frames = retime(original_clip, candidate)
+    frames = retime(original_clip, candidate, despill=green)
     review(candidate, folder / 'review.png')
     report = {'name': name, 'upstream': 'dsh-pet@0.3.7', 'sourceFPS': 24, 'fps': 120, 'frames': frames,
               'duration': info(candidate)['duration'], 'standing': standing, 'contentUnion': union,
-              'scale': scale, 'manualReviewRequired': True}
+              'scale': scale, 'greenEdgeDespill': green, 'manualReviewRequired': True}
     candidate.replace(final)
     (folder / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({'video': str(final), 'review': str(folder / 'review.png'), **report}, ensure_ascii=False))

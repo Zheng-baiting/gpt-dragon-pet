@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from pipeline import ROOT, FFMPEG, run, process, info, assert_alpha
+from pipeline import ROOT, FFMPEG, run, process, info, assert_alpha, retime
 import numpy as np
 from PIL import Image, ImageDraw
 from motion import prepare_pair, interpolate
@@ -59,6 +59,25 @@ class PipelineTest(unittest.TestCase):
         y, x = np.where(result[:, :, 3] > 200)
         self.assertTrue(136 < x.mean() < 144)
         self.assertEqual(int(result[0, 0, 3]), 0)
+
+    def test_alpha_input_preserves_green_props(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / 'work', prefix='alpha-color-test-') as directory:
+            folder = Path(directory)
+            frame = Image.new('RGBA', (640, 360))
+            ImageDraw.Draw(frame).rectangle((200, 100, 400, 300), fill='#00ff00')
+            source, output = folder / 'source.webm', folder / 'output.webm'
+            run([FFMPEG, '-y', '-loglevel', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgba',
+                 '-s', '640x360', '-r', '24', '-i', '-', '-an', '-c:v', 'libvpx-vp9',
+                 '-pix_fmt', 'yuva420p', '-auto-alt-ref', '0', str(source)],
+                input=frame.tobytes()*2, check=True)
+            self.assertEqual(retime(source, output), 10)
+            pixels = run([FFMPEG, '-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', str(output),
+                          '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
+                         check=True, capture_output=True).stdout
+            pixel = np.frombuffer(pixels, np.uint8).reshape(360, 640, 4)[200, 300]
+            self.assertGreater(int(pixel[1]), 220)
+            self.assertLess(int(pixel[0]), 30)
+            self.assertGreater(int(pixel[3]), 240)
 
 
 if __name__ == '__main__':

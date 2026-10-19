@@ -113,6 +113,8 @@ try {
     await pause(200);
   }
   assert(ready, 'Original renderer did not load the reference preview video.');
+  const previewConfig = JSON.parse(await readFile(join(root, '.runtime/preview/engine/assets/config.jsonc'), 'utf8'));
+  const idleAnimation = previewConfig.animations.idle[0];
   const main = await readFile(join(upstream, 'runtime/electron-helper/main.js'), 'utf8');
   const marker = 'const dump = await first.webContents.executeJavaScript(`';
   const start = main.indexOf(marker);
@@ -157,7 +159,7 @@ try {
   await writeFile(join(root, 'work/native-wave.png'), Buffer.from(waveImage.data, 'base64'));
   let returnedToIdle = false;
   for (let i = 0; i < 45; i++) {
-    returnedToIdle = await evaluate('sprites[0].anim === "Q版-眨眼呼吸"');
+    returnedToIdle = await evaluate(`sprites[0].anim === ${JSON.stringify(idleAnimation)}`);
     if (returnedToIdle) break;
     await pause(100);
   }
@@ -170,7 +172,7 @@ try {
       else { const sorted = frames.toSorted((a,b) => a-b); resolve({ medianMs: sorted[60], p95Ms: sorted[114] }); }
     } requestAnimationFrame(tick);
   })`);
-  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, playedWave, returnedToIdle, dump, frameTiming, playback, wavePlayback };
+  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, idleAnimation, playedWave, returnedToIdle, dump, frameTiming, playback, wavePlayback };
   await writeFile(join(root, 'work/smoke-report.json'), json(report));
   if (process.env.GPT_PET_MIN_FPS) {
     const minimum = Number(process.env.GPT_PET_MIN_FPS);

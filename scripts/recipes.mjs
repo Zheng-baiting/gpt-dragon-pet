@@ -11,7 +11,7 @@ function dragon(text) {
     .replaceAll('蓝发', '白发').replaceAll('蓝毛', '白毛')
     .replaceAll('蓝色长发', '白色长发').replaceAll('女仆', '白龙娘')
     .replaceAll('围裙', '裙边').replaceAll('鱼鳍', '小翼').replaceAll('鳍饰', '翼饰')
-    .replaceAll('参考图最左侧', '参考图中的');
+    .replaceAll('参考图最左侧', '参考图中');
 }
 
 export async function recipes() {

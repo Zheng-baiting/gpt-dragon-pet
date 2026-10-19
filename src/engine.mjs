@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { downloadArtifact } from '@electron/get';
 import extract from '@electron-internal/extract-zip';
 import { root, upstream, runtime, profile, json } from './paths.mjs';
+import { mediaStatus } from '../scripts/media.mjs';
 
 export const electronPath = join(runtime, 'electron', process.platform === 'win32' ? 'electron.exe' : 'electron');
 
@@ -58,14 +59,21 @@ if (process.env.GPT_PET_DEBUG_PORT) {
 }`;
   await writeFile(helper, text.replace(marker, isolation));
   const config = JSON.parse(await readFile(join(root, preview ? 'config/preview.json' : 'config/gpt.json'), 'utf8'));
-  await writeFile(join(engine, 'assets/config.jsonc'), json(config));
   const data = join(base, 'data/dsh-pet/main-animation/webm');
   await mkdir(data, { recursive: true });
   if (preview) {
     await cp(join(root, 'assets/basic'), data, { recursive: true });
+    const idle = (await mediaStatus()).find(action => action.name === '待机呼吸休闲' && action.available);
+    if (idle) {
+      await cp(join(root, 'assets/webm', idle.file), join(data, idle.file));
+      config.animations.idle = [idle.name];
+      config.animations.events.balance = [idle.name];
+      config.pets[0].name = 'GPT 白龙娘 · Q版动作预览';
+    }
   } else {
     await cp(join(root, 'assets/webm'), data, { recursive: true });
   }
+  await writeFile(join(engine, 'assets/config.jsonc'), json(config));
   return { base, engine, env: {
     ...process.env, GPT_PET_PROFILE: base,
     DSH_HOME: join(base, 'data'), DSH_PET_ELECTRON_PATH: electronPath,
