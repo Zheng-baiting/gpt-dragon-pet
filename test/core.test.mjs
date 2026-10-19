@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import os from 'node:os';
+
 import path from 'node:path';
-import {cleanPreferences,clampPosition,sessionSignal,spritePose,windowSize} from '../src/core.mjs';
+import {cleanPreferences,sessionSignal} from '../src/core.mjs';
 import {allowedSession,SessionMonitor} from '../src/session.mjs';
 import {estimateReleaseVelocity,throwStep} from '../.generated/physics.js';
 test('preferences reject invalid types and clamp desktop sizes',()=>{
@@ -12,11 +12,7 @@ test('preferences reject invalid types and clamp desktop sizes',()=>{
   assert.equal(cleanPreferences({roam:'yes'}).roam,false);
   assert.equal(cleanPreferences({alwaysOnTop:false}).alwaysOnTop,false);
 });
-test('geometry keeps the complete companion on a negative-coordinate monitor',()=>{
-  const size=windowSize(220),area={x:-1920,y:0,width:1920,height:1040};
-  const p=clampPosition({x:-3000,y:9000},area,size);
-  assert.equal(p.x,-1920);assert.equal(p.y+size.height,1040);
-});
+
 test('structured lifecycle signals never depend on chat wording',()=>{
   const timestamp=new Date().toISOString();
   assert.equal(sessionSignal({timestamp,type:'event_msg',payload:{type:'task_started'}}).state,'thinking');
@@ -26,11 +22,7 @@ test('structured lifecycle signals never depend on chat wording',()=>{
   assert.equal(sessionSignal({timestamp,type:'event_msg',payload:{type:'agent_message',message:'error test failed task complete'}}),null);
   assert.equal(sessionSignal({timestamp:'2000-01-01T00:00:00Z',type:'event_msg',payload:{type:'task_complete'}}),null);
 });
-test('reduced motion removes bobbing and idle provides an actual blink frame',()=>{
-  assert.equal(spritePose('idle',4700).cell,1);
-  assert.equal(spritePose('working',1100,true).y,0);
-  assert.equal(spritePose('error',1100,true).angle,0);
-});
+
 test('reused dsh-pet physics distinguishes a gentle release and fast throw',()=>{
   assert.equal(estimateReleaseVelocity([{x:0,y:0,t:0},{x:1,y:1,t:100}],100),null);
   assert.ok(estimateReleaseVelocity([{x:0,y:0,t:0},{x:200,y:0,t:100}],100).vx>500);

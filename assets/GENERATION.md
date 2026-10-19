@@ -34,3 +34,24 @@
 无嘴巴、无背景、无地面阴影、无文字，各格互不重叠。
 
 实际播放由程序裁取原始图集，不对原始生成图片进行离线改绘。图片继续适用 CHARACTER-NOTICE.txt 的范围。
+
+## motion/*.png（0.2）
+
+提供方仍为内置 OpenAI ImageGen。以 reference.png 的角色身份和 atlas.png 的全身比例为参考，生成带柔和体积光影的白龙娘。运行时按 4 × 4 网格加载，每张图 16 帧，共 64 帧。四帧基础循环叠加程序运动和本地绘制的道具，映射到 actions.json 中的 106 个动作入口。
+
+通用提示规格（各图共同部分）：
+
+> Use case: stylized-concept / identity-preserve. Production transparent sprite sheet for a desktop pet. Preserve the same white-lavender chibi dragon girl: curved horns, purple eyes, curled forelock, knot ornament, pointed ears, layered pale purple dress, boots and dragon tail. Full body, soft sculpted 3D miniature volume, matte surfaces, consistent character identity, scale and baseline. Regular four-column, four-row grid, one complete pose per cell, generous transparent gutters, no text, labels or grid lines. Actual transparent background; no floor or background scene.
+
+各图姿态规格（行从 1 起，每行从左至右四个连续姿态）：
+
+| 文件 | 第 1 行 | 第 2 行 | 第 3 行 | 第 4 行 |
+| --- | --- | --- | --- | --- |
+| motion/core.png | 放松待机与眨眼 | 开心、举手、轻跳、回落 | 托腮思考、侧看 | 抱电脑、点按键盘 |
+| motion/emotion.png | 害羞、脸红、回避视线 | 傲娇、鼓脸、小幅摇头 | 挠痒、笑、缩肩 | 被提起悬空、惊讶、手脚摆动 |
+| motion/life.png | 坐下抱膝入睡 | 打哈欠与伸懒腰 | 提裙屈膝行礼 | 双手持物、操作、放下的空手基础姿态 |
+| motion/move.png | 行走交替脚步 | 奔跑交替脚步 | 张手舞动 | 正面、侧面、背面、另一侧面 |
+
+图像工具的透明边缘质量需要单独检查。重试规格曾要求保留身份与动作，增加单格留白、去除白色杂点和邻格残影；被弃用的重试结果不作为运行素材。最终采用的边缘处理方式应在素材验收后补记于此。
+
+这些图片仍适用 CHARACTER-NOTICE.txt 的非商业使用范围。assets/pet-preview.png、menu-preview.png、workroom-preview.png 是本地 WPF 窗口渲染的界面预览，不是独立生成的产品效果图。

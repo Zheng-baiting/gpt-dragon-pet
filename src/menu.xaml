@@ -1,0 +1,33 @@
+<ContextMenu xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" FontFamily="Microsoft YaHei UI" FontSize="13" Foreground="#40384B" Background="#FEFCFF" BorderThickness="0" MinWidth="224" HasDropShadow="True">
+ <ContextMenu.Resources>
+  <Style TargetType="Separator"><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Separator"><Border Height="1" Background="#ECE6F1" Margin="12,5"/></ControlTemplate></Setter.Value></Setter></Style>
+  <Style TargetType="MenuItem">
+   <Setter Property="Padding" Value="12,8"/><Setter Property="Margin" Value="3,1"/><Setter Property="Background" Value="Transparent"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="MenuItem">
+    <Grid>
+     <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}">
+      <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="22"/><ColumnDefinition Width="*"/><ColumnDefinition Width="20"/></Grid.ColumnDefinitions>
+       <ContentPresenter x:Name="Icon" ContentSource="Icon" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+       <TextBlock x:Name="Check" Text="✓" Visibility="Collapsed" Foreground="#8E70AA" FontWeight="SemiBold"/>
+       <ContentPresenter Grid.Column="1" ContentSource="Header" VerticalAlignment="Center" RecognizesAccessKey="True"/>
+       <TextBlock x:Name="Arrow" Grid.Column="2" Text="›" FontSize="17" Foreground="#A898B5" HorizontalAlignment="Right" VerticalAlignment="Center" Visibility="Collapsed"/>
+      </Grid>
+     </Border>
+     <Popup x:Name="PART_Popup" Placement="Right" HorizontalOffset="1" IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+      <Border Background="#FEFCFF" BorderBrush="#DCD1E7" BorderThickness="1" CornerRadius="11" Padding="4" MinWidth="204" MaxWidth="290">
+       <ScrollViewer MaxHeight="470" CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><ItemsPresenter KeyboardNavigation.DirectionalNavigation="Cycle" KeyboardNavigation.TabNavigation="Cycle"/></ScrollViewer>
+      </Border>
+     </Popup>
+    </Grid>
+    <ControlTemplate.Triggers>
+     <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemBorder" Property="Background" Value="#EEE6F6"/></Trigger>
+     <Trigger Property="IsSubmenuOpen" Value="True"><Setter TargetName="ItemBorder" Property="Background" Value="#EEE6F6"/></Trigger>
+     <Trigger Property="HasItems" Value="True"><Setter TargetName="Arrow" Property="Visibility" Value="Visible"/></Trigger>
+     <Trigger Property="IsChecked" Value="True"><Setter TargetName="Check" Property="Visibility" Value="Visible"/><Setter TargetName="Icon" Property="Visibility" Value="Collapsed"/></Trigger>
+     <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.65"/></Trigger>
+    </ControlTemplate.Triggers>
+   </ControlTemplate></Setter.Value></Setter>
+  </Style>
+ </ContextMenu.Resources>
+ <ContextMenu.Template><ControlTemplate TargetType="ContextMenu"><Border Background="{TemplateBinding Background}" CornerRadius="12" BorderBrush="#DCD1E7" BorderThickness="1" Padding="4"><StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/></Border></ControlTemplate></ContextMenu.Template>
+</ContextMenu>

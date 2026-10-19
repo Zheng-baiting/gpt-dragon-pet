@@ -1,0 +1,20 @@
+{
+  "name": "gpt-dragon-pet",
+  "version": "0.2.0",
+  "description": "白龙娘桌宠：插件加载后显示透明角色，支持动作、拖拽与所选会话状态联动。",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "白龙娘桌宠",
+    "shortDescription": "直接住在桌面上的白龙娘，无独立任务栏图标。",
+    "longDescription": "Windows 本地桌宠插件。加载时直接显示角色，右键切换动作和打开设置；不需要打开网页或设置页。只读联动明确选择的 Codex 会话，不调用模型。",
+    "developerName": "Zheng-baiting",
+    "category": "Productivity",
+    "capabilities": ["Interactive"],
+    "defaultPrompt": ["显示白龙娘桌宠", "查看白龙娘桌宠状态"],
+    "brandColor": "#A98AC8",
+    "composerIcon": "./assets/reference.png",
+    "logo": "./assets/reference.png"
+  },
+  "license": "MIT",
+  "keywords": ["codex", "desktop-pet", "dragon"]
+}
