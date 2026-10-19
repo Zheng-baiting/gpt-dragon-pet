@@ -150,7 +150,7 @@ public sealed class DragonAnimator : IDisposable {
   if(msg==0x02e0||msg==0x007e)window.Dispatcher.BeginInvoke(new Action(RefreshGeometry));return IntPtr.Zero;
  }
  void OnDown(object sender,MouseButtonEventArgs e){DragonNative.Point p;DragonNative.GetCursorPos(out p);if(!Hit(p.X,p.Y))return;BeginPointer(p.X,p.Y);window.CaptureMouse();e.Handled=true;}
- public void BeginPointer(double x,double y){down=true;dragging=false;flying=false;travelEnd=0;downX=x;downY=y;offsetX=x-px;offsetY=y-py;grabOrigin=new System.Windows.Point(Math.Max(.1,Math.Min(.9,(offsetX-40)/girl.Width)),Math.Max(.1,Math.Min(.9,(offsetY-86)/girl.Height)));vx=vy=0;trail.Clear();trail.Add(new[]{clock.Elapsed.TotalSeconds,x,y});squashStart=clock.Elapsed.TotalSeconds;squashDepth=.94;GetClip("emotion",3);}
+ public void BeginPointer(double x,double y){down=true;dragging=false;flying=false;travelEnd=0;downX=x;downY=y;offsetX=x-px;offsetY=y-py;var local=girl.PointFromScreen(new System.Windows.Point(x,y));grabOrigin=new System.Windows.Point(Math.Max(.1,Math.Min(.9,local.X/girl.ActualWidth)),Math.Max(.1,Math.Min(.9,local.Y/girl.ActualHeight)));vx=vy=0;trail.Clear();trail.Add(new[]{clock.Elapsed.TotalSeconds,x,y});squashStart=clock.Elapsed.TotalSeconds;squashDepth=.94;GetClip("emotion",3);}
  void OnUp(object sender,MouseButtonEventArgs e){if(!down)return;EndPointer(false);window.ReleaseMouseCapture();e.Handled=true;}
  void OnLost(object sender,MouseEventArgs e){if(down)EndPointer(true);}
  public void EndPointer(bool cancelled){
