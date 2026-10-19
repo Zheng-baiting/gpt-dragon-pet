@@ -9,8 +9,8 @@ const tools = [
   { name: 'get_gpt_pet_status', description: '查看 GPT 娘原版底座的运行状态和已导入视频数量；不读取聊天、账户或额度。',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     annotations: { readOnlyHint: true } },
-  { name: 'show_gpt_pet', description: '显示 GPT 白龙娘。preview=true 仅显示明确标记的静态角色定稿；正式模式缺视频时明确失败。',
-    inputSchema: { type: 'object', properties: { preview: { type: 'boolean', default: false } }, additionalProperties: false } },
+  { name: 'show_gpt_pet', description: '显示小只 Q 版 GPT 白龙娘，默认带眨眼呼吸和点击招手。preview=false 请求完整动作模式；缺视频时明确失败。',
+    inputSchema: { type: 'object', properties: { preview: { type: 'boolean', default: true } }, additionalProperties: false } },
   { name: 'hide_gpt_pet', description: '关闭本项目的 GPT 娘窗口，保留文件和设置。',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
 ];
@@ -19,19 +19,19 @@ async function call(name, args) {
   if (name === 'get_gpt_pet_status') {
     const actions = await mediaStatus();
     return { preview: await status(true), pet: await status(false),
-      videos: `${actions.filter((a) => a.available).length}/${actions.length}`, previewIsStatic: true };
+      videos: `${actions.filter((a) => a.available).length}/${actions.length}`, basicAnimations: 2, previewIsStatic: false };
   }
   if (name === 'hide_gpt_pet') { await stop(); return { ok: true }; }
   if (name !== 'show_gpt_pet') throw Error('未知工具。');
   if (args.preview !== undefined && typeof args.preview !== 'boolean') throw Error('preview 必须是布尔值。');
-  const preview = args.preview === true;
+  const preview = args.preview !== false;
   const existing = await status(preview);
   if (existing) return { ok: true, preview, port: existing.port };
   if (!preview) {
     const actions = await mediaStatus();
-    if (actions.some((a) => !a.available)) throw Error('动作视频尚未齐全；当前只能用 preview=true 显示静态角色定稿。');
+    if (actions.some((a) => !a.available)) throw Error('完整动作视频尚未齐全；preview=true 可以显示已有基础动画的 Q 版 GPT 娘。');
   }
-  const child = spawn(process.execPath, [join(root, 'src/run.mjs'), ...(preview ? ['--preview'] : [])], {
+  const child = spawn(process.execPath, [join(root, 'src/run.mjs'), ...(preview ? ['--preview'] : ['--full'])], {
     cwd: root, detached: true, windowsHide: true, stdio: 'ignore',
   });
   let failed;
@@ -40,7 +40,7 @@ async function call(name, args) {
   for (let i = 0; i < 60; i++) {
     if (failed) throw failed;
     const current = await status(preview);
-    if (current) return { ok: true, preview, port: current.port, message: preview ? '静态角色定稿预览；动作视频待制作。' : '正式动画模式。' };
+    if (current) return { ok: true, preview, port: current.port, message: preview ? 'Q 版基础动画：眨眼呼吸、点击招手；完整动作视频待制作。' : '完整动作模式。' };
     await new Promise((resolve) => setTimeout(resolve, 250));
   }
   throw Error('桌宠尚未就绪。请执行 npm run runtime:install，并检查 .runtime 中的 engine.log。');
@@ -55,7 +55,7 @@ for await (const line of input) {
     let result;
     if (request.method === 'initialize') result = {
       protocolVersion: request.params?.protocolVersion || '2025-03-26',
-      capabilities: { tools: {} }, serverInfo: { name: 'gpt-dragon-pet', version: '2.0.0' },
+      capabilities: { tools: {} }, serverInfo: { name: 'gpt-dragon-pet', version: '2.1.0' },
     };
     else if (request.method === 'ping') result = {};
     else if (request.method === 'tools/list') result = { tools };

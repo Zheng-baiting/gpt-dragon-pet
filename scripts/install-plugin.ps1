@@ -19,4 +19,4 @@ if($CheckOnly){Write-Output 'Thin plugin package verified: 3 files.';return}
 if($LASTEXITCODE-ne 0){throw 'Could not register this project marketplace.'}
 & $codex plugin add 'gpt-dragon-pet@gpt-dragon-local' --json
 if($LASTEXITCODE-ne 0){throw 'Could not install the GPT pet plugin.'}
-Write-Output 'GPT pet plugin installed. Static preview is opt-in; production videos are not yet available.'
+Write-Output 'GPT pet plugin installed. The chibi basic animation is ready; the complete motion pack is not yet available.'

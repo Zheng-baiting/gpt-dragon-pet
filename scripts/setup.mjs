@@ -20,19 +20,20 @@ config.whisperImageEnabled = false;
 config.chatImageEnabled = false;
 config.font = { family: 'yahei', size: 21, followPet: true };
 config.pets = [{
-  id: 'gpt', name: 'GPT 白龙娘', size: 640, display: 'desktop',
+  id: 'gpt', name: 'GPT 白龙娘', size: 462, display: 'desktop',
   balanceEnabled: false, whisperEnabled: false, workStatusEnabled: false,
   fixedEnabled: false, position: { corner: 'bottom-right', marginX: 40, marginY: 28 },
 }];
 const preview = structuredClone(config);
-const still = '角色定稿（静态预览）';
-preview.pets[0].name += ' · 静态定稿预览';
+const idle = 'Q版-眨眼呼吸';
+const wave = 'Q版-点击招手';
+preview.pets[0].name += ' · Q版基础动画';
 preview.pets[0].fixedEnabled = true;
 preview.animations = {
-  idle: [still], turn: [still], drag: [still], clicks: [still],
+  idle: [idle], turn: [], drag: [], clicks: [wave],
   moves: { default: original.animations.moves.default, actions: [] },
   categories: [],
-  events: { balance: Array(6).fill(still), whisper: [still], workStatus: Array(6).fill(still) },
+  events: { balance: [idle] },
 };
 preview.animationWeights = { idle: 100, turn: 0, move: 0 };
 const sources = animationNames(original);

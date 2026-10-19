@@ -94,6 +94,25 @@ try {
   await evaluate('document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true })); true');
   const cleanImage = await send('Page.captureScreenshot', { format: 'png' });
   await writeFile(join(root, 'work/native-preview.png'), Buffer.from(cleanImage.data, 'base64'));
+  await pause(250);
+  await evaluate('document.querySelector(".pet-hit").click(); true');
+  let playedWave = false;
+  for (let i = 0; i < 30; i++) {
+    playedWave = await evaluate('sprites[0].anim === "Q版-点击招手"');
+    if (playedWave) break;
+    await pause(100);
+  }
+  assert(playedWave, 'Click did not play the chibi wave clip.');
+  await pause(800);
+  const waveImage = await send('Page.captureScreenshot', { format: 'png' });
+  await writeFile(join(root, 'work/native-wave.png'), Buffer.from(waveImage.data, 'base64'));
+  let returnedToIdle = false;
+  for (let i = 0; i < 45; i++) {
+    returnedToIdle = await evaluate('sprites[0].anim === "Q版-眨眼呼吸"');
+    if (returnedToIdle) break;
+    await pause(100);
+  }
+  assert(returnedToIdle, 'Wave did not return to blinking idle.');
   const frameTiming = await evaluate(`new Promise(resolve => {
     const frames = []; let last; function tick(now) {
       if (last !== undefined) frames.push(now - last); last = now;
@@ -101,10 +120,10 @@ try {
       else { const sorted = frames.toSorted((a,b) => a-b); resolve({ medianMs: sorted[60], p95Ms: sorted[114] }); }
     } requestAnimationFrame(tick);
   })`);
-  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: true, dump, frameTiming };
+  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, playedWave, returnedToIdle, dump, frameTiming };
   await writeFile(join(root, 'work/smoke-report.json'), json(report));
   console.log(JSON.stringify({ ok: true, releaseKeptPosition: dump.releaseKeptPosition,
-    interactiveFlip: dump.interactiveFlip, menu: dump.menuSmoke, frameTiming }, null, 2));
+    interactiveFlip: dump.interactiveFlip, menu: dump.menuSmoke, playedWave, returnedToIdle, frameTiming }, null, 2));
 } finally {
   socket?.close();
   await stop();

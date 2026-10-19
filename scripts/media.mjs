@@ -32,17 +32,6 @@ export async function mediaStatus() {
   }));
 }
 
-export async function encodePreview() {
-  await mkdir(runtime, { recursive: true });
-  const output = join(runtime, 'reference-preview.webm');
-  runVideo(['-y', '-loop', '1', '-i', join(root, 'assets/gpt-reference.png'),
-    '-t', '2', '-r', '24', '-vf', 'scale=640:360,format=yuva420p',
-    '-an', '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-b:v', '0', '-lossless', '1',
-    '-row-mt', '1', '-threads', '2', '-auto-alt-ref', '0', output]);
-  assertAlpha(output);
-  return output;
-}
-
 export async function importVideo(name, input, chroma) {
   const actions = await mediaStatus();
   const action = actions.find((a) => a.name === name);
@@ -82,10 +71,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const actions = await mediaStatus();
       for (const a of actions) console.log(`${a.available ? '已导入' : '待制作'}  ${a.name}`);
       console.log(`\n${actions.filter((a) => a.available).length}/${actions.length} 段正式动作视频已导入。`);
-    } else if (command === 'preview') console.log(await encodePreview());
-    else if (command === 'import' && name && input && (!flag || flag === '--chroma')) {
+    } else if (command === 'import' && name && input && (!flag || flag === '--chroma')) {
       if (flag && !chroma) throw Error('--chroma 缺少颜色值。');
       console.log('已导入：' + await importVideo(name, input, chroma));
-    } else throw Error('用法：media.mjs list | preview | import <动作名> <视频路径> [--chroma 0x00FF00]');
+    } else throw Error('用法：media.mjs list | import <动作名> <视频路径> [--chroma 0x00FF00]');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

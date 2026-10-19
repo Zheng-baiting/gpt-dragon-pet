@@ -62,7 +62,7 @@ if (process.env.GPT_PET_DEBUG_PORT) {
   const data = join(base, 'data/dsh-pet/main-animation/webm');
   await mkdir(data, { recursive: true });
   if (preview) {
-    await cp(join(runtime, 'reference-preview.webm'), join(data, '角色定稿（静态预览）.webm'));
+    await cp(join(root, 'assets/basic'), data, { recursive: true });
   } else {
     await cp(join(root, 'assets/webm'), data, { recursive: true });
   }

@@ -1,23 +1,20 @@
 import { spawn } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
 import { createServer } from 'node:net';
-import { mkdir, writeFile, access } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { root, runtime, json } from './paths.mjs';
+import { root, json } from './paths.mjs';
 import { status } from './control.mjs';
 import { installElectron, prepareEngine } from './engine.mjs';
-import { encodePreview, mediaStatus } from '../scripts/media.mjs';
+import { mediaStatus } from '../scripts/media.mjs';
 
-const preview = process.argv.includes('--preview');
+const preview = !process.argv.includes('--full');
 try {
   if (await status(preview)) { console.log('本模式的 GPT 娘已在运行。'); process.exit(0); }
   if (!preview) {
     const actions = await mediaStatus();
     const missing = actions.filter((a) => !a.available);
-    if (missing.length) throw Error(`还缺 ${missing.length}/${actions.length} 段正式动作视频。用 npm run media:list 查看；npm run preview 可查看静态定稿。`);
-  } else {
-    try { await access(join(runtime, 'reference-preview.webm')); }
-    catch { await encodePreview(); }
+    if (missing.length) throw Error(`还缺 ${missing.length}/${actions.length} 段完整动作视频。用 npm run media:list 查看；npm start 可以运行已有基础动画的 Q 版。`);
   }
   await installElectron();
   const { base, engine, env } = await prepareEngine(preview);

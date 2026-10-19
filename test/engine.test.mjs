@@ -7,14 +7,15 @@ import { spawnSync } from 'node:child_process';
 import { root, upstream, animationNames } from '../src/paths.mjs';
 import { runVideo, assertAlpha } from '../scripts/media.mjs';
 
-test('all original menu actions are mapped once; preview is explicitly static', async () => {
+test('all original menu actions are mapped once; basic preview uses real clips', async () => {
   const config = JSON.parse(await readFile(join(root, 'config/gpt.json'), 'utf8'));
   const actions = JSON.parse(await readFile(join(root, 'assets/actions.json'), 'utf8'));
   assert.equal(actions.length, 106);
   assert.deepEqual(animationNames(config), actions.map((a) => a.name).sort());
   const preview = JSON.parse(await readFile(join(root, 'config/preview.json'), 'utf8'));
-  assert.match(preview.pets[0].name, /静态定稿预览/);
-  assert.deepEqual(animationNames(preview), ['角色定稿（静态预览）']);
+  assert.match(preview.pets[0].name, /Q版基础动画/);
+  assert.equal(preview.pets[0].size, 462);
+  assert.deepEqual(animationNames(preview), ['Q版-点击招手', 'Q版-眨眼呼吸']);
   const context = { window: {} };
   vm.runInNewContext(await readFile(join(upstream, 'runtime/electron-helper/shared-core.js'), 'utf8'), context);
   const tree = context.PetShared.buildMenuTree(config.animations);
@@ -30,14 +31,20 @@ test('transparent VP9 decodes correctly and opaque video is rejected', async () 
   runVideo(['-y', '-f', 'lavfi', '-i', 'color=white:size=64x36:rate=1', '-t', '1',
     '-c:v', 'libvpx-vp9', '-threads', '1', opaque]);
   assert.throws(() => assertAlpha(opaque));
-  assertAlpha(join(root, '.runtime/reference-preview.webm'));
+  for (const name of ['Q版-眨眼呼吸', 'Q版-点击招手']) {
+    const file = join(root, 'assets/basic', name + '.webm');
+    assertAlpha(file);
+    const hashes = runVideo(['-c:v', 'libvpx-vp9', '-i', file, '-an', '-f', 'framemd5', '-']).stdout
+      .split('\n').filter((line) => line && !line.startsWith('#')).map((line) => line.split(',').at(-1).trim());
+    assert(new Set(hashes).size > 10, 'Each basic clip must contain changing character frames.');
+  }
 });
 
 test('MCP initialization does not start a pet; unfinished production returns an error', () => {
   const messages = [
     { jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-03-26' } },
     { jsonrpc: '2.0', id: 2, method: 'tools/list' },
-    { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'show_gpt_pet', arguments: {} } },
+    { jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'show_gpt_pet', arguments: { preview: false } } },
   ];
   const result = spawnSync(process.execPath, [join(root, 'src/plugin.mjs')], {
     input: messages.map(JSON.stringify).join('\n') + '\n', encoding: 'utf8', windowsHide: true,

@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Q版-眨眼呼吸",
+    "file": "Q版-眨眼呼吸.webm",
+    "frames": 135,
+    "fps": 30,
+    "duration": 4.5
+  },
+  {
+    "name": "Q版-点击招手",
+    "file": "Q版-点击招手.webm",
+    "frames": 72,
+    "fps": 30,
+    "duration": 2.4
+  }
+]

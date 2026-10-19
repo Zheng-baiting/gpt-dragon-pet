@@ -1,16 +1,16 @@
 {
   "name": "gpt-dragon-pet",
-  "version": "2.0.0",
-  "description": "使用 dsh-pet 原版底座的 GPT 白龙娘。当前提供静态定稿预览，正式动作视频待导入。",
+  "version": "2.1.0",
+  "description": "使用 dsh-pet 原版底座的小只 Q 版 GPT 白龙娘，已有眨眼呼吸和点击招手。完整动作视频待导入。",
   "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "GPT 龙娘 · 鲸鱼底座",
-    "shortDescription": "原版菜单与拖动，GPT 白龙娘角色；当前为静态定稿预览。",
-    "longDescription": "透明桌面角色，使用 dsh-pet 原版 Electron 渲染、菜单、点击与拖动系统。静态定稿预览需主动调用；正式模式须先导入动作视频。启动时不会自动显示静态预览，不读取聊天或账户。",
+    "shortDescription": "小只 Q 版 GPT 娘，眨眼呼吸与点击招手，原版菜单与拖动。",
+    "longDescription": "透明 Q 版桌面角色，使用 dsh-pet 原版 Electron 渲染、菜单、点击与拖动系统。默认显示已有基础动画的 Q 版；完整动作模式须先导入视频。插件加载不会自动弹出角色，不读取聊天或账户。",
     "developerName": "Zheng-baiting",
     "category": "Productivity",
     "capabilities": ["Interactive"],
-    "defaultPrompt": ["显示 GPT 娘静态定稿预览", "查看 GPT 娘动作素材状态"],
+    "defaultPrompt": ["显示 Q 版 GPT 娘", "查看 GPT 娘动作素材状态"],
     "brandColor": "#B7A1D5",
     "composerIcon": "./assets/gpt-reference.png",
     "logo": "./assets/gpt-reference.png"

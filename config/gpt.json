@@ -57,7 +57,7 @@
     {
       "id": "gpt",
       "name": "GPT 白龙娘",
-      "size": 640,
+      "size": 462,
       "display": "desktop",
       "balanceEnabled": false,
       "whisperEnabled": false,
