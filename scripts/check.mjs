@@ -20,8 +20,15 @@ for (const preview of [true, false]) {
   assert.equal(merged.main.pets[0].balanceEnabled, false);
   assert.equal(merged.main.pets[0].whisperEnabled, false);
   assert.equal(merged.main.notificationsEnabled, false);
-  assert.deepEqual(animationNames(merged.main), preview ? ['Q版-点击招手', previewIdle].sort() : actions.map((a) => a.name).sort());
-  if (preview) await access(join(base, 'data/dsh-pet/main-animation/webm', previewIdle + '.webm'));
+  const names = animationNames(merged.main);
+  if (preview) {
+    const allowed = new Set(['Q版-点击招手', 'Q版-眨眼呼吸', ...actions.filter(action => action.available).map(action => action.name)]);
+    for (const name of names) {
+      assert(allowed.has(name), `Preview references an unfinished action: ${name}`);
+      await access(join(base, 'data/dsh-pet/main-animation/webm', name + '.webm'));
+    }
+    assert.equal(merged.main.animations.idle[0], previewIdle);
+  } else assert.deepEqual(names, actions.map(action => action.name).sort());
   const source = await readFile(join(engine, 'runtime/electron-helper/main.js'), 'utf8');
   assert(source.includes('skipTaskbar: true'));
   assert(source.includes("app.setPath('userData', path.join(gptProfile, 'profile'))"));

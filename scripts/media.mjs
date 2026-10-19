@@ -49,14 +49,16 @@ async function actionFor(name) {
   return action;
 }
 
-export async function processVideo(name, input, chroma) {
+export async function processVideo(name, input, chroma, region) {
   await actionFor(name);
   if (chroma && !/^0x00ff00$/i.test(chroma)) throw Error('原项目 HSV 抠像入口只接受绿幕；其他背景请先手工抠像导出透明 MOV。');
   input = resolve(input);
   await access(input);
   const python = process.env.GPT_PET_PYTHON;
   if (!python) throw Error('制作流程需要已有 Python；请仅在当前进程设置 GPT_PET_PYTHON 为其可执行文件路径。');
-  const result = spawnSync(python, [join(root, 'scripts/pipeline.py'), 'process', name, input, ...(chroma ? ['--green'] : [])],
+  if (region && (region.length !== 4 || !region.every(Number.isInteger))) throw Error('--region 须为 x,y,width,height 四个整数。');
+  const result = spawnSync(python, [join(root, 'scripts/pipeline.py'), 'process', name, input,
+    ...(chroma ? ['--green'] : []), ...(region ? ['--region', ...region.map(String)] : [])],
     { cwd: root, env: { ...process.env, PYTHONUTF8: '1' }, windowsHide: true, encoding: 'utf8', maxBuffer: 8*1024*1024 });
   if (result.error || result.status !== 0) throw Error(result.stderr?.slice(-2400) || '素材处理未完成。');
   return JSON.parse(result.stdout.trim());
@@ -84,16 +86,21 @@ export async function importVideo(name, input) {
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   try {
-    const [command, name, input, flag, chroma] = process.argv.slice(2);
+    const [command, name, input, ...options] = process.argv.slice(2);
     if (command === 'list') {
       const actions = await mediaStatus();
       for (const a of actions) console.log(`${a.available ? '已导入' : '待制作'}  ${a.name}`);
       console.log(`\n${actions.filter((a) => a.available).length}/${actions.length} 段正式动作视频已导入。`);
-    } else if (command === 'process' && name && input && (!flag || flag === '--chroma')) {
-      if (flag && !chroma) throw Error('--chroma 缺少颜色值。');
-      console.log(JSON.stringify(await processVideo(name, input, chroma), null, 2));
-    } else if (command === 'import' && name && input && !flag) {
+    } else if (command === 'process' && name && input) {
+      const flags = new Map();
+      for (let i = 0; i < options.length; i += 2) {
+        if (!['--chroma', '--region'].includes(options[i]) || !options[i+1] || flags.has(options[i])) throw Error('制作选项为 --chroma <颜色> 和 --region <x,y,width,height>，各使用一次。');
+        flags.set(options[i], options[i+1]);
+      }
+      const region = flags.get('--region')?.split(',').map(Number);
+      console.log(JSON.stringify(await processVideo(name, input, flags.get('--chroma'), region), null, 2));
+    } else if (command === 'import' && name && input && !options.length) {
       console.log('已导入：' + await importVideo(name, input));
-    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] | import <动作名> <已检查的120fps视频>');
+    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] [--region x,y,width,height] | import <动作名> <已检查的120fps视频>');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

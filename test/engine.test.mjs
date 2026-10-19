@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { root, upstream, animationNames } from '../src/paths.mjs';
 import { runVideo, assertAlpha } from '../scripts/media.mjs';
 import { recipes } from '../scripts/recipes.mjs';
+import { configurePreview } from '../src/preview-config.mjs';
 
 test('all 106 recipes retain the upstream action timing with the GPT character identity', async () => {
   const all = await recipes();
@@ -67,6 +68,25 @@ test('transparent clips decode at 120 fps with changing in-between frames; opaqu
     assert.equal(entry.frames, frames);
     assert.equal(entry.duration, frames / 120);
   }
+});
+
+test('preview activates completed interactions without referencing missing clips or shifting event tiers', async () => {
+  const base = JSON.parse(await readFile(join(root, 'config/preview.json'), 'utf8'));
+  const full = JSON.parse(await readFile(join(root, 'config/gpt.json'), 'utf8'));
+  const subset = ['待机呼吸休闲', '被鼠标拖拽悬空反馈', '点击回应-害羞惊讶', '工作状态-忙碌点按'];
+  const partial = configurePreview(base, full, subset);
+  assert.deepEqual(partial.animations.drag, ['被鼠标拖拽悬空反馈']);
+  assert.deepEqual(partial.animations.clicks, ['点击回应-害羞惊讶']);
+  assert.deepEqual(partial.animations.idle, ['待机呼吸休闲']);
+  assert.equal(partial.animations.events.workStatus, undefined);
+  assert(!partial.animations.events.balance.includes('待机呼吸休闲'));
+  const allowed = new Set([...subset, 'Q版-眨眼呼吸']);
+  assert(animationNames(partial).every(name => allowed.has(name)));
+  const complete = configurePreview(base, full, animationNames(full));
+  assert.deepEqual(complete.animations, full.animations);
+  assert.deepEqual(complete.animationWeights, full.animationWeights);
+  assert.deepEqual(complete.animations.events.workStatus, full.animations.events.workStatus);
+  assert.deepEqual(base.animations.drag, []);
 });
 
 test('import preserves the 120 fps file exactly and refuses to overwrite an action', async () => {

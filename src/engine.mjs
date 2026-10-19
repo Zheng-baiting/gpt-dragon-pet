@@ -5,6 +5,7 @@ import { downloadArtifact } from '@electron/get';
 import extract from '@electron-internal/extract-zip';
 import { root, upstream, runtime, profile, json } from './paths.mjs';
 import { mediaStatus } from '../scripts/media.mjs';
+import { configurePreview } from './preview-config.mjs';
 
 export const electronPath = join(runtime, 'electron', process.platform === 'win32' ? 'electron.exe' : 'electron');
 
@@ -58,18 +59,15 @@ if (process.env.GPT_PET_DEBUG_PORT) {
   app.commandLine.appendSwitch('remote-debugging-port', process.env.GPT_PET_DEBUG_PORT);
 }`;
   await writeFile(helper, text.replace(marker, isolation));
-  const config = JSON.parse(await readFile(join(root, preview ? 'config/preview.json' : 'config/gpt.json'), 'utf8'));
+  let config = JSON.parse(await readFile(join(root, preview ? 'config/preview.json' : 'config/gpt.json'), 'utf8'));
   const data = join(base, 'data/dsh-pet/main-animation/webm');
   await mkdir(data, { recursive: true });
   if (preview) {
     await cp(join(root, 'assets/basic'), data, { recursive: true });
-    const idle = (await mediaStatus()).find(action => action.name === '待机呼吸休闲' && action.available);
-    if (idle) {
-      await cp(join(root, 'assets/webm', idle.file), join(data, idle.file));
-      config.animations.idle = [idle.name];
-      config.animations.events.balance = [idle.name];
-      config.pets[0].name = 'GPT 白龙娘 · Q版动作预览';
-    }
+    const completed = (await mediaStatus()).filter(action => action.available);
+    const full = JSON.parse(await readFile(join(root, 'config/gpt.json'), 'utf8'));
+    config = configurePreview(config, full, completed.map(action => action.name));
+    for (const action of completed) await cp(join(root, 'assets/webm', action.file), join(data, action.file));
   } else {
     await cp(join(root, 'assets/webm'), data, { recursive: true });
   }

@@ -115,6 +115,7 @@ try {
   assert(ready, 'Original renderer did not load the reference preview video.');
   const previewConfig = JSON.parse(await readFile(join(root, '.runtime/preview/engine/assets/config.jsonc'), 'utf8'));
   const idleAnimation = previewConfig.animations.idle[0];
+  const clickAnimations = previewConfig.animations.clicks;
   const main = await readFile(join(upstream, 'runtime/electron-helper/main.js'), 'utf8');
   const marker = 'const dump = await first.webContents.executeJavaScript(`';
   const start = main.indexOf(marker);
@@ -125,13 +126,19 @@ try {
   const corrected = expression.replace(/(pointerId: 94 \}\)\);\s*window\.dispatchEvent\(new MouseEvent\('mousemove', \{)/,
     '$1 buttons: 1,');
   assert.notEqual(corrected, expression, 'Upstream synthetic drag event changed.');
-  expression = corrected;
+  expression = corrected.replace('var during = { x: d.dragPos.x, y: d.dragPos.y };',
+    'var during = { x: d.dragPos.x, y: d.dragPos.y }; var duringAnimation = sprites[0].anim;');
+  assert.notEqual(expression, corrected, 'Upstream drag observation changed.');
+  expression = expression.replace('during: during,', 'during: during, animation: duringAnimation,');
   const dump = await evaluate(expression);
   await mkdir(join(root, 'work'), { recursive: true });
   await writeFile(join(root, 'work/smoke-raw.json'), json(dump));
   assert.equal(dump.errorVisible, false);
   assert.equal(dump.sprites, 1);
   assert.equal(dump.releaseKeptPosition?.kept, true);
+  if (previewConfig.animations.drag.length) {
+    assert(previewConfig.animations.drag.includes(dump.releaseKeptPosition.animation), 'Drag did not play a configured suspended clip.');
+  }
   assert.equal(dump.interactiveFlip?.inside, true);
   assert.equal(dump.interactiveFlip?.outside, true);
   assert.equal(dump.interactiveFlip?.duringDragForced, true);
@@ -146,24 +153,24 @@ try {
   await writeFile(join(root, 'work/native-preview.png'), Buffer.from(cleanImage.data, 'base64'));
   await pause(250);
   await evaluate('document.querySelector(".pet-hit").click(); true');
-  let playedWave = false;
+  let clickedAnimation;
   for (let i = 0; i < 30; i++) {
-    playedWave = await evaluate('sprites[0].anim === "Q版-点击招手"');
-    if (playedWave) break;
+    const current = await evaluate('sprites[0].anim');
+    if (clickAnimations.includes(current)) { clickedAnimation = current; break; }
     await pause(100);
   }
-  assert(playedWave, 'Click did not play the chibi wave clip.');
+  assert(clickedAnimation, 'Click did not play a configured response.');
   await pause(100);
-  const wavePlayback = await measurePlayback(evaluate, 1800);
+  const clickPlayback = await measurePlayback(evaluate, 1800);
   const waveImage = await send('Page.captureScreenshot', { format: 'png' });
   await writeFile(join(root, 'work/native-wave.png'), Buffer.from(waveImage.data, 'base64'));
   let returnedToIdle = false;
-  for (let i = 0; i < 45; i++) {
+  for (let i = 0; i < 130; i++) {
     returnedToIdle = await evaluate(`sprites[0].anim === ${JSON.stringify(idleAnimation)}`);
     if (returnedToIdle) break;
     await pause(100);
   }
-  assert(returnedToIdle, 'Wave did not return to blinking idle.');
+  assert(returnedToIdle, 'Click response did not return to the configured idle.');
   const playback = await measurePlayback(evaluate, 3000);
   const frameTiming = await evaluate(`new Promise(resolve => {
     const frames = []; let last; function tick(now) {
@@ -172,15 +179,15 @@ try {
       else { const sorted = frames.toSorted((a,b) => a-b); resolve({ medianMs: sorted[60], p95Ms: sorted[114] }); }
     } requestAnimationFrame(tick);
   })`);
-  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, idleAnimation, playedWave, returnedToIdle, dump, frameTiming, playback, wavePlayback };
+  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, idleAnimation, clickedAnimation, returnedToIdle, dump, frameTiming, playback, clickPlayback };
   await writeFile(join(root, 'work/smoke-report.json'), json(report));
   if (process.env.GPT_PET_MIN_FPS) {
     const minimum = Number(process.env.GPT_PET_MIN_FPS);
     assert(playback.observedFPS >= minimum, `Idle playback below ${minimum} fps.`);
-    assert(wavePlayback.observedFPS >= minimum, `Wave playback below ${minimum} fps.`);
+    assert(clickPlayback.observedFPS >= minimum, `Click playback below ${minimum} fps.`);
   }
   console.log(JSON.stringify({ ok: true, releaseKeptPosition: dump.releaseKeptPosition,
-    interactiveFlip: dump.interactiveFlip, menu: dump.menuSmoke, playedWave, returnedToIdle, frameTiming, playback, wavePlayback }, null, 2));
+    interactiveFlip: dump.interactiveFlip, menu: dump.menuSmoke, clickedAnimation, returnedToIdle, frameTiming, playback, clickPlayback }, null, 2));
 } finally {
   socket?.close();
   await stop();

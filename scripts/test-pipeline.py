@@ -18,7 +18,7 @@ class PipelineTest(unittest.TestCase):
             source = folder / 'fixture.mp4'
             run([FFMPEG, '-y', '-loglevel', 'error', '-f', 'lavfi', '-i',
                  'color=0x00FF00:s=1280x720:r=24', '-vf',
-                 'drawbox=x=590:y=180:w=100:h=432:color=white:t=fill',
+                 'drawbox=x=590:y=180:w=100:h=432:color=white:t=fill,drawbox=x=20:y=20:w=20:h=20:color=white:t=fill',
                  '-t', '0.5', '-c:v', 'libx264', '-crf', '18', str(source)], check=True)
             # Isolate all fixture outputs from real generation jobs.
             from unittest.mock import patch
@@ -30,7 +30,7 @@ class PipelineTest(unittest.TestCase):
                 import shutil
                 shutil.copytree(ROOT / 'vendor/dsh-pet', folder / 'vendor/dsh-pet')
                 with contextlib.redirect_stdout(io.StringIO()):
-                    process('fixture', source, True)
+                    process('fixture', source, True, (240, 0, 800, 720))
             output = folder / 'work/pipeline/fixture/video-120fps.webm'
             metadata = info(output)
             self.assertEqual(metadata['r_frame_rate'], '120/1')
@@ -48,6 +48,7 @@ class PipelineTest(unittest.TestCase):
             report = json.loads((output.parent / 'report.json').read_text(encoding='utf-8'))
             self.assertEqual(report['frames'], 60)
             self.assertTrue(report['manualReviewRequired'])
+            self.assertEqual(report['extractionRegion'], [240, 0, 800, 720])
 
     def test_motion_has_a_new_intermediate_position(self):
         frames = []

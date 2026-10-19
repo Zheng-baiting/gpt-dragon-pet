@@ -1,0 +1,43 @@
+{
+  "name": "点击回应-害羞惊讶",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/点击回应-害羞惊讶-doubao.mp4",
+  "sourceSha256": "ba20f08b28f00f6e91feffd438f10d19f4579202a7645e2fda74f015348c6035",
+  "prompt": "assets/sources/点击回应-害羞惊讶-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/点击回应-害羞惊讶.webm",
+  "outputSha256": "de1e46f2a35a6f6f950f2a66f07995174bc43d53a45d5df68f2cada3de9cc413",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      202,
+      54,
+      442,
+      334
+    ],
+    "greenSpillFraction": 4.396452063185009e-06,
+    "loopAlphaMeanDifference": 4.114639756944444,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and processed contact sheets: consistent character, hands to cheeks, shy eyes, swaying and return to the original standing pose; no cropped parts."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

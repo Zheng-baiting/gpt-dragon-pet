@@ -156,7 +156,7 @@ def review(video, target):
     canvas.save(target)
 
 
-def process(name, source, green):
+def process(name, source, green, region=None):
     actions = json.loads((ROOT / 'assets/actions.json').read_text(encoding='utf-8'))
     if name not in {action['name'] for action in actions}:
         raise ValueError('未知动作名。')
@@ -166,6 +166,10 @@ def process(name, source, green):
         raise ValueError('原项目配方要求约 10 秒；素材时长必须在 0.2～10.2 秒内。')
     if abs(metadata['width']/metadata['height'] - 16/9) > .01:
         raise ValueError('素材必须为 16:9；请按原项目构图生成，避免拉伸角色。')
+    if region:
+        x, y, width, height = region
+        if not green or min(x, y) < 0 or min(width, height) <= 0 or x+width > metadata['width'] or y+height > metadata['height']:
+            raise ValueError('提取范围须位于绿幕源视频内部；请先检查完整动作不会被裁切。')
     folder = ROOT / 'work/pipeline' / name
     folder.mkdir(parents=True, exist_ok=True)
     keyed = folder / 'step02.webm'
@@ -175,7 +179,11 @@ def process(name, source, green):
     candidate = folder / 'video-120fps.pending.webm'
     if green:
         prepared = folder / 'step01.mp4'
-        run([FFMPEG, '-y', '-loglevel', 'error', '-i', str(source), '-vf', 'scale=1280:720,fps=24',
+        filters = []
+        if region:
+            filters.append(f'crop=w={width}:h={height}:x={x}:y={y}:exact=1,pad={metadata["width"]}:{metadata["height"]}:{x}:{y}:color=0x00FF00')
+        filters += ['scale=1280:720', 'fps=24']
+        run([FFMPEG, '-y', '-loglevel', 'error', '-i', str(source), '-vf', ','.join(filters),
              '-an', '-c:v', 'libx264', '-crf', '18', str(prepared)], check=True)
         chroma = original('chroma_step02.py')
         chroma.convert_video(prepared, keyed, chroma.sample_background_color(prepared))
@@ -208,7 +216,7 @@ def process(name, source, green):
     review(candidate, folder / 'review.png')
     report = {'name': name, 'upstream': 'dsh-pet@0.3.7', 'sourceFPS': 24, 'fps': 120, 'frames': frames,
               'duration': info(candidate)['duration'], 'standing': standing, 'contentUnion': union,
-              'scale': scale, 'greenEdgeDespill': green, 'manualReviewRequired': True}
+              'scale': scale, 'extractionRegion': region, 'greenEdgeDespill': green, 'manualReviewRequired': True}
     candidate.replace(final)
     (folder / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({'video': str(final), 'review': str(folder / 'review.png'), **report}, ensure_ascii=False))
@@ -222,12 +230,13 @@ if __name__ == '__main__':
     media.add_argument('name')
     media.add_argument('source')
     media.add_argument('--green', action='store_true')
+    media.add_argument('--region', type=int, nargs=4, metavar=('X', 'Y', 'WIDTH', 'HEIGHT'))
     args = parser.parse_args()
     try:
         if args.command == 'reference':
             reference()
         else:
-            process(args.name, args.source, args.green)
+            process(args.name, args.source, args.green, args.region)
     except (ValueError, RuntimeError, subprocess.CalledProcessError) as error:
         print(str(error), file=sys.stderr)
         raise SystemExit(1)

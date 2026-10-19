@@ -14,7 +14,7 @@ try {
   if (!preview) {
     const actions = await mediaStatus();
     const missing = actions.filter((a) => !a.available);
-    if (missing.length) throw Error(`还缺 ${missing.length}/${actions.length} 段完整动作视频。用 npm run media:list 查看；npm start 可以运行已有基础动画的 Q 版。`);
+    if (missing.length) throw Error(`还缺 ${missing.length}/${actions.length} 段完整动作视频。用 npm run media:list 查看；npm start 可以运行已完成动作的 Q 版预览。`);
   }
   await installElectron();
   const { base, engine, env } = await prepareEngine(preview);
