@@ -15,12 +15,16 @@ test('host coordinates all actions without per-frame IPC, preserves sleep and se
  const messages=[];let errors='';child.stderr.on('data',s=>errors+=s);const lines=readline.createInterface({input:child.stdout});lines.on('line',s=>messages.push(JSON.parse(s)));
  const send=value=>child.stdin.write(JSON.stringify(value)+'\n');
  async function until(predicate,after=0){for(let i=0;i<200;i++){const value=messages.slice(after).find(predicate);if(value)return value;if(child.exitCode!==null)throw Error(errors||'Host stopped early');await delay(15);}throw Error('IPC timeout: '+errors);}
- async function command(value,predicate){const after=messages.length;send(value);return until(predicate,after);}
+ async function command(value,predicate){const after=messages.length,serial=messages.filter(m=>m.type==='view').at(-1)?.serial??-1;send(value);return until(m=>predicate(m)&&(!['action','interaction'].includes(value.type)||m.serial>serial),after);}
  try{
   await until(m=>m.type==='view');
   const prefs=await command({type:'preferences',patch:{size:999,sessionFile:'not-permitted',alwaysOnTop:false}},m=>m.type==='view'&&m.preferences.size===340);
   assert.equal(prefs.preferences.sessionFile,null);assert.equal(prefs.preferences.alwaysOnTop,false);
   await command({type:'session',file:selected},m=>m.type==='view'&&m.connection.connected&&m.state==='thinking');
+  const burstAt=messages.length;
+  await fs.appendFile(selected,JSON.stringify({timestamp:new Date().toISOString(),type:'response_item',payload:{type:'function_call',name:'exec_command'}})+'\n');
+  await delay(300);assert.equal(messages.slice(burstAt).some(m=>m.type==='view'&&m.state==='working'),false,'short tool bursts must not restart a pose immediately');
+  await until(m=>m.type==='view'&&m.state==='working',burstAt);
   await command({type:'action',name:'sleep'},m=>m.type==='view'&&m.state==='sleep');
   await fs.appendFile(selected,JSON.stringify({timestamp:new Date().toISOString(),type:'event_msg',payload:{type:'task_complete'}})+'\n');
   await delay(1200);assert.equal(messages.filter(m=>m.type==='view').at(-1).state,'sleep');

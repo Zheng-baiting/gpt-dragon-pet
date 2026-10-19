@@ -14,7 +14,7 @@
 
 `assets/reference.png` 是此前 GPT-Niang 挂件中生成的白龙娘参考胸像；角色来源参考 [T7moris/GPT-Niang](https://github.com/T7moris/GPT-Niang)，不是声称该文件是上游仓库原图。
 
-原素材声明保留在 `assets/CHARACTER-NOTICE.txt`。`atlas.png`、`walk.png` 和 `motion/*.png` 使用内置 OpenAI ImageGen，以公开角色图为参考生成；它们及含角色的界面截图继续按来源声明的非商业范围展示和分发。图片、角色设计及相关第三方权利不因本项目代码采用 MIT 而重新授权。
+原素材声明保留在 `assets/CHARACTER-NOTICE.txt`。`atlas.png`、`walk.png`、`motion/*.png` 和 `source-idle.png` 使用内置 OpenAI ImageGen，以公开角色图为参考生成；`animation/*.png` 为获用户同意后进行本地清理、对齐与补帧的派生素材。它们及含角色的界面截图、动画预览继续按来源声明的非商业范围展示和分发。图片、角色设计及相关第三方权利不因本项目代码采用 MIT 而重新授权。
 
 Windows 透明窗口的逐像素命中、不抢焦点处理，以及 Codex 桌面主窗口的筛选条件参考并改写自 GPT-Niang 的 WPF 与 supervisor 实现。其代码采用 MIT，Copyright © 2026 T7moris、GPT-Niang contributors，许可保留在 `vendor/GPT-Niang-LICENSE.txt`。
 
@@ -30,3 +30,5 @@ Windows 透明窗口的逐像素命中、不抢焦点处理，以及 Codex 桌�
 - [Yang-huai406/Codex-Whale-Public](https://github.com/Yang-huai406/Codex-Whale-Public)：预加载运行时与自动跟随 Codex 的启动方式。
 
 本项目不打包第三方运行时；WPF 使用 Windows 随附组件，Node.js 由使用者自行安装。
+
+素材开发流程使用 OpenCV DIS optical flow、Pillow 和 NumPy，版本见 `scripts/requirements-motion.txt`。这些开发依赖及其缓存不随桌宠运行文件发布；最终 PNG 不需要这些库即可播放。算法接口参考 [OpenCV 文档](https://docs.opencv.org/4.x/de/d4f/classcv_1_1DISOpticalFlow.html)。

@@ -14,3 +14,8 @@ test('idle sampling respects movement and reduced-motion preferences without rep
  assert.equal(pickIdle({...DEFAULTS,reducedMotion:true},'').id,findAction('待机').id);
  assert.equal(pickIdle({...DEFAULTS,idleActions:false},'').id,findAction('待机').id);
 });
+
+test('click reactions complete once with time to return to the shared neutral pose',()=>{
+ for(const action of ACTIONS.filter(a=>a.category==='点击回应'))assert.ok(action.duration>1&&action.duration<3.5,action.id);
+ assert.ok(findAction('待机').duration>6);
+});

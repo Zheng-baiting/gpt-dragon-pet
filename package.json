@@ -1,6 +1,6 @@
 {
   "name": "gpt-dragon-pet",
-  "version": "0.2.1",
+  "version": "1.0.1",
   "description": "A white dragon companion for your coding desk, inspired by dsh-pet.",
   "private": true,
   "type": "module",

@@ -78,18 +78,41 @@ public sealed class DragonFollower : IDisposable {
 public sealed class DragonFrame {
  public BitmapSource Image; public byte[] Pixels; public int Width,Height;
  public DragonFrame(BitmapSource bitmap) { Image=bitmap; Width=bitmap.PixelWidth; Height=bitmap.PixelHeight;
-  var alpha=new FormatConvertedBitmap(bitmap,PixelFormats.Bgra32,null,0); Pixels=new byte[Width*Height*4];alpha.CopyPixels(Pixels,Width*4,0); }
+  var alpha=new FormatConvertedBitmap(bitmap,PixelFormats.Bgra32,null,0);var rgba=new byte[Width*Height*4];alpha.CopyPixels(rgba,Width*4,0);Pixels=new byte[Width*Height];for(int i=0;i<Pixels.Length;i++)Pixels[i]=rgba[i*4+3]; }
+}
+public sealed class DragonClip {
+ public readonly string File;public readonly int Width,Height,Columns,Steps,Keys;public readonly double[] Times;public readonly double Entry,Exit;public readonly bool Settle;
+ public DragonFrame[] Frames;public double Cycle {get{return Times.Sum();}}public int Count {get{return Steps*(Keys+2);}}
+ public DragonClip(string[] value,string root){
+  if(value.Length!=11||Path.GetFileName(value[1])!=value[1])throw new InvalidDataException("Invalid motion index.");
+  File=Path.Combine(root,"assets","animation",value[1]);Width=int.Parse(value[2]);Height=int.Parse(value[3]);Columns=int.Parse(value[4]);Steps=int.Parse(value[5]);Keys=int.Parse(value[6]);Times=value[7].Split(',').Select(x=>double.Parse(x,CultureInfo.InvariantCulture)).ToArray();Entry=double.Parse(value[8],CultureInfo.InvariantCulture);Exit=double.Parse(value[9],CultureInfo.InvariantCulture);Settle=value[10]=="1";
+  if(Width<32||Width>512||Height<32||Height>768||Columns<1||Columns>16||Steps<2||Steps>24||Keys<2||Keys>16||Times.Length!=Keys||Times.Any(x=>x<=0||x>10)||Entry<=0||Exit<=0)throw new InvalidDataException("Invalid motion geometry.");
+ }
+ public void Load(){
+  if(Frames!=null)return;var bitmap=new BitmapImage();bitmap.BeginInit();bitmap.CacheOption=BitmapCacheOption.OnLoad;bitmap.UriSource=new Uri(File);bitmap.EndInit();bitmap.Freeze();
+  if(bitmap.PixelWidth!=Width*Columns||bitmap.PixelHeight!=Height*(int)Math.Ceiling(Count/(double)Columns))throw new InvalidDataException("Motion atlas does not match index.");
+  Frames=new DragonFrame[Count];for(int i=0;i<Count;i++){var crop=new CroppedBitmap(bitmap,new Int32Rect(i%Columns*Width,i/Columns*Height,Width,Height));crop.Freeze();Frames[i]=new DragonFrame(crop);}
+ }
+ public DragonFrame At(double elapsed,bool loop,bool reduced){
+  if(reduced)return Frames[Steps];
+  if(elapsed<Entry)return Frames[Math.Min(Steps-1,(int)(Math.Max(0,elapsed)/Entry*Steps))];
+  double t=elapsed-Entry,cycle=loop?Cycle:Cycle-Times[Keys-1];
+  if(loop)t%=cycle;
+  else if(t>=cycle)return Frames[Steps*(Keys+1)+Math.Min(Steps-1,(int)((t-cycle)/Exit*Steps))];
+  for(int k=0;k<Keys;k++){if(t<Times[k])return Frames[Steps+k*Steps+Math.Min(Steps-1,(int)(t/Times[k]*Steps))];t-=Times[k];}
+  return Frames[Count-1];
+ }
 }
 public sealed class DragonAnimator : IDisposable {
- readonly Window window; readonly Image girl,previous; readonly DragonEffects effects; readonly Border bubble; readonly IntPtr hwnd;
+ readonly Window window;readonly Canvas canvas; readonly Image girl,previous; readonly DragonEffects effects; readonly Border bubble; readonly IntPtr hwnd;
  readonly ScaleTransform scale=new ScaleTransform(); readonly RotateTransform rotate=new RotateTransform(); readonly TranslateTransform translate=new TranslateTransform();
- readonly Dictionary<string,DragonFrame[]> sheets=new Dictionary<string,DragonFrame[]>(); readonly Queue<string> events=new Queue<string>();
+ readonly Dictionary<string,DragonClip> clips=new Dictionary<string,DragonClip>();readonly List<string> clipCache=new List<string>(); readonly Queue<string> events=new Queue<string>();
  readonly Stopwatch clock=Stopwatch.StartNew(); readonly List<double[]> trail=new List<double[]>(); readonly List<double> frameTimes=new List<double>();
  System.Windows.Forms.Screen[] screens; DragonFrame current; string sheet="core",motion="idle",prop=""; int row,lastX=int.MinValue,lastY=int.MinValue;
- double started,lastRender,fadeStart,squashStart=-100,squashDepth=.82,px,py,vx,vy,offsetX,offsetY,downX,downY,travelEnd,actualWidth=300,actualHeight=401;
+ double started,lastRender,fadeStart,squashStart=-100,squashDepth=.82,px,py,vx,vy,offsetX,offsetY,downX,downY,travelEnd,actualWidth=300,actualHeight=401,dragStarted,lean,leanVelocity,duration=10;System.Windows.Point grabOrigin=new System.Windows.Point(.5,.3);
  bool positioned,down,dragging,flying,transparent,disposed; int facing=1;
  public bool Reduced {get;set;} public bool Roam {get;set;} public double X {get{return px;}} public double Y {get{return py;}}
- public bool Busy {get{return down||flying;}} public int FrameCount {get{return sheets.Values.Sum(a=>a.Length);}}
+ public bool Busy {get{return down||flying;}} public int FrameCount {get{return clips.Values.Sum(a=>a.Count);}}public int CachedClipCount {get{return clipCache.Count;}}
  public double Fps {get {return frameTimes.Count>2?1000.0/frameTimes.Average():0;}}
  public double P95Ms {get {if(frameTimes.Count==0)return 0;var a=frameTimes.OrderBy(v=>v).ToArray();return a[(int)((a.Length-1)*.95)];}}
  public string[] Drain(){var a=events.ToArray();events.Clear();return a;}
@@ -97,19 +120,17 @@ public sealed class DragonAnimator : IDisposable {
  void PositionEvent(){Event("{\"type\":\"position\",\"x\":"+px.ToString("F2",CultureInfo.InvariantCulture)+",\"y\":"+py.ToString("F2",CultureInfo.InvariantCulture)+"}");}
  void Interaction(string name){Event("{\"type\":\"interaction\",\"name\":\""+name+"\"}");}
  public DragonAnimator(Window window,Canvas canvas,Image girl,Image previous,Border bubble,string root) {
-  this.window=window;this.girl=girl;this.previous=previous;this.bubble=bubble;hwnd=new WindowInteropHelper(window).EnsureHandle();
-  foreach(string name in new[]{"core","emotion","life","move"}){
-   string file=Path.Combine(root,"assets","motion",name+".png");var bitmap=new BitmapImage();bitmap.BeginInit();bitmap.CacheOption=BitmapCacheOption.OnLoad;bitmap.UriSource=new Uri(file);bitmap.EndInit();bitmap.Freeze();
-   int w=bitmap.PixelWidth/4,h=bitmap.PixelHeight/4;var frames=new DragonFrame[16];for(int i=0;i<16;i++){var crop=new CroppedBitmap(bitmap,new Int32Rect((i%4)*w,(i/4)*h,w,h));crop.Freeze();frames[i]=new DragonFrame(crop);}sheets[name]=frames;
-  }
-  current=sheets["core"][0];girl.Source=current.Image;
+  this.window=window;this.canvas=canvas;this.girl=girl;this.previous=previous;this.bubble=bubble;hwnd=new WindowInteropHelper(window).EnsureHandle();
+  foreach(string line in System.IO.File.ReadAllLines(Path.Combine(root,"assets","animation","index.tsv"))){if(string.IsNullOrWhiteSpace(line)||line.StartsWith("#"))continue;var fields=line.Split('\t');clips.Add(fields[0],new DragonClip(fields,root));}
+  current=GetClip("core",0).Frames[0];girl.Source=current.Image;GetClip("emotion",3);
   var transform=new TransformGroup();transform.Children.Add(scale);transform.Children.Add(rotate);transform.Children.Add(translate);girl.RenderTransform=transform;previous.RenderTransform=transform;girl.RenderTransformOrigin=previous.RenderTransformOrigin=new System.Windows.Point(.5,.9);
   effects=new DragonEffects();effects.IsHitTestVisible=false;canvas.Children.Add(effects);Canvas.SetLeft(effects,40);Canvas.SetTop(effects,86);
   var ex=DragonNative.GetWindowLongPtr(hwnd,-20).ToInt64()|0x08000000|0x80;DragonNative.SetWindowLongPtr(hwnd,-20,new IntPtr(ex));
   HwndSource.FromHwnd(hwnd).AddHook(Hook);RefreshGeometry();
   window.MouseLeftButtonDown+=OnDown;window.MouseLeftButtonUp+=OnUp;window.LostMouseCapture+=OnLost;window.IsVisibleChanged+=OnVisibility;CompositionTarget.Rendering+=Render;
  }
- public BitmapSource Portrait {get{return sheets["core"][0].Image;}}
+ DragonClip GetClip(string name,int index){string key=name+":"+index;var clip=clips[key];clip.Load();clipCache.Remove(key);clipCache.Add(key);while(clipCache.Count>3){string old=clipCache.First(x=>x!="emotion:3"&&x!=key);clipCache.Remove(old);clips[old].Frames=null;}return clip;}
+ public BitmapSource Portrait {get{return GetClip("core",0).Frames[0].Image;}}
  public void Resize(double size){girl.Width=previous.Width=effects.Width=size;girl.Height=previous.Height=effects.Height=Math.Round(size*4/3);window.Width=size+80;window.Height=Math.Round(size*4/3)+108;window.UpdateLayout();RefreshGeometry();}
  public void RefreshGeometry(){DragonNative.Rect r;DragonNative.GetWindowRect(hwnd,out r);actualWidth=Math.Max(1,r.Right-r.Left);actualHeight=Math.Max(1,r.Bottom-r.Top);screens=System.Windows.Forms.Screen.AllScreens;if(positioned)Clamp();}
  public void InitializePosition(double x,double y){if(positioned)return;positioned=true;if(double.IsNaN(x)||double.IsNaN(y)){Reset();return;}px=x;py=y;Clamp();MoveWindow();}
@@ -121,7 +142,7 @@ public sealed class DragonAnimator : IDisposable {
   var point=new System.Windows.Point(sx,sy);
   if(bubble.Visibility==Visibility.Visible){var b=bubble.PointFromScreen(point);if(b.X>=0&&b.Y>=0&&b.X<bubble.ActualWidth&&b.Y<bubble.ActualHeight)return true;}
   var p=girl.PointFromScreen(point);if(p.X<0||p.Y<0||p.X>=girl.ActualWidth||p.Y>=girl.ActualHeight||girl.ActualWidth<=0)return false;
-  int x=(int)(p.X/girl.ActualWidth*current.Width),y=(int)(p.Y/girl.ActualHeight*current.Height);return current.Pixels[(y*current.Width+x)*4+3]>25;
+  int x=(int)(p.X/girl.ActualWidth*current.Width),y=(int)(p.Y/girl.ActualHeight*current.Height);return current.Pixels[y*current.Width+x]>25;
  }
  IntPtr Hook(IntPtr h,int msg,IntPtr w,IntPtr l,ref bool handled){
   if(msg==0x21){handled=true;return new IntPtr(3);}
@@ -129,7 +150,7 @@ public sealed class DragonAnimator : IDisposable {
   if(msg==0x02e0||msg==0x007e)window.Dispatcher.BeginInvoke(new Action(RefreshGeometry));return IntPtr.Zero;
  }
  void OnDown(object sender,MouseButtonEventArgs e){DragonNative.Point p;DragonNative.GetCursorPos(out p);if(!Hit(p.X,p.Y))return;BeginPointer(p.X,p.Y);window.CaptureMouse();e.Handled=true;}
- public void BeginPointer(double x,double y){down=true;dragging=false;flying=false;travelEnd=0;downX=x;downY=y;offsetX=x-px;offsetY=y-py;vx=vy=0;trail.Clear();trail.Add(new[]{clock.Elapsed.TotalSeconds,x,y});squashStart=clock.Elapsed.TotalSeconds;squashDepth=.82;}
+ public void BeginPointer(double x,double y){down=true;dragging=false;flying=false;travelEnd=0;downX=x;downY=y;offsetX=x-px;offsetY=y-py;grabOrigin=new System.Windows.Point(Math.Max(.1,Math.Min(.9,(offsetX-40)/girl.Width)),Math.Max(.1,Math.Min(.9,(offsetY-86)/girl.Height)));vx=vy=0;trail.Clear();trail.Add(new[]{clock.Elapsed.TotalSeconds,x,y});squashStart=clock.Elapsed.TotalSeconds;squashDepth=.94;GetClip("emotion",3);}
  void OnUp(object sender,MouseButtonEventArgs e){if(!down)return;EndPointer(false);window.ReleaseMouseCapture();e.Handled=true;}
  void OnLost(object sender,MouseEventArgs e){if(down)EndPointer(true);}
  public void EndPointer(bool cancelled){
@@ -138,12 +159,12 @@ public sealed class DragonAnimator : IDisposable {
   dragging=false;vx=vy=0;
   var samples=trail.Where(a=>now-a[0]<=.15).ToArray();
   if(!cancelled&&!Reduced&&samples.Length>=2){var first=samples[0];var last=samples[samples.Length-1];double span=last[0]-first[0],dx=last[1]-first[1],dy=last[2]-first[2];if(span>=.02&&now-last[0]<=.15){double baseSpeed=Math.Sqrt(dx*dx+dy*dy)/span,peak=baseSpeed;for(int i=1;i<samples.Length;i++){double dt=samples[i][0]-samples[i-1][0];if(dt>=.008)peak=Math.Max(peak,Math.Sqrt(Math.Pow(samples[i][1]-samples[i-1][1],2)+Math.Pow(samples[i][2]-samples[i-1][2],2))/dt);}double speed=3600*(1-Math.Exp(-(.5*baseSpeed+.5*peak)/3600));double distance=Math.Sqrt(dx*dx+dy*dy);if(speed>=500&&distance>0){vx=dx/distance*speed;vy=dy/distance*speed;flying=true;}}}
-  if(!flying){Interaction("release");squashStart=now;squashDepth=.85;}PositionEvent();
+  if(!flying){Interaction("release");squashStart=now;squashDepth=.94;}PositionEvent();
  }
  public void Play(string sheet,int row,string motion,string prop,double duration){
-  if(!sheets.ContainsKey(sheet)||row<0||row>3)throw new ArgumentException("Unknown animation frames.");
-  this.sheet=sheet;this.row=row;this.motion=motion;this.prop=prop;started=clock.Elapsed.TotalSeconds;
-  if(motion=="turn")facing*=-1;
+  if(!clips.ContainsKey(sheet+":"+row))throw new ArgumentException("Unknown animation frames.");
+  GetClip(sheet,row);previous.Source=current.Image;previous.Opacity=Reduced?0:1;fadeStart=clock.Elapsed.TotalSeconds;
+  this.sheet=sheet;this.row=row;this.motion=motion;this.prop=prop;this.duration=duration;started=clock.Elapsed.TotalSeconds;
   if(motion=="run"||motion=="crabwalk"||motion=="float"||motion=="pace")travelEnd=Reduced?0:started+Math.Min(duration,5);else travelEnd=0;
  }
  public void Squash(){squashStart=clock.Elapsed.TotalSeconds;squashDepth=.72;}
@@ -152,19 +173,29 @@ public sealed class DragonAnimator : IDisposable {
   effects.Measure(new Size(girl.Width,girl.Height));effects.Arrange(new Rect(0,0,girl.Width,girl.Height));
   var bitmap=new RenderTargetBitmap((int)girl.Width,(int)girl.Height,96,96,PixelFormats.Pbgra32);bitmap.Render(effects);
  }
+ public void ExportPreview(string name,int clipRow,string kind,double seconds,string folder){
+  Directory.CreateDirectory(folder);Play(name,clipRow,kind,"",seconds);double origin=started;
+  for(int i=0;i<(int)(seconds*24);i++){
+   double elapsed=i/24.0;if(kind=="drag"){dragging=true;dragStarted=origin;vx=Math.Sin(elapsed*3)*450;grabOrigin=new System.Windows.Point(.5,.25);}
+   Paint(origin+elapsed,1.0/24);window.UpdateLayout();
+   var bitmap=new RenderTargetBitmap((int)window.Width,(int)window.Height,96,96,PixelFormats.Pbgra32);bitmap.Render(canvas);
+   var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using(var stream=System.IO.File.Create(Path.Combine(folder,i.ToString("D4")+".png")))encoder.Save(stream);
+  }
+  dragging=false;vx=vy=0;
+ }
  void OnVisibility(object sender,DependencyPropertyChangedEventArgs e){lastRender=0;}
  void Render(object sender,EventArgs e){
   if(disposed||!positioned)return;if(!window.IsVisible){lastRender=0;return;}double now=clock.Elapsed.TotalSeconds,raw=lastRender>0?now-lastRender:1.0/60;if(raw<.001)return;
   if(lastRender>0){frameTimes.Add(raw*1000);if(frameTimes.Count>180)frameTimes.RemoveAt(0);}lastRender=now;
   double dt=Math.Min(.05,raw);DragonNative.Point mouse;DragonNative.GetCursorPos(out mouse);
-  StepMotion(dt,now,mouse.X,mouse.Y);Paint(now);MoveWindow();
+  StepMotion(dt,now,mouse.X,mouse.Y);Paint(now,dt);MoveWindow();
   bool menu=window.ContextMenu!=null&&window.ContextMenu.IsOpen;
   bool pass=!down&&!menu&&!Hit(mouse.X,mouse.Y);if(pass!=transparent){long ex=DragonNative.GetWindowLongPtr(hwnd,-20).ToInt64();DragonNative.SetWindowLongPtr(hwnd,-20,new IntPtr(pass?ex|0x20:ex&~0x20));transparent=pass;}
  }
  void StepMotion(double dt,double now,double mouseX,double mouseY){
   if(down){
 
-   if(!dragging&&Math.Sqrt(Math.Pow(mouseX-downX,2)+Math.Pow(mouseY-downY,2))>4){dragging=true;Interaction("drag-start");}
+   if(!dragging&&Math.Sqrt(Math.Pow(mouseX-downX,2)+Math.Pow(mouseY-downY,2))>4){dragging=true;dragStarted=now;Interaction("drag-start");}
    if(dragging){trail.Add(new[]{now,mouseX,mouseY});trail.RemoveAll(sample=>now-sample[0]>.2);
     // Same damped spring equation, with tighter 60+ Hz tracking. Substeps avoid frame-spike instability.
     double remaining=dt;while(remaining>0){double step=Math.Min(1.0/120,remaining);vx+=((mouseX-offsetX-px)*680-vx*42)*step;vy+=((mouseY-offsetY-py)*680-vy*42)*step;px+=vx*step;py+=vy*step;remaining-=step;}
@@ -181,44 +212,46 @@ public sealed class DragonAnimator : IDisposable {
   if(now<travelEnd&&!Reduced){double speed=motion=="run"?95:motion=="float"?22:35;if(motion=="pace")speed*=Math.Cos((now-started)*2);px+=facing*speed*dt;var a=Area(px+actualWidth/2,py+actualHeight/2);if(px<a.Left||px+actualWidth>a.Right)facing*=-1;Clamp();}
   else if(travelEnd>0){travelEnd=0;PositionEvent();}
  }
- void Paint(double now){
+ void Paint(double now,double dt=.016){
   double t=now-started;string activeSheet=sheet;int activeRow=row;string kind=motion;
-  if(dragging||flying){activeSheet="emotion";activeRow=3;kind="drag";}
-  double frameSeconds=kind=="idle"?.95:kind=="sleep"?.85:kind=="run"?.11:kind=="type"?.32:kind=="think"?.65:.27;
-  int phase=Reduced?0:(int)(t/frameSeconds)%4;
-  if(kind=="idle")phase=(t%6.4>5.8?2:(int)(t/2.9)%2);
-  int index=activeRow*4+phase;var next=sheets[activeSheet][index];
-  if(current!=next){previous.Source=girl.Source;previous.Opacity=1;current=next;girl.Source=next.Image;fadeStart=now;}
-  double fade=Reduced?1:Math.Min(1,(now-fadeStart)/.085);girl.Opacity=fade;previous.Opacity=1-fade;
+  if(dragging||flying){activeSheet="emotion";activeRow=3;kind="drag";t=now-dragStarted;}
+  var clip=GetClip(activeSheet,activeRow);bool loop=!clip.Settle||kind=="dance"||kind=="sway"||kind=="float"||kind=="pace"||kind=="crabwalk";
+  var next=clip.At(t,loop,Reduced);if(current!=next){current=next;girl.Source=next.Image;}
+  // Only interrupted action changes use a brief overlay. Frames within a clip
+  // are already motion-compensated; fading each pair would create double edges.
+  double fade=Reduced?1:Math.Min(1,(now-fadeStart)/.12);girl.Opacity=fade;previous.Opacity=1-fade;if(fade>=1)previous.Source=null;
   double sx=1,sy=1,y=0,angle=0;double speed=Math.Sqrt(vx*vx+vy*vy);
   if(!Reduced){
-   double breath=Math.Sin(t*2.1)*.008;sx=1-breath;sy=1+breath;y=Math.Sin(t*2.1)*1.0;
+   double breath=Math.Sin(now*1.7)*.003;sx=1-breath*.3;sy=1+breath;y=Math.Sin(now*1.7)*.45;
+   double envelope=Math.Min(1,t/.25)*Math.Min(1,Math.Max(0,(duration-t)/.35));
    switch(kind){
-    case "jump":case "celebrate":y=-Math.Abs(Math.Sin(t*3.5))*14;break;
-    case "tickle":angle=Math.Sin(t*13)*3.8;y=-Math.Abs(Math.Sin(t*7))*3;break;
-    case "pout":angle=Math.Sin(t*9)*2*(.5+.5*Math.Cos(t));break;
-    case "shy":angle=Math.Sin(t*2)*3;break;
-    case "dance":angle=Math.Sin(t*4)*7;y=-Math.Abs(Math.Sin(t*4))*7;break;
-    case "sway":angle=Math.Sin(t*3)*6;break;
-    case "stretch":sy=1+Math.Sin(t*1.2)*.04;break;
-    case "squat":sy=.85+Math.Cos(t*2)*.1;sx=1+(1-sy)*.3;break;
-    case "float":y=-8-Math.Sin(t*2)*7;break;
-    case "bow":angle=Math.Sin(t*1.5)*2;sy=.98+Math.Sin(t*1.5)*.02;break;
+    case "jump":case "celebrate":y=-Math.Sin(Math.PI*Math.Max(0,Math.Min(1,(t-.28)/.65)))*12;break;
+    case "tickle":angle=Math.Sin(t*10)*1.5*envelope;break;
+    case "pout":angle=Math.Sin(t*5)*1.2*envelope;break;
+    case "shy":angle=Math.Sin(t*2)*1.2*envelope;break;
+    case "dance":angle=Math.Sin(t*3.5)*3*envelope;y=-Math.Abs(Math.Sin(t*3.5))*2*envelope;break;
+    case "sway":angle=Math.Sin(t*2.2)*2.5*envelope;break;
+    case "stretch":sy=1+Math.Sin(Math.PI*Math.Min(1,t/2))*.012;break;
+    case "squat":sy=1-Math.Sin(Math.PI*Math.Min(1,t/2))*.06;sx=1+(1-sy)*.3;break;
+    case "float":y=(-6-Math.Sin(t*2)*4)*envelope;break;
+    case "bow":angle=Math.Sin(Math.PI*Math.Min(1,t/duration))*1.5;sy=1-Math.Sin(Math.PI*Math.Min(1,t/duration))*.012;break;
     case "sleep":sy=1+Math.Sin(t)*.01;break;
-    case "drag":angle=Math.Max(-18,Math.Min(18,vx*.012));sy=1+Math.Min(.05,speed/25000);break;
-    case "spin":sx=.7+.3*Math.Abs(Math.Cos(t*3));break;
-    case "wake":if(t%5>3){y=-Math.Abs(Math.Sin(t*8))*9;angle=Math.Sin(t*18)*2;}break;
-    case "tail":angle=Math.Sin(t*5)*4;break;
-    case "ride":y=Math.Sin(t*5)*7;angle=Math.Sin(t*2.5)*4;break;
-    case "swing":angle=Math.Sin(t*1.6)*12;y=-Math.Abs(Math.Sin(t*1.6))*10;break;
-    case "surprise":y=-Math.Abs(Math.Sin(t*3))*10;break;
+    case "drag":sy=1+Math.Min(.025,speed/45000);break;
+    case "spin":sx=1-.22*Math.Abs(Math.Sin(t*3))*envelope;break;
+    case "wake":double wake=Math.Sin(Math.PI*Math.Max(0,Math.Min(1,(t-.8)/.6)));y=-wake*5;angle=wake*Math.Sin(t*14);break;
+    case "tail":angle=Math.Sin(t*2.5)*1.5*envelope;break;
+    case "ride":y=Math.Sin(t*4)*3*envelope;angle=Math.Sin(t*2)*2*envelope;break;
+    case "swing":angle=Math.Sin(t*1.6)*7*envelope;y=-Math.Abs(Math.Sin(t*1.6))*5*envelope;break;
+    case "surprise":y=-Math.Sin(Math.PI*Math.Max(0,Math.Min(1,(t-.2)/.65)))*6;break;
    }
-   double u=(now-squashStart)/.28;if(u>=0&&u<1){double q=u<.35?1-(1-squashDepth)*Math.Pow(u/.35,2):squashDepth+(1-squashDepth)*(1+2.70158*Math.Pow((u-.35)/.65-1,3)+1.70158*Math.Pow((u-.35)/.65-1,2));sy*=q;sx*=1/Math.Sqrt(Math.Max(.5,q));}
+   double target=(dragging||flying)?Math.Max(-12,Math.Min(12,-vx*.008)):0;leanVelocity+=((target-lean)*100-leanVelocity*17)*dt;lean+=leanVelocity*dt;angle+=lean;
+   var origin=dragging?grabOrigin:new System.Windows.Point(.5,.9);var old=girl.RenderTransformOrigin;double blend=1-Math.Exp(-dt*14);girl.RenderTransformOrigin=previous.RenderTransformOrigin=new System.Windows.Point(old.X+(origin.X-old.X)*blend,old.Y+(origin.Y-old.Y)*blend);
+   double u=(now-squashStart)/.38;if(u>=0&&u<1){double q=1-(1-squashDepth)*Math.Exp(-u*5)*Math.Cos(u*Math.PI*2.5);sy*=q;sx*=1/Math.Sqrt(Math.Max(.5,q));}
   }
   scale.ScaleX=sx*facing;scale.ScaleY=sy;rotate.Angle=angle;translate.Y=y;
   effects.Prop=(dragging||flying)?"":prop;effects.Time=Reduced?0:t;effects.Kind=kind;effects.InvalidateVisual();
  }
- public bool HitTestCheck(){var empty=girl.PointToScreen(new System.Windows.Point(0,0));bool emptyOK=!Hit(empty.X,empty.Y);int pixel=0;for(int i=3;i<current.Pixels.Length;i+=4)if(current.Pixels[i]>240){pixel=(i-3)/4;break;}var opaque=girl.PointToScreen(new System.Windows.Point((pixel%current.Width+.5)/current.Width*girl.ActualWidth,(pixel/current.Width+.5)/current.Height*girl.ActualHeight));return emptyOK&&Hit(opaque.X,opaque.Y);}
+ public bool HitTestCheck(){var empty=girl.PointToScreen(new System.Windows.Point(0,0));bool emptyOK=!Hit(empty.X,empty.Y);int pixel=0;for(int i=0;i<current.Pixels.Length;i++)if(current.Pixels[i]>240){pixel=i;break;}var opaque=girl.PointToScreen(new System.Windows.Point((pixel%current.Width+.5)/current.Width*girl.ActualWidth,(pixel/current.Width+.5)/current.Height*girl.ActualHeight));return emptyOK&&Hit(opaque.X,opaque.Y);}
  public double[] TestMotion(){
   double startX=px,startY=py;var a=Area(px,py);px=a.Left+20;py=a.Top+50;BeginPointer(px+100,py+100);
   double now=clock.Elapsed.TotalSeconds,target=px+100,mouseY=py+100;
