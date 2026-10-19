@@ -1,10 +1,10 @@
-﻿param([Parameter(Mandatory=$true)][string]$Root,[switch]$SmokeTest)
+﻿param([Parameter(Mandatory=$true)][string]$Root,[switch]$SmokeTest,[switch]$FollowCodex)
 $ErrorActionPreference='Stop'
-Add-Type -AssemblyName PresentationFramework,PresentationCore,WindowsBase,System.Windows.Forms,System.Drawing
-$references=@('System.dll','System.Core.dll','System.Xaml.dll','System.Drawing.dll','System.Windows.Forms.dll',[Windows.Window].Assembly.Location,[Windows.Media.Imaging.BitmapSource].Assembly.Location,[Windows.Point].Assembly.Location)
-Add-Type -Path (Join-Path $Root 'src\DragonAnimator.cs') -ReferencedAssemblies $references
+$script:startupClock=[Diagnostics.Stopwatch]::StartNew()
+. (Join-Path $Root 'scripts\load-native.ps1')
+Import-DragonNative $Root
 try{[DragonNative]::SetProcessDpiAwarenessContext([IntPtr](-4))|Out-Null;[DragonNative]::SetThreadDpiAwarenessContext([IntPtr](-4))|Out-Null}catch{}
-$script:root=$Root;$script:smoke=[bool]$SmokeTest;$script:closing=$false;$script:sync=$false;$script:settings=$null;$script:view=$null;$script:serial=-1;$script:smokeTicks=0;$script:runtimeTicks=0
+$script:root=$Root;$script:smoke=[bool]$SmokeTest;$script:closing=$false;$script:sync=$false;$script:settings=$null;$script:view=$null;$script:serial=-1;$script:smokeTicks=0;$script:runtimeTicks=0;$script:follower=$null;$script:following=[bool]$FollowCodex;$script:healthWritten=$false;$script:readyMs=0
 $data=if($env:GPT_DRAGON_DATA){$env:GPT_DRAGON_DATA}else{Join-Path $Root '.state'};if($SmokeTest){$data=Join-Path $Root 'work\smoke-state'}
 $null=New-Item -ItemType Directory -Path $data -Force
 $mutexName='Local\GptDragonPet_'+([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($Root))).Replace('/','_').Replace('+','-')+$(if($SmokeTest){'_test'}else{''})
@@ -13,8 +13,9 @@ try{$owned=$mutex.WaitOne(0)}catch [Threading.AbandonedMutexException]{$owned=$t
 if(!$owned){$mutex.Dispose();return}
 function Send-Dragon($Value){if($script:hostProcess -and !$script:hostProcess.HasExited){$script:hostInput.WriteLine(($Value|ConvertTo-Json -Depth 6 -Compress));$script:hostInput.Flush()}}
 function Invoke-DragonAction([string]$Name){Send-Dragon @{type='action';name=$Name}}
+function Enable-DragonFollow {if(!$script:follower){$script:following=$true;$script:tray.Visible=$false;$script:follower=[DragonFollower]::new($script:window,0);$script:healthWritten=$false}}
 function Read-Xaml([string]$Name){return [Windows.Markup.XamlReader]::Parse([IO.File]::ReadAllText((Join-Path $script:root ('src\'+$Name)),[Text.Encoding]::UTF8))}
-$script:window=Read-Xaml 'pet.xaml';$script:ui=@{}
+$script:window=Read-Xaml 'pet.xaml';$script:window.Opacity=0;$script:ui=@{}
 foreach($name in @('Canvas','Bubble','BubbleCopy','Tail','Girl','Previous')){$script:ui[$name]=$script:window.FindName($name)}
 $script:animator=[DragonAnimator]::new($script:window,$script:ui.Canvas,$script:ui.Girl,$script:ui.Previous,$script:ui.Bubble,$Root)
 $script:catalog=[IO.File]::ReadAllText((Join-Path $Root 'assets\actions.json'),[Text.Encoding]::UTF8)|ConvertFrom-Json
@@ -66,7 +67,7 @@ function Update-DragonView($Value){
  if(!$Value){return};$script:view=$Value;$p=$Value.preferences;$size=[double]$p.size
  if([Math]::Abs($script:ui.Girl.Width-$size)-gt .5){$script:animator.Resize($size)}
  $script:animator.Reduced=[bool]$p.reducedMotion;$script:animator.Roam=[bool]$p.roam;$script:window.Topmost=[bool]$p.alwaysOnTop
- $x=if($null-eq $p.x){[double]::NaN}else{[double]$p.x};$y=if($null-eq $p.y){[double]::NaN}else{[double]$p.y};$script:animator.InitializePosition($x,$y)
+ $x=if($null-eq $p.x){[double]::NaN}else{[double]$p.x};$y=if($null-eq $p.y){[double]::NaN}else{[double]$p.y};$script:animator.InitializePosition($x,$y);if(!$script:smoke){$script:window.Opacity=1}
  $script:ui.Bubble.Width=$size+32;[Windows.Controls.Canvas]::SetLeft($script:ui.Tail,($size+80)*.62)
  if($script:serial-ne $Value.serial){$a=$Value.animation;$script:animator.Play($a.sheet,[int]$a.row,$a.motion,$a.prop,[double]$a.duration);$script:serial=$Value.serial}
  $script:menuStatus.Text=$Value.animation.label;$script:roamMenu.IsChecked=[bool]$p.roam
@@ -79,13 +80,13 @@ function Update-DragonView($Value){
  }
 }
 $info=New-Object Diagnostics.ProcessStartInfo;$info.FileName=(Get-Command node.exe).Source;$info.Arguments='"'+(Join-Path $Root 'src\host.mjs')+'"';$info.WorkingDirectory=$Root;$info.UseShellExecute=$false;$info.CreateNoWindow=$true;$info.RedirectStandardInput=$true;$info.RedirectStandardOutput=$true;$info.RedirectStandardError=$true;$info.StandardOutputEncoding=[Text.UTF8Encoding]::new($false);$info.StandardErrorEncoding=[Text.UTF8Encoding]::new($false)
-$info.EnvironmentVariables['GPT_DRAGON_DATA']=$data;if($SmokeTest){$info.EnvironmentVariables['GPT_DRAGON_SMOKE']='1'}
+$info.EnvironmentVariables['GPT_DRAGON_DATA']=$data;if($SmokeTest){$info.EnvironmentVariables['GPT_DRAGON_SMOKE']='1'};if($FollowCodex){$info.EnvironmentVariables['GPT_DRAGON_FOLLOW']='1'}
 $script:hostProcess=New-Object Diagnostics.Process;$script:hostProcess.StartInfo=$info;$script:hostProcess.Start()|Out-Null;
 # Windows PowerShell otherwise uses the system ANSI code page for child stdin.
 $script:hostInput=[IO.StreamWriter]::new($script:hostProcess.StandardInput.BaseStream,[Text.UTF8Encoding]::new($false));$script:hostInput.AutoFlush=$true
 $script:runtimeFile=Join-Path $data 'runtime.json';$script:nextLine=$script:hostProcess.StandardOutput.ReadLineAsync();$script:errors=$script:hostProcess.StandardError.ReadToEndAsync()
 $script:tray=New-Object Windows.Forms.NotifyIcon
-$iconBitmap=[Drawing.Bitmap]::new((Join-Path $Root 'assets\reference.png'));$script:tray.Icon=[Drawing.Icon]::FromHandle($iconBitmap.GetHicon());$script:tray.Text='龙娘 · 在这里陪你';$script:tray.Visible=(!$SmokeTest -and $env:GPT_DRAGON_PLUGIN-ne '1')
+$iconBitmap=[Drawing.Bitmap]::new((Join-Path $Root 'assets\reference.png'));$script:tray.Icon=[Drawing.Icon]::FromHandle($iconBitmap.GetHicon());$script:tray.Text='龙娘 · 在这里陪你';$script:tray.Visible=(!$SmokeTest -and !$FollowCodex -and $env:GPT_DRAGON_PLUGIN-ne '1')
 $trayMenu=New-Object Windows.Forms.ContextMenuStrip
 $trayMenu.Items.Add('打开工作间').Add_Click({Show-Workroom});$trayMenu.Items.Add('回到屏幕角落').Add_Click({Invoke-DragonAction 'reset'});$trayMenu.Items.Add('退出龙娘').Add_Click({$script:window.Close()});$script:tray.ContextMenuStrip=$trayMenu;$script:tray.Add_DoubleClick({Show-Workroom})
 function Save-DragonPreview($Element,[string]$File){$Element.UpdateLayout();$width=[int][Math]::Ceiling($Element.ActualWidth);$height=[int][Math]::Ceiling($Element.ActualHeight);$bitmap=[Windows.Media.Imaging.RenderTargetBitmap]::new($width,$height,96,96,[Windows.Media.PixelFormats]::Pbgra32);$bitmap.Render($Element);$encoder=[Windows.Media.Imaging.PngBitmapEncoder]::new();$encoder.Frames.Add([Windows.Media.Imaging.BitmapFrame]::Create($bitmap));$stream=[IO.File]::Create($File);try{$encoder.Save($stream)}finally{$stream.Dispose()}}
@@ -94,11 +95,11 @@ $script:timer.Add_Tick({
  try{
   if($script:hostProcess.HasExited){$script:window.Close();return}
   $count=0
-  while($script:nextLine.IsCompleted -and $count-lt 30){$line=$script:nextLine.Result;if($null-eq $line){$script:window.Close();return};$script:nextLine=$script:hostProcess.StandardOutput.ReadLineAsync();$count++;$value=$line|ConvertFrom-Json;if($value.type-eq 'view'){Update-DragonView $value}elseif($value.type-eq 'command'){switch($value.name){'reset'{$script:animator.Reset()};'settings'{Show-Workroom};'close'{$script:window.Close();return}}}}
+  while($script:nextLine.IsCompleted -and $count-lt 30){$line=$script:nextLine.Result;if($null-eq $line){$script:window.Close();return};$script:nextLine=$script:hostProcess.StandardOutput.ReadLineAsync();$count++;$value=$line|ConvertFrom-Json;if($value.type-eq 'view'){Update-DragonView $value}elseif($value.type-eq 'command'){switch($value.name){'reset'{$script:animator.Reset()};'settings'{Show-Workroom};'follow'{Enable-DragonFollow};'close'{$script:window.Close();return}}}}
   foreach($eventLine in $script:animator.Drain()){$script:hostInput.WriteLine($eventLine)}
   if($script:view){$visible=$script:view.preferences.bubbles -and [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()-lt $script:view.messageUntil;$script:ui.Bubble.Visibility=if($visible){[Windows.Visibility]::Visible}else{[Windows.Visibility]::Hidden};$script:ui.Tail.Visibility=$script:ui.Bubble.Visibility;$script:ui.BubbleCopy.Text=[string]$script:view.message}
   $script:runtimeTicks++
-  if($script:runtimeTicks%30-eq 0 -and $script:view){$health=@{pid=$PID;hostPid=$script:hostProcess.Id;version='0.2.0';mode=$(if($env:GPT_DRAGON_PLUGIN-eq '1'){'plugin'}else{'standalone'});state=$script:view.state;animation=$script:view.animation.label;connected=[bool]$script:view.connection.connected;fps=[Math]::Round($script:animator.Fps,1);p95Ms=[Math]::Round($script:animator.P95Ms,1);updatedAt=[DateTimeOffset]::UtcNow.ToString('o')};[IO.File]::WriteAllText($script:runtimeFile,($health|ConvertTo-Json))}
+  if((!$script:healthWritten -or $script:runtimeTicks%30-eq 0) -and $script:view){if($script:readyMs-eq 0){$script:readyMs=$script:startupClock.ElapsedMilliseconds};$health=@{pid=$PID;hostPid=$script:hostProcess.Id;version='0.2.1';mode=$(if($script:following){'follow'}elseif($env:GPT_DRAGON_PLUGIN-eq '1'){'plugin'}else{'standalone'});visible=$script:window.IsVisible;startupMs=$script:readyMs;state=$script:view.state;animation=$script:view.animation.label;connected=[bool]$script:view.connection.connected;fps=[Math]::Round($script:animator.Fps,1);p95Ms=[Math]::Round($script:animator.P95Ms,1);updatedAt=[DateTimeOffset]::UtcNow.ToString('o')};[IO.File]::WriteAllText($script:runtimeFile,($health|ConvertTo-Json));$script:healthWritten=$true}
   if($script:smoke -and $script:view){
    $script:smokeTicks++
    if($script:smokeTicks-eq 5){Show-Workroom;$script:controls.Work.RaiseEvent([Windows.RoutedEventArgs]::new([Windows.Controls.Button]::ClickEvent))}
@@ -120,8 +121,9 @@ $script:timer.Add_Tick({
  }catch{[IO.File]::WriteAllText((Join-Path $script:root 'work\native-error.log'),($_|Out-String));$script:window.Close()}
 })
 $script:window.Add_Closed({
- if($script:closing){return};$script:closing=$true;$script:timer.Stop();$script:menu.IsOpen=$false;if($script:settings){$script:settings.Close()};$script:animator.Dispose();foreach($eventLine in $script:animator.Drain()){$script:hostInput.WriteLine($eventLine)}
- $script:tray.Visible=$false;$script:tray.Dispose();$iconBitmap.Dispose();Send-Dragon @{type='quit'};if(!$script:hostProcess.WaitForExit(1500)){$script:hostProcess.Kill()};$script:hostProcess.Dispose();[Windows.Threading.Dispatcher]::CurrentDispatcher.InvokeShutdown()
+ if($script:closing){return};$script:closing=$true;$script:timer.Stop();$script:menu.IsOpen=$false;if($script:follower){$script:follower.Dispose()};if($script:settings){$script:settings.Close()};$script:animator.Dispose();foreach($eventLine in $script:animator.Drain()){$script:hostInput.WriteLine($eventLine)}
+ $script:tray.Visible=$false;$script:tray.Dispose();$iconBitmap.Dispose();Send-Dragon @{type='quit';pauseFollow=$script:following};if(!$script:hostProcess.WaitForExit(1500)){$script:hostProcess.Kill()};$script:hostProcess.Dispose();[Windows.Threading.Dispatcher]::CurrentDispatcher.InvokeShutdown()
 })
-try{if($SmokeTest){$script:window.Opacity=0};$script:window.Show();$script:animator.Resize(220);$script:timer.Start();[Windows.Threading.Dispatcher]::Run()}
+$script:window.Add_IsVisibleChanged({$script:healthWritten=$false;if(!$script:window.IsVisible -and $script:settings){$script:settings.Hide()}})
+try{if($SmokeTest){$script:window.Opacity=0};$script:animator.Resize(220);if($FollowCodex){Enable-DragonFollow}else{$script:window.Show()};$script:timer.Start();[Windows.Threading.Dispatcher]::Run()}
 finally{if(!$script:closing){$script:window.Close()};if($owned){$mutex.ReleaseMutex()};$mutex.Dispose()}

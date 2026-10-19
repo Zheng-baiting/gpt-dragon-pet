@@ -12,7 +12,7 @@ export function desktopStatus(){
     const value=JSON.parse(fs.readFileSync(path.join(data,'runtime.json'),'utf8'));
     if(!Number.isInteger(value.pid)||!Number.isInteger(value.hostPid)||Date.now()-Date.parse(value.updatedAt)>15000)return {running:false};
     process.kill(value.pid,0);process.kill(value.hostPid,0);
-    return {running:true,version:value.version,mode:value.mode,state:value.state,animation:value.animation,connected:value.connected,fps:value.fps};
+    return {running:true,version:value.version,mode:value.mode,visible:value.visible,startupMs:value.startupMs,state:value.state,animation:value.animation,connected:value.connected,fps:value.fps};
   }catch{return {running:false};}
 }
 
@@ -21,6 +21,21 @@ export function requestDesktop(command){
   const name=path.join(commandDirectory,randomUUID()+'.json');
   fs.writeFileSync(name+'.tmp',JSON.stringify({...command,expiresAt:Date.now()+10000}));
   fs.renameSync(name+'.tmp',name);
+}
+
+export function followEnabled(directory=data){
+  try{return JSON.parse(fs.readFileSync(path.join(directory,'follow.json'),'utf8')).enabled===true;}catch{return false;}
+}
+
+export function followPaused(directory=data){
+  try{return JSON.parse(fs.readFileSync(path.join(directory,'follow.json'),'utf8')).paused===true;}catch{return false;}
+}
+
+export function setFollowPaused(paused,directory=data){
+  let value;try{value=JSON.parse(fs.readFileSync(path.join(directory,'follow.json'),'utf8'));}catch{return;}
+  if(value.enabled!==true)return;
+  fs.writeFileSync(path.join(directory,'follow.tmp'),JSON.stringify({enabled:true,paused:!!paused}));
+  fs.renameSync(path.join(directory,'follow.tmp'),path.join(directory,'follow.json'));
 }
 
 export function takeDesktopCommands(directory=data){
@@ -33,7 +48,7 @@ export function takeDesktopCommands(directory=data){
       const stat=fs.lstatSync(file);
       if(!stat.isFile()||stat.isSymbolicLink()||stat.size>1024)continue;
       const value=JSON.parse(fs.readFileSync(file,'utf8'));
-      if(value.expiresAt>Date.now()&&value.expiresAt<Date.now()+11000&&['settings','close'].includes(value.name))values.push({type:'command',name:value.name});
+      if(value.expiresAt>Date.now()&&value.expiresAt<Date.now()+11000&&['settings','close','follow'].includes(value.name))values.push({type:'command',name:value.name});
     }catch{}finally{try{fs.unlinkSync(file);}catch{}}
   }
   return values;

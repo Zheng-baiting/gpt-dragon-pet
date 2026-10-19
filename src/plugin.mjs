@@ -4,7 +4,7 @@ import readline from 'node:readline';
 import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {setTimeout as delay} from 'node:timers/promises';
-import {root,data,clientDirectory,desktopStatus,requestDesktop} from './plugin-client.mjs';
+import {root,data,clientDirectory,desktopStatus,requestDesktop,followEnabled,followPaused,setFollowPaused} from './plugin-client.mjs';
 
 const version=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8')).version;
 const send=value=>process.stdout.write(JSON.stringify(value)+'\n');
@@ -17,14 +17,20 @@ function retain(){
   touch();heartbeat=setInterval(touch,2000);
 }
 function release(){clearInterval(heartbeat);heartbeat=null;try{fs.unlinkSync(lease);}catch{}}
-function show(){
+function show(automatic=false){
   retain();
+  if(automatic&&followEnabled()&&followPaused())return Promise.resolve({running:false,paused:true});
+  if(!automatic)setFollowPaused(false);
   if(process.env.GPT_DRAGON_PLUGIN_TEST==='1')return Promise.resolve({running:false,testMode:true});
   if(desktopStatus().running)return Promise.resolve(desktopStatus());
   if(starting)return starting;
   starting=(async()=>{
     if(process.platform!=='win32')throw Error('Windows 10/11 is required.');
-    const child=spawn(process.execPath,[path.join(root,'scripts/launch.cjs')],{cwd:root,env:{...process.env,GPT_DRAGON_DATA:data,GPT_DRAGON_PLUGIN:'1'},detached:true,stdio:'ignore',windowsHide:true});
+    const temporary=path.join(root,'work/temp');fs.mkdirSync(temporary,{recursive:true});
+    // Windows PowerShell needs its own console lifetime; keep the detached launcher.
+    const args=[path.join(root,'scripts/launch.cjs')];
+    if(followEnabled())args.push('--follow');
+    const child=spawn(process.execPath,args,{cwd:root,env:{...process.env,TEMP:temporary,TMP:temporary,GPT_DRAGON_DATA:data,GPT_DRAGON_PLUGIN:'1'},detached:true,stdio:'ignore',windowsHide:true});
     let error;child.on('error',value=>{error=value;});child.unref();
     for(let i=0;i<120;i++){if(error)throw error;await delay(100);const status=desktopStatus();if(status.running)return status;}
     throw Error('桌宠未能启动，请运行 npm run smoke 检查本机环境。');
@@ -43,7 +49,7 @@ async function handle(message){
     let result;
     switch(message.method){
       case 'initialize':
-        retain();void show().catch(error=>process.stderr.write(error.message+'\n'));
+        retain();void show(true).catch(error=>process.stderr.write(error.message+'\n'));
         result={protocolVersion:message.params?.protocolVersion??'2024-11-05',capabilities:{tools:{}},serverInfo:{name:'gpt-dragon-pet',version}};break;
       case 'ping':result={};break;
       case 'tools/list':result={tools};break;
@@ -53,7 +59,7 @@ async function handle(message){
         if(!args||typeof args!=='object'||Array.isArray(args)||Object.keys(args).some(key=>name!=='show_dragon_pet'||key!=='settings')||('settings' in args&&typeof args.settings!=='boolean'))throw Error('Invalid arguments');
         let status=desktopStatus();
         if(name==='show_dragon_pet'){status=await show();if(args.settings)requestDesktop({name:'settings'});}
-        if(name==='hide_dragon_pet'&&status.running){requestDesktop({name:'close'});status={...status,closing:true};}
+        if(name==='hide_dragon_pet'){setFollowPaused(true);if(status.running){requestDesktop({name:'close'});status={...status,closing:true};}}
         result={content:[{type:'text',text:JSON.stringify(status)}]};break;
       }
       default:send({jsonrpc:'2.0',id:message.id,error:{code:-32601,message:'Method not found'}});return;

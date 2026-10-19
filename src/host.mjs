@@ -5,7 +5,7 @@ import readline from 'node:readline';
 import {cleanPreferences,LABELS,STATES} from './core.mjs';
 import {SessionMonitor} from './session.mjs';
 import {ACTIONS,findAction,pickAction,pickIdle} from './actions.mjs';
-import {takeDesktopCommands,hasPluginClients} from './plugin-client.mjs';
+import {takeDesktopCommands,hasPluginClients,setFollowPaused} from './plugin-client.mjs';
 const root=path.resolve(import.meta.dirname,'..'),data=process.env.GPT_DRAGON_DATA||path.join(root,'.state');fs.mkdirSync(data,{recursive:true});
 let preferences;try{preferences=cleanPreferences(JSON.parse(fs.readFileSync(path.join(data,'preferences.json'),'utf8')));}catch{preferences=cleanPreferences();}
 let state='idle',stateAt=Date.now(),message='我来啦，今天想做点什么？',messageUntil=Date.now()+6000,connection={connected:false};
@@ -47,12 +47,12 @@ async function receive(command){
     try{lastSignal=null;await monitor.connect(command.file,process.env.CODEX_HOME||path.join(os.homedir(),'.codex'));preferences.sessionFile=command.file;save();if(!command.file&&!interacting&&Date.now()>=manualUntil)setState('idle',true);send(snapshot());}
     catch{connection={connected:false,error:'请选择 Codex 会话目录中的 JSONL 文件。'};send(snapshot());}return;
   }
-  if(command.type==='quit')shutdown();
+  if(command.type==='quit'){if(command.pauseFollow)setFollowPaused(true,data);shutdown();}
 }
-let lastView=Date.now(),lastClients=Date.now();
+let lastView=Date.now(),lastClients=Date.now(),following=process.env.GPT_DRAGON_FOLLOW==='1';
 const timer=setInterval(()=>{
-  for(const command of takeDesktopCommands(data))send(command);
-  if(process.env.GPT_DRAGON_PLUGIN==='1'&&Date.now()-lastClients>2000){lastClients=Date.now();if(!hasPluginClients(data))send({type:'command',name:'close'});}
+  for(const command of takeDesktopCommands(data)){if(command.name==='follow')following=true;send(command);}
+  if(!following&&process.env.GPT_DRAGON_PLUGIN==='1'&&Date.now()-lastClients>2000){lastClients=Date.now();if(!hasPluginClients(data))send({type:'command',name:'close'});}
   if(!interacting&&manualUntil&&Date.now()>=manualUntil)automatic();
   if(!interacting&&Date.now()>=manualUntil){
     if(['done','error'].includes(state)&&Date.now()-stateAt>8000)setState('idle');

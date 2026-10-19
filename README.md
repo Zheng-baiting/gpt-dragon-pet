@@ -14,6 +14,8 @@ Windows 白龙娘桌宠，提供 Codex 本地插件入口，重点参考 [PC2005
 - 鼠标与窗口运动由原生 WPF 渲染循环处理，拖拽、甩抛、碰壁和落地回弹不再逐帧经过 Node.js 与 PowerShell 通信。
 - 工作间支持尺寸、置顶、散步、气泡、减少动态效果及所选 Codex 会话联动。
 
+0.2.1 新增预加载自动跟随：Codex 窗口重开、恢复时复用已经加载的龙娘窗口；关闭或最小化全部 Codex 窗口时隐藏角色。检测通过本地窗口事件与低频兜底检查完成，不依赖聊天加载 MCP。原生代码按源文件和运行环境缓存编译结果，日常启动复用缓存。
+
 **素材边界：106 个入口使用基础姿态、程序运动和独立道具组合，并非 106 段独立制作的完整视频。人物是有立体光影的二维精灵，不是可自由旋转的 3D 模型。** 鲸鱼娘原项目的视频演出更细腻；本项目保留相应动作主题，以龙娘素材重新实现。逐项映射见 [动作目录](docs/ACTIONS.md)。
 
 ![右键菜单](assets/menu-preview.png)
@@ -30,7 +32,7 @@ npm run install:plugin
 
 插件名称为「白龙娘桌宠」，ID 为 `gpt-dragon-pet@gpt-dragon-local`。安装后，由 Codex 在会话加载本地 MCP 服务时启动角色；已打开的会话可能需要重新进入才能载入新插件。**安装登记完成不等于当前会话已经加载服务。** 不需要打开网页、设置页或独立程序主界面。
 
-角色与设置窗口都不出现在 Windows 任务栏；插件模式也不显示独立托盘图标。右键角色可打开设置和退出。多个插件连接共享同一只桌宠；插件服务全部断开后退出由插件启动的桌宠，崩溃连接最多等待约 12 秒。主动退出角色后，调用「显示白龙娘桌宠」可以重新显示。
+角色与设置窗口都不出现在 Windows 任务栏；插件和自动跟随模式也不显示独立托盘图标。右键角色可打开设置和退出。多个插件连接共享同一只桌宠；未启用自动跟随时，插件服务全部断开后退出由插件启动的桌宠，崩溃连接最多等待约 12 秒。主动退出角色后，调用「显示白龙娘桌宠」可以重新显示。
 
 插件提供显示、状态查询和隐藏三个工具，不自动选择其他聊天、不增加模型请求。设置入口只在明确要求打开时显示。现有的 GPT娘额度插件保持独立。
 
@@ -42,6 +44,30 @@ codex plugin marketplace remove gpt-dragon-local
 ```
 
 移除插件保留项目文件与 `.state/` 中的个人偏好。GitHub 仓库只是源码存储，并未发布到公共插件目录。
+
+## 快速跟随 Codex
+
+```powershell
+npm run follow:start
+npm run follow:status
+```
+
+启动后，跟随器在本次 Windows 登录期间保持预加载。检测到 Codex 桌面主窗口才显示角色；最小化、关闭全部主窗口时隐藏，重新打开时直接恢复。它只检查窗口类型、可见性和对应程序路径，不读取窗口标题或聊天正文。只识别 OpenAI Codex 安装目录里的桌面程序，不跟随浏览器或命令行 Codex。
+
+右键「退出龙娘」或 `npm run follow:stop` 会暂停跟随，新聊天加载插件不会自行唤醒。`npm run follow:start` 或插件的显示工具可明确恢复。跟随开启期间，MCP 断开不会结束跟随器。
+
+如果希望重启电脑后仍自动跟随，需要明确启用当前用户登录启动项：
+
+```powershell
+# 先查看将写入的位置，不做改动
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action EnableStartup -CheckOnly
+# 用户同意后启用
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action EnableStartup
+# 撤销并停止跟随，保留项目和设置
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action DisableStartup
+```
+
+启用只在当前用户的 Startup 文件夹创建 `GPT Dragon Pet.lnk`，指向本项目 `follow-codex.vbs`；不需要管理员权限。普通插件安装与 `follow:start` 不创建这个启动项。项目移动后需重新指定启动项；禁用操作只移除指向本项目的快捷方式。登录启动尊重主动退出后的暂停状态，可随时明确恢复。
 
 ## 独立运行
 
@@ -82,9 +108,12 @@ npm start
 ```powershell
 npm test
 npm run smoke
+npm run test:follow
 ```
 
 Node 检查覆盖插件协议、连接清理、控制命令白名单、动作目录、随机动作限制、偏好过滤、事件解析、所选会话边界及手动动作优先级。原生冒烟检查会创建实际 WPF 窗口，加载 64 帧、渲染全部 106 个动作道具、验证透明命中、任务栏隐藏、尺寸控制、拖拽跟踪与甩抛落地，输出截图及报告到 `work/qa/`。
+
+自动跟随检查使用本项目创建的测试窗口，验证首次显示、最小化、恢复、关闭和重开，不操作用户的 Codex 窗口。开发机器的一次检查中，预加载窗口恢复为 29 ms、重开为 39 ms；缓存原生程序集加载为 69 ms。这些是测试窗口的本机测量，包含首次启动、图集加载在内的完整启动会更慢，不能用它们保证所有机器或实际 Codex 启动时间。
 
 0.2 在开发机器的一次原生检查中测得约 165 次/秒渲染回调、P95 间隔 6.7 ms；这是该机器上的窗口渲染测量，不代表姿态图拥有 165 帧/秒，也不保证其他设备达到相同结果。当前提供源码启动方式，尚无免 Node.js 安装包。
 

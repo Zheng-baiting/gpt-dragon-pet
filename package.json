@@ -1,6 +1,6 @@
 {
   "name": "gpt-dragon-pet",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A white dragon companion for your coding desk, inspired by dsh-pet.",
   "private": true,
   "type": "module",
@@ -9,7 +9,11 @@
     "start": "node scripts/launch.cjs",
     "test": "node scripts/build.mjs && node --test test/*.test.mjs",
     "smoke": "node scripts/launch.cjs --smoke-test",
-    "install:plugin": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/install-plugin.ps1"
+    "install:plugin": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/install-plugin.ps1",
+    "follow:start": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action Start",
+    "follow:stop": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action Stop",
+    "follow:status": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action Status",
+    "test:follow": "powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File scripts/test-follow.ps1"
   },
   "engines": {
     "node": ">=24"

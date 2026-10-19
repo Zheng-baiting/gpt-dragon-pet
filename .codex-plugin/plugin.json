@@ -1,6 +1,6 @@
 {
   "name": "gpt-dragon-pet",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "白龙娘桌宠：插件加载后显示透明角色，支持动作、拖拽与所选会话状态联动。",
   "mcpServers": "./.mcp.json",
   "interface": {

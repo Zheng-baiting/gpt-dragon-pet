@@ -36,3 +36,17 @@ test('host coordinates all actions without per-frame IPC, preserves sleep and se
   const saved=JSON.parse(await fs.readFile(path.join(root,'preferences.json'),'utf8'));assert.equal(saved.sessionFile,null);assert.equal(saved.x,-650);assert.equal(saved.y,300);
  }finally{if(child.exitCode===null){child.kill();await new Promise(resolve=>child.once('exit',resolve));}lines.close();await fs.rm(root,{recursive:true,force:true});}
 });
+
+test('automatic follower survives MCP disconnect and records an explicit exit',async()=>{
+ const data=await fs.mkdtemp(path.join(process.cwd(),'work/follow-test-'));
+ await fs.writeFile(path.join(data,'follow.json'),JSON.stringify({enabled:true,paused:false}));
+ const child=spawn(process.execPath,['src/host.mjs'],{env:{...process.env,GPT_DRAGON_DATA:data,GPT_DRAGON_PLUGIN:'1',GPT_DRAGON_FOLLOW:'1',GPT_DRAGON_SMOKE:'1'},windowsHide:true});
+ const messages=[];const lines=readline.createInterface({input:child.stdout});lines.on('line',s=>messages.push(JSON.parse(s)));
+ try{
+  await delay(2300);assert.equal(child.exitCode,null);assert.ok(messages.some(m=>m.type==='view'));
+  assert.equal(messages.some(m=>m.type==='command'&&m.name==='close'),false);
+  child.stdin.write(JSON.stringify({type:'quit',pauseFollow:true})+'\n');
+  await new Promise(resolve=>child.once('exit',resolve));assert.equal(child.exitCode,0);
+  assert.deepEqual(JSON.parse(await fs.readFile(path.join(data,'follow.json'),'utf8')),{enabled:true,paused:true});
+ }finally{if(child.exitCode===null){child.kill();await new Promise(resolve=>child.once('exit',resolve));}lines.close();await fs.rm(data,{recursive:true,force:true});}
+});

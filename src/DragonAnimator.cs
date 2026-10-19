@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Interop;
+using System.Text;
 
 public static class DragonNative {
  [StructLayout(LayoutKind.Sequential)] public struct Point { public int X,Y; }
@@ -24,6 +25,55 @@ public static class DragonNative {
  [DllImport("user32.dll",EntryPoint="SetWindowLongPtrW")] public static extern IntPtr SetWindowLongPtr(IntPtr h,int index,IntPtr value);
  [DllImport("user32.dll")] public static extern bool SetProcessDpiAwarenessContext(IntPtr c);
  [DllImport("user32.dll")] public static extern IntPtr SetThreadDpiAwarenessContext(IntPtr c);
+}
+
+// A preloaded window follows native host visibility; it does not wait for MCP.
+public sealed class DragonFollower : IDisposable {
+ delegate bool EnumProc(IntPtr window,IntPtr parameter);
+ delegate void WinEventProc(IntPtr hook,uint kind,IntPtr window,int obj,int child,uint thread,uint time);
+ [DllImport("user32.dll")] static extern bool EnumWindows(EnumProc callback,IntPtr value);
+ [DllImport("user32.dll")] static extern bool IsWindowVisible(IntPtr window);
+ [DllImport("user32.dll")] static extern bool IsIconic(IntPtr window);
+ [DllImport("user32.dll")] static extern IntPtr GetWindow(IntPtr window,uint command);
+ [DllImport("user32.dll")] static extern uint GetWindowThreadProcessId(IntPtr window,out uint pid);
+ [DllImport("user32.dll",CharSet=CharSet.Unicode)] static extern int GetClassName(IntPtr window,StringBuilder value,int count);
+ [DllImport("dwmapi.dll")] static extern int DwmGetWindowAttribute(IntPtr window,int attribute,out uint value,int size);
+ [DllImport("user32.dll")] static extern IntPtr SetWinEventHook(uint first,uint last,IntPtr module,WinEventProc callback,uint process,uint thread,uint flags);
+ [DllImport("user32.dll")] static extern bool UnhookWinEvent(IntPtr hook);
+ readonly Window window;readonly int testProcess;readonly WinEventProc callback;readonly List<IntPtr> hooks=new List<IntPtr>();
+ readonly System.Windows.Threading.DispatcherTimer fallback;bool queued,disposed;
+ public bool HostVisible {get;private set;}
+ public DragonFollower(Window window,int testProcess){
+  this.window=window;this.testProcess=testProcess;callback=Changed;
+  hooks.Add(SetWinEventHook(0x8001,0x8003,IntPtr.Zero,callback,0,0,0));
+  hooks.Add(SetWinEventHook(0x16,0x17,IntPtr.Zero,callback,0,0,0));
+  hooks.Add(SetWinEventHook(3,3,IntPtr.Zero,callback,0,0,0));
+  fallback=new System.Windows.Threading.DispatcherTimer(System.Windows.Threading.DispatcherPriority.Background,window.Dispatcher);fallback.Interval=TimeSpan.FromMilliseconds(500);fallback.Tick+=Poll;fallback.Start();Refresh();
+ }
+ public static bool TrustedProcess(string name,string file){
+  return (name.Equals("Codex",StringComparison.OrdinalIgnoreCase)||name.Equals("ChatGPT",StringComparison.OrdinalIgnoreCase))&&
+   (file.IndexOf("\\OpenAI.Codex_",StringComparison.OrdinalIgnoreCase)>=0||file.IndexOf("\\OpenAI\\Codex\\",StringComparison.OrdinalIgnoreCase)>=0);
+ }
+ bool IsHost(IntPtr candidate){
+  if(GetWindow(candidate,4)!=IntPtr.Zero)return false;
+  long extended=DragonNative.GetWindowLongPtr(candidate,-20).ToInt64();if((extended&0x80)!=0||(extended&0x08000000)!=0)return false;
+  uint pid;GetWindowThreadProcessId(candidate,out pid);
+  if(testProcess>0)return pid==testProcess;
+  var cls=new StringBuilder(128);GetClassName(candidate,cls,128);if(cls.ToString()!="Chrome_WidgetWin_1")return false;
+  try{using(var process=Process.GetProcessById((int)pid)){return TrustedProcess(process.ProcessName,process.MainModule.FileName);}}catch{return false;}
+ }
+ public void Refresh(){
+  if(disposed)return;bool visible=false;
+  EnumWindows((candidate,value)=>{uint cloaked;if(IsWindowVisible(candidate)&&!IsIconic(candidate)&&IsHost(candidate)&&(DwmGetWindowAttribute(candidate,14,out cloaked,4)!=0||cloaked==0)){visible=true;return false;}return true;},IntPtr.Zero);
+  HostVisible=visible;if(visible){if(!window.IsVisible)window.Show();}else if(window.IsVisible)window.Hide();
+ }
+ void Changed(IntPtr hook,uint kind,IntPtr candidate,int obj,int child,uint thread,uint time){
+  if(disposed||queued||obj!=0||child!=0)return;
+  if(kind>=0x8000){var cls=new StringBuilder(128);GetClassName(candidate,cls,128);if(testProcess==0&&cls.ToString()!="Chrome_WidgetWin_1"&&kind!=0x8001)return;}
+  queued=true;window.Dispatcher.BeginInvoke(new Action(()=>{queued=false;Refresh();}),System.Windows.Threading.DispatcherPriority.Background);
+ }
+ void Poll(object sender,EventArgs args){Refresh();}
+ public void Dispose(){if(disposed)return;disposed=true;fallback.Stop();fallback.Tick-=Poll;foreach(var hook in hooks)if(hook!=IntPtr.Zero)UnhookWinEvent(hook);}
 }
 public sealed class DragonFrame {
  public BitmapSource Image; public byte[] Pixels; public int Width,Height;
@@ -57,7 +107,7 @@ public sealed class DragonAnimator : IDisposable {
   effects=new DragonEffects();effects.IsHitTestVisible=false;canvas.Children.Add(effects);Canvas.SetLeft(effects,40);Canvas.SetTop(effects,86);
   var ex=DragonNative.GetWindowLongPtr(hwnd,-20).ToInt64()|0x08000000|0x80;DragonNative.SetWindowLongPtr(hwnd,-20,new IntPtr(ex));
   HwndSource.FromHwnd(hwnd).AddHook(Hook);RefreshGeometry();
-  window.MouseLeftButtonDown+=OnDown;window.MouseLeftButtonUp+=OnUp;window.LostMouseCapture+=OnLost;CompositionTarget.Rendering+=Render;
+  window.MouseLeftButtonDown+=OnDown;window.MouseLeftButtonUp+=OnUp;window.LostMouseCapture+=OnLost;window.IsVisibleChanged+=OnVisibility;CompositionTarget.Rendering+=Render;
  }
  public BitmapSource Portrait {get{return sheets["core"][0].Image;}}
  public void Resize(double size){girl.Width=previous.Width=effects.Width=size;girl.Height=previous.Height=effects.Height=Math.Round(size*4/3);window.Width=size+80;window.Height=Math.Round(size*4/3)+108;window.UpdateLayout();RefreshGeometry();}
@@ -102,8 +152,9 @@ public sealed class DragonAnimator : IDisposable {
   effects.Measure(new Size(girl.Width,girl.Height));effects.Arrange(new Rect(0,0,girl.Width,girl.Height));
   var bitmap=new RenderTargetBitmap((int)girl.Width,(int)girl.Height,96,96,PixelFormats.Pbgra32);bitmap.Render(effects);
  }
+ void OnVisibility(object sender,DependencyPropertyChangedEventArgs e){lastRender=0;}
  void Render(object sender,EventArgs e){
-  if(disposed||!positioned)return;double now=clock.Elapsed.TotalSeconds,raw=now-lastRender;if(raw<.001)return;
+  if(disposed||!positioned)return;if(!window.IsVisible){lastRender=0;return;}double now=clock.Elapsed.TotalSeconds,raw=lastRender>0?now-lastRender:1.0/60;if(raw<.001)return;
   if(lastRender>0){frameTimes.Add(raw*1000);if(frameTimes.Count>180)frameTimes.RemoveAt(0);}lastRender=now;
   double dt=Math.Min(.05,raw);DragonNative.Point mouse;DragonNative.GetCursorPos(out mouse);
   StepMotion(dt,now,mouse.X,mouse.Y);Paint(now);MoveWindow();
@@ -180,7 +231,7 @@ public sealed class DragonAnimator : IDisposable {
   }
   bool landed=!flying;flying=false;px=startX;py=startY;MoveWindow();return new[]{lag,bounded?1:0,landed?1:0};
  }
- public void Dispose(){if(disposed)return;disposed=true;CompositionTarget.Rendering-=Render;window.MouseLeftButtonDown-=OnDown;window.MouseLeftButtonUp-=OnUp;window.LostMouseCapture-=OnLost;PositionEvent();}
+ public void Dispose(){if(disposed)return;disposed=true;CompositionTarget.Rendering-=Render;window.MouseLeftButtonDown-=OnDown;window.MouseLeftButtonUp-=OnUp;window.LostMouseCapture-=OnLost;window.IsVisibleChanged-=OnVisibility;PositionEvent();}
 }
 
 public sealed class DragonEffects : FrameworkElement {
