@@ -112,7 +112,7 @@ public sealed class DragonAnimator : IDisposable {
  }
  void StepMotion(double dt,double now,double mouseX,double mouseY){
   if(down){
-   
+
    if(!dragging&&Math.Sqrt(Math.Pow(mouseX-downX,2)+Math.Pow(mouseY-downY,2))>4){dragging=true;Interaction("drag-start");}
    if(dragging){trail.Add(new[]{now,mouseX,mouseY});trail.RemoveAll(sample=>now-sample[0]>.2);
     // Same damped spring equation, with tighter 60+ Hz tracking. Substeps avoid frame-spike instability.
