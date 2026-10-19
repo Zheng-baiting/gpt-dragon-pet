@@ -3,13 +3,17 @@ import json
 import math
 import os
 import subprocess
+import sys
+import hashlib
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / 'work' / 'tools' / 'python'))
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw
-
-ROOT = Path(__file__).resolve().parent.parent
-FPS = 30
+import cv2
+cv2.setNumThreads(2)
+FPS = 120
 FFMPEG = os.environ.get("GPT_PET_FFMPEG", "ffmpeg")
 
 
@@ -54,37 +58,70 @@ def sheet_frames(name, columns, rows):
     return result
 
 
-def animate(frames, timeline, folder, breathe=False):
+def animate(frames, timeline, folder, output, breathe=False):
     folder.mkdir(parents=True, exist_ok=True)
-    premultiplied = [frame.convert("RGBa") for frame in frames]
+    premultiplied = [np.asarray(frame.convert('RGBa'), dtype=np.float32) for frame in frames]
+    gray = [cv2.cvtColor(np.asarray(frame), cv2.COLOR_RGBA2GRAY) for frame in frames]
+    grid_y, grid_x = np.mgrid[:360, :640].astype(np.float32)
+    flow_cache = {}
+    flow_engine = cv2.DISOpticalFlow_create(cv2.DISOPTICAL_FLOW_PRESET_MEDIUM)
+    flow_engine.setFinestScale(0)
     count = round(timeline[-1][0] * FPS)
     rendered = []
-    for number in range(count):
-        time = number / FPS
-        interval = next(i for i in range(len(timeline) - 1) if timeline[i + 1][0] > time)
-        left, right = timeline[interval], timeline[interval + 1]
-        progress = (time - left[0]) / (right[0] - left[0])
-        progress = (1 - math.cos(math.pi * progress)) / 2
-        frame = Image.blend(premultiplied[left[1]], premultiplied[right[1]], progress).convert("RGBA")
-        if breathe:
-            # A small continuous breath keeps the feet fixed; drawn eye frames blink.
-            pulse = math.sin(2 * math.pi * time / timeline[-1][0])
-            height = round(360 * (1 + 0.008 * pulse))
-            scaled = frame.resize((640, height), Image.Resampling.BICUBIC)
-            canvas = Image.new("RGBA", (640, 360))
-            canvas.alpha_composite(scaled, (0, round(330 * (1 - height / 360))))
-            frame = canvas
-        frame.save(folder / f"{number:04}.png")
-        if number % 3 == 0:
-            rendered.append(frame.resize((480, 270), Image.Resampling.LANCZOS))
-    return count, rendered
-
-
-def encode(folder, count, output):
-    subprocess.run([FFMPEG, "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
-                    "-framerate", str(FPS), "-i", str(folder / "%04d.png"), "-frames:v", str(count),
-                    "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-lossless", "1",
-                    "-auto-alt-ref", "0", "-row-mt", "1", "-threads", "2", "-an", str(output)], check=True)
+    hashes = set()
+    command = [FFMPEG, "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
+                    "-f", "rawvideo", "-pixel_format", "rgba", "-video_size", "640x360",
+                    "-framerate", str(FPS), "-i", "pipe:0", "-frames:v", str(count),
+                    "-c:v", "libvpx-vp9", "-pix_fmt", "yuva420p", "-b:v", "0", "-crf", "18",
+                    "-deadline", "good", "-cpu-used", "4", "-tile-columns", "1",
+                    "-auto-alt-ref", "0", "-row-mt", "1", "-threads", "2", "-an", str(output)]
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    try:
+        for number in range(count):
+            time = number / FPS
+            interval = next(i for i in range(len(timeline) - 1) if timeline[i + 1][0] > time)
+            left, right = timeline[interval], timeline[interval + 1]
+            progress = (time - left[0]) / (right[0] - left[0])
+            progress = (1 - math.cos(math.pi * progress)) / 2
+            lidx, ridx = left[1], right[1]
+            if lidx == ridx:
+                pixels = premultiplied[lidx]
+            else:
+                pair = (lidx, ridx)
+                if pair not in flow_cache:
+                    flow_cache[pair] = (flow_engine.calc(gray[lidx], gray[ridx], None),
+                                        flow_engine.calc(gray[ridx], gray[lidx], None))
+                forward, backward = flow_cache[pair]
+                first = cv2.remap(premultiplied[lidx], grid_x-progress*forward[:,:,0],
+                                  grid_y-progress*forward[:,:,1], cv2.INTER_LINEAR)
+                second = cv2.remap(premultiplied[ridx], grid_x-(1-progress)*backward[:,:,0],
+                                   grid_y-(1-progress)*backward[:,:,1], cv2.INTER_LINEAR)
+                pixels = first*(1-progress) + second*progress
+            raw = np.clip(np.rint(pixels), 0, 255).astype(np.uint8).tobytes()
+            frame = Image.frombytes('RGBa', (640,360), raw)
+            if breathe:
+                # Continuous subpixel breathing: no integer resize or position steps.
+                pulse = math.sin(2*math.pi*time/timeline[-1][0])
+                sx, sy = 1-0.003*pulse, 1+0.008*pulse
+                frame = frame.transform((640,360), Image.Transform.AFFINE,
+                    (1/sx,0,320*(1-1/sx),0,1/sy,330*(1-1/sy)), Image.Resampling.BICUBIC)
+            frame = frame.convert('RGBA')
+            data = frame.tobytes()
+            hashes.add(hashlib.sha256(data).digest())
+            process.stdin.write(data)
+            if number in {0, round(count/4), round(count/2), round(count*3/4), count-1}:
+                frame.save(folder / f'{number:04}.png')
+            if number % (FPS//10) == 0:
+                rendered.append(frame.resize((480,270), Image.Resampling.LANCZOS))
+        process.stdin.close()
+        error = process.stderr.read().decode('utf-8', errors='replace')
+        if process.wait() != 0:
+            raise RuntimeError(error)
+    finally:
+        if process.poll() is None:
+            process.terminate()
+            process.wait(timeout=5)
+    return count, rendered, len(hashes)
 
 
 def main():
@@ -101,10 +138,11 @@ def main():
         ("Q版-点击招手", wave, wave_timeline, False),
     ]:
         folder = ROOT / "work" / "basic-frames" / name
-        count, gif_frames = animate(frames, timeline, folder, breath)
         output = out / f"{name}.webm"
-        encode(folder, count, output)
-        info.append({"name": name, "file": output.name, "frames": count, "fps": FPS, "duration": count / FPS})
+        count, gif_frames, unique = animate(frames, timeline, folder, output, breath)
+        info.append({"name": name, "file": output.name, "frames": count, "fps": FPS,
+                     "duration": count / FPS, "uniqueRenderedFrames": unique,
+                     "interpolation": "bidirectional-optical-flow", "originalKeyframes": len(frames)})
         preview_frames += gif_frames
     # First idle frame is the reference used on the desktop, so the artwork matches.
     idle[0].resize((1920, 1080), Image.Resampling.LANCZOS).save(ROOT / "assets" / "gpt-reference.png", optimize=True)

@@ -24,19 +24,28 @@ test('all original menu actions are mapped once; basic preview uses real clips',
   assert(tree[0].children.some((group) => group.label === '时节'));
 });
 
-test('transparent VP9 decodes correctly and opaque video is rejected', async () => {
+test('transparent clips decode at 120 fps with changing in-between frames; opaque video is rejected', async () => {
   const folder = join(root, 'work/test-media');
   await mkdir(folder, { recursive: true });
   const opaque = join(folder, 'opaque.webm');
   runVideo(['-y', '-f', 'lavfi', '-i', 'color=white:size=64x36:rate=1', '-t', '1',
     '-c:v', 'libvpx-vp9', '-threads', '1', opaque]);
   assert.throws(() => assertAlpha(opaque));
-  for (const name of ['Q版-眨眼呼吸', 'Q版-点击招手']) {
+  const manifest = JSON.parse(await readFile(join(root, 'assets/basic/manifest.json'), 'utf8'));
+  for (const [name, frames] of [['Q版-眨眼呼吸', 540], ['Q版-点击招手', 288]]) {
     const file = join(root, 'assets/basic', name + '.webm');
     assertAlpha(file);
-    const hashes = runVideo(['-c:v', 'libvpx-vp9', '-i', file, '-an', '-f', 'framemd5', '-']).stdout
-      .split('\n').filter((line) => line && !line.startsWith('#')).map((line) => line.split(',').at(-1).trim());
-    assert(new Set(hashes).size > 10, 'Each basic clip must contain changing character frames.');
+    const decoded = runVideo(['-c:v', 'libvpx-vp9', '-i', file, '-an', '-f', 'framemd5', '-']).stdout;
+    assert.match(decoded, /#tb 0: 1\/120\s/);
+    const rows = decoded.split('\n').filter((line) => line && !line.startsWith('#'));
+    assert.equal(rows.length, frames);
+    const hashes = rows.map(line => line.split(',').at(-1).trim());
+    // Four copies of each 30 fps frame would have at most 25% unique frames.
+    assert(new Set(hashes).size > frames / 2, 'Interpolation must produce changing intermediate frames.');
+    const entry = manifest.find(item => item.name === name);
+    assert.equal(entry.fps, 120);
+    assert.equal(entry.frames, frames);
+    assert.equal(entry.duration, frames / 120);
   }
 });
 

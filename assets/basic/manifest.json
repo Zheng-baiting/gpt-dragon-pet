@@ -2,15 +2,21 @@
   {
     "name": "Q版-眨眼呼吸",
     "file": "Q版-眨眼呼吸.webm",
-    "frames": 135,
-    "fps": 30,
-    "duration": 4.5
+    "frames": 540,
+    "fps": 120,
+    "duration": 4.5,
+    "uniqueRenderedFrames": 309,
+    "interpolation": "bidirectional-optical-flow",
+    "originalKeyframes": 8
   },
   {
     "name": "Q版-点击招手",
     "file": "Q版-点击招手.webm",
-    "frames": 72,
-    "fps": 30,
-    "duration": 2.4
+    "frames": 288,
+    "fps": 120,
+    "duration": 2.4,
+    "uniqueRenderedFrames": 223,
+    "interpolation": "bidirectional-optical-flow",
+    "originalKeyframes": 6
   }
 ]

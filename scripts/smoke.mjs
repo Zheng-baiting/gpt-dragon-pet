@@ -7,6 +7,54 @@ import { root, upstream, json } from '../src/paths.mjs';
 import { stop } from '../src/control.mjs';
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function measurePlayback(evaluate, milliseconds) {
+  return evaluate(`new Promise(resolve => {
+    const elements = [...document.querySelectorAll('video')];
+    const started = performance.now(); const callbacks = new Map();
+    let displayed = 0; let finished = false;
+    const samples = new Map();
+    const current = sprites[0];
+    const initialFront = current.front === 0 ? current.videoA : current.videoB;
+    const qualityBefore = initialFront.getVideoPlaybackQuality();
+    function next(video) {
+      callbacks.set(video, video.requestVideoFrameCallback((now, metadata) => {
+        if (finished) return;
+        const sprite = sprites[0];
+        const front = sprite.front === 0 ? sprite.videoA : sprite.videoB;
+        if (video === front) {
+          displayed++;
+          const sample = samples.get(video) || { first: metadata, last: metadata, callbacks: 0 };
+          sample.last = metadata; sample.callbacks++;
+          samples.set(video, sample);
+        }
+        next(video);
+      }));
+    }
+    elements.forEach(next);
+    setTimeout(() => {
+      finished = true;
+      for (const [video, callback] of callbacks) video.cancelVideoFrameCallback(callback);
+      const qualityAfter = initialFront.getVideoPlaybackQuality();
+      const elapsed = (performance.now() - started) / 1000;
+      // A paused outgoing video may count discarded queued frames as dropped.
+      // Restrict quality counters to the video under measurement.
+      const total = Math.max(0, qualityAfter.totalVideoFrames-qualityBefore.totalVideoFrames);
+      const dropped = Math.max(0, qualityAfter.droppedVideoFrames-qualityBefore.droppedVideoFrames);
+      // Callbacks may be coalesced. Use the compositor's presentedFrames counter,
+      // not the number of JavaScript callbacks, to measure video presentation.
+      const segments = [...samples.values()].map(s => ({
+        frames: s.last.presentedFrames - s.first.presentedFrames,
+        seconds: (s.last.presentationTime - s.first.presentationTime) / 1000,
+        callbackCount: s.callbacks, first: s.first, last: s.last
+      }));
+      const observedFrames = segments.reduce((sum,s) => sum+s.frames,0);
+      const observedSeconds = segments.reduce((sum,s) => sum+s.seconds,0);
+      resolve({ seconds: elapsed, presentedCallbacks: displayed, callbackFPS: displayed / elapsed,
+        observedFPS: observedSeconds ? observedFrames / observedSeconds : 0, segments, totalVideoFrames: total,
+        droppedVideoFrames: dropped, dropPercent: total ? dropped / total * 100 : 0 });
+    }, ${milliseconds});
+  })`);
+}
 const port = await new Promise((resolve) => {
   const probe = createServer();
   probe.listen(0, '127.0.0.1', () => {
@@ -103,7 +151,8 @@ try {
     await pause(100);
   }
   assert(playedWave, 'Click did not play the chibi wave clip.');
-  await pause(800);
+  await pause(100);
+  const wavePlayback = await measurePlayback(evaluate, 1800);
   const waveImage = await send('Page.captureScreenshot', { format: 'png' });
   await writeFile(join(root, 'work/native-wave.png'), Buffer.from(waveImage.data, 'base64'));
   let returnedToIdle = false;
@@ -113,6 +162,7 @@ try {
     await pause(100);
   }
   assert(returnedToIdle, 'Wave did not return to blinking idle.');
+  const playback = await measurePlayback(evaluate, 3000);
   const frameTiming = await evaluate(`new Promise(resolve => {
     const frames = []; let last; function tick(now) {
       if (last !== undefined) frames.push(now - last); last = now;
@@ -120,10 +170,15 @@ try {
       else { const sorted = frames.toSorted((a,b) => a-b); resolve({ medianMs: sorted[60], p95Ms: sorted[114] }); }
     } requestAnimationFrame(tick);
   })`);
-  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, playedWave, returnedToIdle, dump, frameTiming };
+  const report = { renderer: 'dsh-pet@0.3.7', previewIsStatic: false, playedWave, returnedToIdle, dump, frameTiming, playback, wavePlayback };
   await writeFile(join(root, 'work/smoke-report.json'), json(report));
+  if (process.env.GPT_PET_MIN_FPS) {
+    const minimum = Number(process.env.GPT_PET_MIN_FPS);
+    assert(playback.observedFPS >= minimum, `Idle playback below ${minimum} fps.`);
+    assert(wavePlayback.observedFPS >= minimum, `Wave playback below ${minimum} fps.`);
+  }
   console.log(JSON.stringify({ ok: true, releaseKeptPosition: dump.releaseKeptPosition,
-    interactiveFlip: dump.interactiveFlip, menu: dump.menuSmoke, playedWave, returnedToIdle, frameTiming }, null, 2));
+    interactiveFlip: dump.interactiveFlip, menu: dump.menuSmoke, playedWave, returnedToIdle, frameTiming, playback, wavePlayback }, null, 2));
 } finally {
   socket?.close();
   await stop();
