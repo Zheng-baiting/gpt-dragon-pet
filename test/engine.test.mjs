@@ -1,11 +1,31 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { readFile, mkdir, mkdtemp, copyFile, writeFile, rm } from 'node:fs/promises';
+import { join, sep } from 'node:path';
 import vm from 'node:vm';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { root, upstream, animationNames } from '../src/paths.mjs';
 import { runVideo, assertAlpha } from '../scripts/media.mjs';
+import { recipes } from '../scripts/recipes.mjs';
+
+test('all 106 recipes retain the upstream action timing with the GPT character identity', async () => {
+  const all = await recipes();
+  const actions = JSON.parse(await readFile(join(root, 'assets/actions.json'), 'utf8'));
+  assert.equal(all.length, 106);
+  assert.deepEqual(all.map(item => item.name), actions.map(item => item.name));
+  assert(all.every(item => item.prompt.includes('10') && !item.prompt.includes('Q版蓝发女仆')));
+  const idle = all.find(item => item.name === '待机呼吸休闲');
+  assert.match(idle.prompt, /0~3秒/);
+  assert.match(idle.prompt, /3~7秒/);
+  assert.match(idle.prompt, /7~10秒/);
+  assert.match(idle.prompt, /白龙尾巴/);
+  const hashes = JSON.parse(await readFile(join(root, 'vendor/dsh-pet/hashes.json'), 'utf8'));
+  for (const entry of hashes) {
+    const bytes = await readFile(join(root, 'vendor/dsh-pet', entry.File));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), entry.Sha256, `Upstream source changed: ${entry.File}`);
+  }
+});
 
 test('all original menu actions are mapped once; basic preview uses real clips', async () => {
   const config = JSON.parse(await readFile(join(root, 'config/gpt.json'), 'utf8'));
@@ -46,6 +66,30 @@ test('transparent clips decode at 120 fps with changing in-between frames; opaqu
     assert.equal(entry.fps, 120);
     assert.equal(entry.frames, frames);
     assert.equal(entry.duration, frames / 120);
+  }
+});
+
+test('import preserves the 120 fps file exactly and refuses to overwrite an action', async () => {
+  await mkdir(join(root, 'work'), { recursive: true });
+  const directory = await mkdtemp(join(root, 'work/import-test-'));
+  try {
+    for (const folder of ['src', 'scripts', 'assets']) await mkdir(join(directory, folder));
+    for (const file of ['src/paths.mjs', 'scripts/media.mjs']) await copyFile(join(root, file), join(directory, file));
+    await writeFile(join(directory, 'assets/actions.json'), JSON.stringify([{ name: 'fixture', file: 'fixture.webm' }]));
+    await copyFile(join(root, 'assets/basic/Q版-点击招手.webm'), join(directory, 'source.webm'));
+    const worker = spawnSync(process.execPath, ['--input-type=module'], {
+      cwd: directory, encoding: 'utf8', windowsHide: true,
+      input: `import assert from 'node:assert/strict';
+        import { readFile } from 'node:fs/promises';
+        import { importVideo } from './scripts/media.mjs';
+        await importVideo('fixture', 'source.webm');
+        assert.deepEqual(await readFile('source.webm'), await readFile('assets/webm/fixture.webm'));
+        await assert.rejects(importVideo('fixture', 'source.webm'), /已经存在/);`,
+    });
+    assert.equal(worker.status, 0, worker.stderr);
+  } finally {
+    assert(directory.startsWith(join(root, 'work') + sep));
+    await rm(directory, { recursive: true, force: true });
   }
 });
 

@@ -23,11 +23,11 @@ npm start
 
 双击 `预览GPT娘.vbs` 可以隐藏终端启动。角色会眨眼、轻微呼吸，点击时招手，结束后回到待机。窗口右键菜单和拖动来自上游。`npm run stop` 关闭本项目窗口；`npm run status` 查看状态。
 
-仅在重建或导入素材时才需要已有的 FFmpeg。若 FFmpeg 不在 PATH，可仅对当前终端设置路径：
+导入已检查的成品时需要已有的 FFmpeg 与 FFprobe；处理源视频另需已有 Python，见制作文档。若 FFmpeg 不在 PATH，可仅对当前终端设置路径：
 
 ```powershell
 $env:GPT_PET_FFMPEG = '你的已有FFmpeg目录\ffmpeg.exe'
-npm run media:import -- '待机呼吸休闲' 'D:\已有素材\idle.webm'
+npm run media:import -- '待机呼吸休闲' 'work/pipeline/待机呼吸休闲/video-120fps.webm'
 ```
 
 Electron 固定为上游使用的 43.3.0，下载与缓存都在项目内。官方下载过慢时，可在当前终端使用上游默认镜像再执行安装：
@@ -51,11 +51,14 @@ npm run runtime:install
 
 ## 制作动作视频
 
-见 [视频制作与导入](docs/VIDEO.md)。`assets/actions.json` 列出全部 106 个入口及上游动作名；`config/gpt.json` 保留原版分类、权重和运动参数，鲸鱼专属动作名称改为白龙版本。
+见 [视频制作与导入](docs/VIDEO.md)。原项目的 106 个逐动作配方与四个后期脚本已接入，替换角色设定后仍沿用原版动作时序和站姿规范。`assets/actions.json` 列出全部入口及上游动作名；`config/gpt.json` 保留原版分类、权重和运动参数，鲸鱼专属动作名称改为白龙版本。
 
 ```powershell
 npm run media:list
-npm run media:import -- '待机呼吸休闲' 'D:\已有素材\idle.webm'
+npm run media:prompt -- '待机呼吸休闲'
+npm run media:recipes
+npm run media:process -- '待机呼吸休闲' 'D:\已有素材\idle.mp4' --chroma 0x00FF00
+npm run media:import -- '待机呼吸休闲' 'work/pipeline/待机呼吸休闲/video-120fps.webm'
 npm run check
 npm test
 ```

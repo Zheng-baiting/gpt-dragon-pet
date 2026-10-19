@@ -1,6 +1,6 @@
 {
   "name": "gpt-dragon-pet",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "使用 dsh-pet 原版底座的小只 Q 版 GPT 白龙娘，眨眼呼吸和点击招手为 120 fps。完整动作视频待导入。",
   "mcpServers": "./.mcp.json",
   "interface": {

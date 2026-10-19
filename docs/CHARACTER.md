@@ -29,4 +29,6 @@ python scripts/build-basic.py
 
 这些是基础关键帧动画，不是图生视频服务生成的完整动作。没有用它们冒充鲸鱼娘的 106 段动作视频。基础模式拖动时沿用待机画面，位置与抛掷由原版物理处理；悬空姿态、走路、生活动作等仍未制作。
 
-`assets/gpt-reference.png` 取实际使用的 Q 版待机首帧，与桌面角色保持一致。`assets/basic-preview.gif` 是 10 fps 的待机和招手缩略预览，不用于判断桌面播放帧率。当前非官方同人形象不能声称 OpenAI 官方背书、合作或官方吉祥物身份；角色素材仅供个人非商业同人用途。
+`assets/gpt-reference.png` 取基础待机首帧，用作当前桌面与插件图标。完整视频制作使用 `assets/gpt-video-reference.png`：从同一角色的单张 Q 版定稿清理、对齐而来，保留完整龙角、翅膀和尾巴，避免动作帧网格边界裁切参考图。`scripts/pipeline.py reference` 按原项目的 16:9、头顶与脚底规范生成绿幕参考，供逐动作视频制作。
+
+`assets/basic-preview.gif` 是 10 fps 的待机和招手缩略预览，不用于判断桌面播放帧率。当前非官方同人形象不能声称 OpenAI 官方背书、合作或官方吉祥物身份；角色素材仅供个人非商业同人用途。

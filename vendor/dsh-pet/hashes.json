@@ -1,0 +1,26 @@
+[
+  {
+    "File": "action-prompts.md",
+    "Sha256": "df4af712c2d9c34da823ecf4b69e92d119e8f24fb37f8ad7a0be3ff4dd581405"
+  },
+  {
+    "File": "chroma_step02.py",
+    "Sha256": "d86368a00a5910eeb67f2dcdc76298822cc875d659d97ed88b1e9f78098f8050"
+  },
+  {
+    "File": "encode_thumbs.py",
+    "Sha256": "f60f12c9e16224161a45fc090d3fead44ad4aba2afcc391d58ca7e2447d5bd2d"
+  },
+  {
+    "File": "LICENSE",
+    "Sha256": "22757dc9c895b2729a2fc684d227cadfb54d5af3dd300029926839e8c4e269ce"
+  },
+  {
+    "File": "normalize_step03.py",
+    "Sha256": "1b7a51d84b9a5eef1df1f0ef06b1cab046abe28ff4a0f58a086fa6f650321ac8"
+  },
+  {
+    "File": "pr_import_step02.py",
+    "Sha256": "27cb58643d887341918e955a9eebf95cdc6e161e9021ca524d8b16087a25d1f2"
+  }
+]

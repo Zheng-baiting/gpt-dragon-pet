@@ -11,8 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'work' / 'tools' / 'python'))
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw
-import cv2
-cv2.setNumThreads(2)
+from motion import prepare_pair, interpolate
 FPS = 120
 FFMPEG = os.environ.get("GPT_PET_FFMPEG", "ffmpeg")
 
@@ -60,12 +59,8 @@ def sheet_frames(name, columns, rows):
 
 def animate(frames, timeline, folder, output, breathe=False):
     folder.mkdir(parents=True, exist_ok=True)
-    premultiplied = [np.asarray(frame.convert('RGBa'), dtype=np.float32) for frame in frames]
-    gray = [cv2.cvtColor(np.asarray(frame), cv2.COLOR_RGBA2GRAY) for frame in frames]
-    grid_y, grid_x = np.mgrid[:360, :640].astype(np.float32)
+    premultiplied = [frame.convert('RGBa') for frame in frames]
     flow_cache = {}
-    flow_engine = cv2.DISOpticalFlow_create(cv2.DISOPTICAL_FLOW_PRESET_MEDIUM)
-    flow_engine.setFinestScale(0)
     count = round(timeline[-1][0] * FPS)
     rendered = []
     hashes = set()
@@ -85,20 +80,12 @@ def animate(frames, timeline, folder, output, breathe=False):
             progress = (1 - math.cos(math.pi * progress)) / 2
             lidx, ridx = left[1], right[1]
             if lidx == ridx:
-                pixels = premultiplied[lidx]
+                frame = premultiplied[lidx]
             else:
                 pair = (lidx, ridx)
                 if pair not in flow_cache:
-                    flow_cache[pair] = (flow_engine.calc(gray[lidx], gray[ridx], None),
-                                        flow_engine.calc(gray[ridx], gray[lidx], None))
-                forward, backward = flow_cache[pair]
-                first = cv2.remap(premultiplied[lidx], grid_x-progress*forward[:,:,0],
-                                  grid_y-progress*forward[:,:,1], cv2.INTER_LINEAR)
-                second = cv2.remap(premultiplied[ridx], grid_x-(1-progress)*backward[:,:,0],
-                                   grid_y-(1-progress)*backward[:,:,1], cv2.INTER_LINEAR)
-                pixels = first*(1-progress) + second*progress
-            raw = np.clip(np.rint(pixels), 0, 255).astype(np.uint8).tobytes()
-            frame = Image.frombytes('RGBa', (640,360), raw)
+                    flow_cache[pair] = prepare_pair(frames[lidx], frames[ridx])
+                frame = interpolate(flow_cache[pair], progress)
             if breathe:
                 # Continuous subpixel breathing: no integer resize or position steps.
                 pulse = math.sin(2*math.pi*time/timeline[-1][0])

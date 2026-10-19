@@ -1,47 +1,85 @@
-# 正式动作视频入口
+# 按 dsh-pet 原项目制作完整动作
 
-鲸鱼娘原版使用 106 段 VP9 Alpha 视频，角色和动作已合成在像素中。保留原版动作可以用原视频做角色替换，替换后逐段检查人物和动作一致性。当前已附带两段 120 fps 的 Q 版基础动画；完整换角动作仍未导入。
+本项目直接复用 [PC2005-cloud/dsh-pet](https://github.com/PC2005-cloud/dsh-pet) 的 106 个逐动作配方与素材制作脚本，固定提交 cc623c7e78aaab7e708f5aede783c3de01b11964，与运行包 dsh-pet@0.3.7 一致。原作者用豆包生成动作视频，再做透明后期。这里将角色设定换成 Q 版 GPT 白龙娘，动作时序、构图和首尾站姿沿用原配方。
 
-换角可以先用原版“待机呼吸休闲”的 3 秒片段与 `assets/gpt-reference.png` 试做，确认质量后再决定完整批次。[Runway Edit Studio](https://help.runwayml.com/hc/en-us/articles/51683104370451-Creating-with-Edit-Studio) 支持用参考图修改视频中的角色，服务输出最高 30 fps，仍需本地制作 120 fps 运动中间帧。提交素材前须指定服务、数据范围与费用上限。
+当前制作流程已接通，**完整 GPT 动作视频仍为 0/106**。现有两段基础动画独立计数；配方齐全不代表视频已生成。
 
-## 制作顺序
+## 1. 角色与动作配方
 
-先制作并检查“待机呼吸休闲”，随后是“被鼠标拖拽悬空反馈”、五种点击回应、三个移动动作、六种工作状态；确认人物一致和透明边缘后再补其余生活、玩耍与时节动作。完整名称以 `npm run media:list` 为准。
+assets/gpt-video-reference.png 是完整龙角、翅膀和尾巴的 Q 版站姿参考。prompts/character.md 定义角色身份；vendor/dsh-pet/action-prompts.md 保留原版全部配方，scripts/recipes.mjs 按 assets/actions.json 的映射替换角色描述，保留各阶段动作安排。
 
-每段视频需要：固定机位、16:9、角色全身居中、脚底同一高度、首尾回到同一中立站姿。禁止镜头移动、人物变形、突然切换服装、龙角或龙尾消失；保留发色、瞳色和长裙细节。必须逐段人工预览，透明度检查只能验证视频格式，不能判断动作质量和人物一致性。
+~~~powershell
+npm run media:prompt -- '待机呼吸休闲'
+npm run media:recipes
+~~~
 
-## 角色与通用提示词
+后一条把全部 106 份可直接使用的 GPT 娘提示词导出到项目 work/recipes/，不联网。每份都包含角色定义、原版通用构图要求和该动作的按秒安排。sourceName 保留原动作名称，可对照原视频检查。
 
-使用 `assets/gpt-reference.png` 作为角色参考。通用提示词：
+先制作待机，再制作拖拽悬空反馈、五种点击回应、移动和工作状态，最后补生活、玩耍与时节动作。每段约 10 秒，16:9，绿幕统一为 #00FF00，机位固定，人物不横向漂移，首尾回到同一正面站姿，道具按原配方出现并收回。
 
-> 一位大头小身的 Q 版白龙娘，约两头身，白色长发、淡紫色大眼睛、白色龙角、精灵耳，白紫色遮盖完整的小裙、飘袖、白靴、浅紫膜翼、蓬松白色鳞尾，细小银色结饰。精致动漫插画与柔和立体明暗，保持角色、脸部、服装一致。单个人物，全身完整，固定镜头，不运镜，无切镜，无字幕和水印。16:9；人物位于画面中央，头顶留足空间，脚底位置统一。动作：[填入动作名和具体时间安排]。开头约 1 秒与结尾约 1 秒回到参考图中立站姿。头发、裙摆、翼尖和尾巴有轻微惯性，动作连贯自然，手指稳定。使用可分离的纯绿色背景，角色服装不含绿色，不要地面投影。
+生成视频需要所选服务的账号和可用额度。上传参考图前须确认具体服务、素材范围和费用上限；本地脚本不会自动调用任何视频服务。此前为 Runway 准备的 3 秒换角试做文件仅留在 work/retarget/，不作为当前原版流程的依赖。
 
-“白龙现世”对应上游“蓝鲸现世”；“用龙尾拍打地面”对应鲸尾动作。`assets/actions.json` 的 `sourceName` 保留映射来源，不是已生成素材的声明。选择视频供应商、授权参考图上传并确认费用范围后，才能将上述提示词和参考图交给服务。
+## 2. 准备本地工具
 
-## 导入
+使用已有 Python 与 FFmpeg，当前终端设置可执行文件路径，不修改系统 PATH：
 
-已有透明 WebM：
+~~~powershell
+$env:GPT_PET_PYTHON = '你的已有Python目录\python.exe'
+$env:GPT_PET_FFMPEG = '你的已有FFmpeg目录\ffmpeg.exe'
+& $env:GPT_PET_PYTHON -m pip install --target work/tools/python --cache-dir work/pip-cache -r scripts/requirements-motion.txt
+& $env:GPT_PET_PYTHON scripts/pipeline.py reference
+~~~
 
-```powershell
-npm run media:import -- '待机呼吸休闲' 'D:\videos\idle.webm'
-```
+参考图命令生成 work/generation/gpt-source-reference.png：1280×720，头顶约 20%、脚底约 85%，与原项目的生成构图一致。源参考图保留。
 
-纯绿背景视频，先在本地做基础抠像：
+## 3. 原版后期处理与 120 fps
 
-```powershell
-npm run media:import -- '待机呼吸休闲' 'D:\videos\idle.mp4' --chroma 0x00FF00
-```
+绿幕源视频：
 
-导入器会转为 640×360、30 fps、VP9 Alpha，限制最多 10 秒并去除音频；保持宽高比，空白区域透明填充。它会实际解码 Alpha，拒绝全不透明或全透明素材，也不会覆盖已存在的视频。基础色键不等于最终抠像质量，白发、蕾丝和半透明裙边必须另行检查。
+~~~powershell
+npm run media:process -- '待机呼吸休闲' 'D:\已有视频\idle.mp4' --chroma 0x00FF00
+~~~
 
-成功导入的文件保存在 `assets/webm/`。加入正式模式前检查脚底对齐、首尾衔接、角色一致性、绿边与残影。不要把静态定稿视频复制成所有动作来凑数量。
+已手工抠像、含 Alpha 的 MOV 或 WebM：
 
-```powershell
+~~~powershell
+npm run media:process -- '待机呼吸休闲' 'D:\已有视频\idle.mov'
+~~~
+
+流程在项目内依次执行：
+
+1. 绿幕视频预处理为原脚本所需的 1280×720、24 fps，运行原版 chroma_step02.py 的 HSV 抠像；手工抠像 MOV 则走原版 pr_import_step02.py。原作者现有动作使用手工抠像路线；自动抠像仍须检查白发和半透明边缘。
+2. 运行原版 normalize_step03.py：按首尾站姿测量人物高度，归一化到 2160×1215 母版、角色高 900、脚底线 1115；扫描全片，拒绝对齐后会裁掉动作的构图。包装器将输入时间戳对齐到 24 fps 网格，避免末帧因毫秒取整丢失。
+3. 运行原版 encode_thumbs.py：640×360、24 fps 的透明 VP9 WebM。本项目将质量设为 CRF 18。
+4. 在预乘 Alpha 空间用双向光流生成 120 fps 运动中间帧，保留动作时长，再输出透明 WebM。补帧不能补出源视频里没有的动作，仍需逐段检查人物和遮挡变化。
+
+原脚本原样保存在 vendor/dsh-pet/，包装器仅在当前进程指定路径、尺寸、编码参数和线程限制。每次只处理一个动作，编解码和滤镜各限两个线程。原始输入不修改，中间文件均在 work/pipeline/<动作名>/：
+
+- step02.webm：抠像结果。
+- step03.webm：统一站姿的母版。
+- step04-24fps.webm：原项目格式的播放视频。
+- video-120fps.webm：120 fps 成品。
+- review.png、report.json：六帧检查图与格式、对齐参数记录。
+
+## 4. 检查后导入
+
+逐段看完整视频与检查图，确认人物、表情、手脚、龙角、翼和尾巴一致，首尾站姿衔接，透明边缘无绿边、残影或裁切。格式检查不能替代动作质量检查。
+
+~~~powershell
+npm run media:import -- '待机呼吸休闲' 'work/pipeline/待机呼吸休闲/video-120fps.webm'
 npm run media:list
 npm run check
-npm run start:full
-```
+~~~
 
-## 原版行为保留范围
+导入只接受 640×360、120 fps、无音轨、含透明背景且不超过 10.2 秒的 WebM；按字节复制，避免把 120 fps 再降成 30 fps，也不会覆盖已存在的动作。成品在 assets/webm/。全部 106 段齐全后执行 npm run start:full。
 
-菜单树、分层菜单布局、视频双缓冲、权重选择、弹簧跟手、甩抛、跨屏几何均来自原版。当前修改运行目录隔离和角色配置。点击时的挤压来自原版代码；Q 版眨眼呼吸与点击招手来自已附带的基础视频，其余表情和肢体动作仍需制作相应素材。
+## 验证与运行逻辑
+
+~~~powershell
+npm test
+& $env:GPT_PET_PYTHON scripts/test-pipeline.py
+~~~
+
+测试验证 106 个配方均对应原版动作、上游源文件摘要未变化，并用隔离的几何测试片验证绿幕抠像、居中、脚底、透明通道、时长和 120 fps。测试片不导入正式动作库。
+
+菜单、双缓冲切换、随机权重、弹簧跟手、甩抛、落地和多屏几何继续来自原版运行底座；这些逻辑与生成视频中的人物肢体动作共同构成最终效果。

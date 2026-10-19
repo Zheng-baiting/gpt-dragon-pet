@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { root } from './paths.mjs';
 import { status, stop } from './control.mjs';
 import { mediaStatus } from '../scripts/media.mjs';
+import { recipes } from '../scripts/recipes.mjs';
 
 const tools = [
   { name: 'get_gpt_pet_status', description: '查看 GPT 娘原版底座的运行状态和已导入视频数量；不读取聊天、账户或额度。',
@@ -19,7 +20,8 @@ async function call(name, args) {
   if (name === 'get_gpt_pet_status') {
     const actions = await mediaStatus();
     return { preview: await status(true), pet: await status(false),
-      videos: `${actions.filter((a) => a.available).length}/${actions.length}`, basicAnimations: 2, basicVideoFPS: 120, previewIsStatic: false };
+      videos: `${actions.filter((a) => a.available).length}/${actions.length}`, basicAnimations: 2, basicVideoFPS: 120,
+      originalActionRecipes: (await recipes()).length, previewIsStatic: false };
   }
   if (name === 'hide_gpt_pet') { await stop(); return { ok: true }; }
   if (name !== 'show_gpt_pet') throw Error('未知工具。');
@@ -55,7 +57,7 @@ for await (const line of input) {
     let result;
     if (request.method === 'initialize') result = {
       protocolVersion: request.params?.protocolVersion || '2025-03-26',
-      capabilities: { tools: {} }, serverInfo: { name: 'gpt-dragon-pet', version: '2.2.0' },
+      capabilities: { tools: {} }, serverInfo: { name: 'gpt-dragon-pet', version: '2.3.0' },
     };
     else if (request.method === 'ping') result = {};
     else if (request.method === 'tools/list') result = { tools };

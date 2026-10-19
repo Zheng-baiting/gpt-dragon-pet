@@ -1,6 +1,6 @@
 {
   "name": "gpt-whale-pet",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "type": "module",
   "description": "GPT 白龙娘角色包，直接使用 dsh-pet 原版动画和桌面运行底座。",
@@ -14,6 +14,9 @@
     "stop": "node src/control.mjs stop",
     "status": "node src/control.mjs status",
     "media:list": "node scripts/media.mjs list",
+    "media:prompt": "node scripts/recipes.mjs show",
+    "media:recipes": "node scripts/recipes.mjs export",
+    "media:process": "node scripts/media.mjs process",
     "media:import": "node scripts/media.mjs import",
     "check": "node scripts/check.mjs",
     "test": "node --test test/*.test.mjs",

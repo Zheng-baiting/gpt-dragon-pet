@@ -1,8 +1,9 @@
-import { readFile, mkdir, access, rename, unlink } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { readFile, mkdir, access, copyFile } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { root, runtime } from '../src/paths.mjs';
+import { root } from '../src/paths.mjs';
 
 export const ffmpeg = () => process.env.GPT_PET_FFMPEG || 'ffmpeg';
 export function runVideo(args) {
@@ -16,7 +17,7 @@ export function runVideo(args) {
 
 export function assertAlpha(file) {
   const result = runVideo(['-c:v', 'libvpx-vp9', '-i', file, '-an', '-vf',
-    'fps=1,alphaextract,signalstats,metadata=print:file=-', '-f', 'null', '-']);
+    'select=not(mod(n\\,24)),alphaextract,signalstats,metadata=print:file=-', '-f', 'null', '-']);
   const min = [...result.stdout.matchAll(/lavfi\.signalstats\.YMIN=(\d+)/g)].map((v) => Number(v[1]));
   const max = [...result.stdout.matchAll(/lavfi\.signalstats\.YMAX=(\d+)/g)].map((v) => Number(v[1]));
   if (!min.some((v) => v < 250) || !max.some((v) => v > 10)) {
@@ -32,35 +33,52 @@ export async function mediaStatus() {
   }));
 }
 
-export async function importVideo(name, input, chroma) {
+function probe(input) {
+  const binary = process.env.GPT_PET_FFPROBE || join(dirname(ffmpeg()), process.platform === 'win32' ? 'ffprobe.exe' : 'ffprobe');
+  const result = spawnSync(binary, ['-v', 'error', '-show_entries',
+    'stream=codec_type,width,height,r_frame_rate,avg_frame_rate:format=duration', '-of', 'json', input],
+  { encoding: 'utf8', windowsHide: true });
+  if (result.error || result.status !== 0) throw Error('无法读取视频参数，请检查已有 FFprobe 路径。');
+  return JSON.parse(result.stdout);
+}
+
+async function actionFor(name) {
   const actions = await mediaStatus();
   const action = actions.find((a) => a.name === name);
   if (!action) throw Error('未知动作名。先执行 npm run media:list 查看允许的名称。');
-  if (action.available) throw Error('该动作已经存在；请先核对现有文件，导入不会覆盖素材。');
-  if (chroma && !/^0x[0-9a-f]{6}$/i.test(chroma)) throw Error('抠像颜色必须是 0xRRGGBB。');
+  return action;
+}
+
+export async function processVideo(name, input, chroma) {
+  await actionFor(name);
+  if (chroma && !/^0x00ff00$/i.test(chroma)) throw Error('原项目 HSV 抠像入口只接受绿幕；其他背景请先手工抠像导出透明 MOV。');
   input = resolve(input);
   await access(input);
-  if (!chroma) {
-    if (!input.toLowerCase().endsWith('.webm')) throw Error('无色键导入只接受已有透明 WebM；纯色背景视频需要 --chroma。');
-    // Check the source before transparent letterboxing could mask an opaque background.
-    assertAlpha(input);
+  const python = process.env.GPT_PET_PYTHON;
+  if (!python) throw Error('制作流程需要已有 Python；请仅在当前进程设置 GPT_PET_PYTHON 为其可执行文件路径。');
+  const result = spawnSync(python, [join(root, 'scripts/pipeline.py'), 'process', name, input, ...(chroma ? ['--green'] : [])],
+    { cwd: root, env: { ...process.env, PYTHONUTF8: '1' }, windowsHide: true, encoding: 'utf8', maxBuffer: 8*1024*1024 });
+  if (result.error || result.status !== 0) throw Error(result.stderr?.slice(-2400) || '素材处理未完成。');
+  return JSON.parse(result.stdout.trim());
+}
+
+export async function importVideo(name, input) {
+  const action = await actionFor(name);
+  if (action.available) throw Error('该动作已经存在；请先核对现有文件，导入不会覆盖素材。');
+  input = resolve(input);
+  await access(input);
+  if (!input.toLowerCase().endsWith('.webm')) throw Error('先执行 media:process 制作透明视频，并检查 review.png。');
+  const metadata = probe(input);
+  const video = metadata.streams.find(stream => stream.codec_type === 'video');
+  const rate = value => { const [a,b = 1] = String(value).split('/').map(Number); return a/b; };
+  if (video?.width !== 640 || video?.height !== 360 || rate(video.r_frame_rate) !== 120 || rate(video.avg_frame_rate) !== 120 ||
+      metadata.streams.some(stream => stream.codec_type === 'audio') || !(Number(metadata.format.duration) > 0 && Number(metadata.format.duration) <= 10.2)) {
+    throw Error('正式素材须为 640×360、120 fps、无音轨且不超过 10.2 秒；请先执行 media:process。');
   }
+  assertAlpha(input);
   await mkdir(join(root, 'assets/webm'), { recursive: true });
-  const temp = join(runtime, `import-${Date.now()}.webm`);
-  await mkdir(runtime, { recursive: true });
-  const filters = [
-    ...(chroma ? [`chromakey=${chroma}:0.15:0.05`] : []),
-    'scale=640:360:force_original_aspect_ratio=decrease',
-    'pad=640:360:(ow-iw)/2:(oh-ih)/2:color=0x00000000', 'format=yuva420p',
-  ];
-  try {
-    runVideo(['-y', ...(!chroma && input.toLowerCase().endsWith('.webm') ? ['-c:v', 'libvpx-vp9'] : []),
-      '-i', input, '-t', '10', '-vf', filters.join(','), '-an', '-r', '30',
-      '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-b:v', '0', '-crf', '25',
-      '-auto-alt-ref', '0', '-row-mt', '1', '-threads', '2', temp]);
-    assertAlpha(temp);
-    await rename(temp, join(root, 'assets/webm', action.file));
-  } finally { await unlink(temp).catch(() => {}); }
+  // Preserve interpolated frames exactly; importing must not downsample to 30 fps.
+  await copyFile(input, join(root, 'assets/webm', action.file), constants.COPYFILE_EXCL);
   return action.file;
 }
 
@@ -71,9 +89,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       const actions = await mediaStatus();
       for (const a of actions) console.log(`${a.available ? '已导入' : '待制作'}  ${a.name}`);
       console.log(`\n${actions.filter((a) => a.available).length}/${actions.length} 段正式动作视频已导入。`);
-    } else if (command === 'import' && name && input && (!flag || flag === '--chroma')) {
+    } else if (command === 'process' && name && input && (!flag || flag === '--chroma')) {
       if (flag && !chroma) throw Error('--chroma 缺少颜色值。');
-      console.log('已导入：' + await importVideo(name, input, chroma));
-    } else throw Error('用法：media.mjs list | import <动作名> <视频路径> [--chroma 0x00FF00]');
+      console.log(JSON.stringify(await processVideo(name, input, chroma), null, 2));
+    } else if (command === 'import' && name && input && !flag) {
+      console.log('已导入：' + await importVideo(name, input));
+    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] | import <动作名> <已检查的120fps视频>');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }
