@@ -1,22 +1,22 @@
 {
-  "name": "gpt-dragon-pet",
-  "version": "1.0.1",
-  "description": "A white dragon companion for your coding desk, inspired by dsh-pet.",
+  "name": "gpt-whale-pet",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
+  "description": "GPT 白龙娘角色包，直接使用 dsh-pet 原版动画和桌面运行底座。",
+  "engines": { "node": ">=24" },
   "scripts": {
-    "build": "node scripts/build.mjs",
-    "start": "node scripts/launch.cjs",
-    "test": "node scripts/build.mjs && node --test test/*.test.mjs",
-    "smoke": "node scripts/launch.cjs --smoke-test",
-    "install:plugin": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/install-plugin.ps1",
-    "follow:start": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action Start",
-    "follow:stop": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action Stop",
-    "follow:status": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/follow-control.ps1 -Action Status",
-    "test:follow": "powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File scripts/test-follow.ps1"
+    "setup": "node scripts/setup.mjs",
+    "runtime:install": "node src/engine.mjs --install-electron",
+    "preview": "node src/run.mjs --preview",
+    "start": "node src/run.mjs",
+    "stop": "node src/control.mjs stop",
+    "status": "node src/control.mjs status",
+    "media:list": "node scripts/media.mjs list",
+    "media:import": "node scripts/media.mjs import",
+    "check": "node scripts/check.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:native": "node scripts/smoke.mjs"
   },
-  "engines": {
-    "node": ">=24"
-  },
-  "license": "MIT"
+  "dependencies": { "dsh-pet": "0.3.7" }
 }

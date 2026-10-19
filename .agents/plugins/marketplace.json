@@ -1,10 +1,10 @@
 {
   "name": "gpt-dragon-local",
-  "interface": {"displayName": "白龙娘桌宠"},
+  "interface": { "displayName": "GPT 龙娘 · 鲸鱼底座" },
   "plugins": [{
     "name": "gpt-dragon-pet",
-    "source": {"source": "local", "path": "./.generated/plugin-package"},
-    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+    "source": { "source": "local", "path": "./.generated/plugin-package" },
+    "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
     "category": "Productivity"
   }]
 }

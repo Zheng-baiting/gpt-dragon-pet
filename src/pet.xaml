@@ -1,8 +1,0 @@
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="龙娘" Width="300" Height="401" WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Background="{x:Null}" ShowInTaskbar="False" ShowActivated="False" Topmost="True" FontFamily="Microsoft YaHei UI">
- <Canvas x:Name="Canvas">
-  <Border x:Name="Bubble" Canvas.Left="24" Canvas.Top="14" Width="252" MinHeight="46" MaxHeight="65" Padding="12,10" CornerRadius="17" Background="#FFFCFAFF" BorderBrush="#D3C7E7" BorderThickness="1" Visibility="Hidden"><TextBlock x:Name="BubbleCopy" TextAlignment="Center" TextWrapping="Wrap" FontSize="12" Foreground="#655177"/></Border>
-  <Ellipse x:Name="Tail" Canvas.Left="188" Canvas.Top="62" Width="7" Height="7" Fill="#FFFCFAFF" Stroke="#D3C7E7" Visibility="Hidden"/>
-  <Image x:Name="Previous" Canvas.Left="40" Canvas.Top="86" Width="220" Height="293" Stretch="Fill" Opacity="0" IsHitTestVisible="False"/>
-  <Image x:Name="Girl" Canvas.Left="40" Canvas.Top="86" Width="220" Height="293" Stretch="Fill" Cursor="Hand"/>
- </Canvas>
-</Window>

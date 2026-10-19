@@ -1,0 +1,133 @@
+{
+  "whisperPrompt": "你是白发紫瞳的白龙娘 GPT，是一个非官方同人桌面角色。",
+  "chatMemoryRounds": 5,
+  "whisperModel": {
+    "provider": "",
+    "model": ""
+  },
+  "chatModel": {
+    "provider": "",
+    "model": ""
+  },
+  "whisperImageEnabled": false,
+  "chatImageEnabled": false,
+  "chatImageLimit": 10,
+  "memes": {},
+  "notificationsEnabled": false,
+  "confineToScreen": false,
+  "workStatusTexts": [
+    [
+      "正在认真想下一步呢",
+      "让我整理一下思路~",
+      "正在梳理接下来要做什么"
+    ],
+    [
+      "正在处理任务呢",
+      "这一步正在进行中哦",
+      "正在继续干活呢，别打扰我~"
+    ],
+    [
+      "这一步处理好啦，接着看下一步",
+      "搞定一步，继续看看哦~"
+    ],
+    [
+      "需要你确认一下呢",
+      "这里要等你看一下哦",
+      "轮到你来决定啦，等你~"
+    ],
+    [
+      "这一轮搞定啦，真棒！",
+      "任务完成咯，可以摸鱼啦~"
+    ],
+    [
+      "这一步好像没跑通呢",
+      "刚才的操作遇到点问题哦",
+      "这里卡了一下，再等等你呢"
+    ]
+  ],
+  "physics": {
+    "gravity": 1400,
+    "restitution": 0.78,
+    "groundFriction": 2.5,
+    "ceilingBounce": true,
+    "throwPower": 1,
+    "petCollision": false
+  },
+  "pets": [
+    {
+      "id": "gpt",
+      "name": "GPT 白龙娘 · 静态定稿预览",
+      "size": 640,
+      "display": "desktop",
+      "balanceEnabled": false,
+      "whisperEnabled": false,
+      "workStatusEnabled": false,
+      "fixedEnabled": true,
+      "position": {
+        "corner": "bottom-right",
+        "marginX": 40,
+        "marginY": 28
+      }
+    }
+  ],
+  "animations": {
+    "idle": [
+      "角色定稿（静态预览）"
+    ],
+    "turn": [
+      "角色定稿（静态预览）"
+    ],
+    "drag": [
+      "角色定稿（静态预览）"
+    ],
+    "clicks": [
+      "角色定稿（静态预览）"
+    ],
+    "moves": {
+      "default": {
+        "minDist": 60,
+        "maxDist": 240,
+        "margin": 20,
+        "leadSec": 2,
+        "tailSec": 2
+      },
+      "actions": []
+    },
+    "categories": [],
+    "events": {
+      "balance": [
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）"
+      ],
+      "whisper": [
+        "角色定稿（静态预览）"
+      ],
+      "workStatus": [
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）",
+        "角色定稿（静态预览）"
+      ]
+    }
+  },
+  "eventsRefreshSec": {
+    "balance": 1800,
+    "whisper": 300
+  },
+  "animationWeights": {
+    "idle": 100,
+    "turn": 0,
+    "move": 0
+  },
+  "font": {
+    "family": "yahei",
+    "size": 21,
+    "followPet": true
+  }
+}
