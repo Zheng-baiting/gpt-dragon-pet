@@ -1,0 +1,54 @@
+{
+  "name": "原地重力下蹲压缩",
+  "aiGenerated": true,
+  "provider": "可灵 AI",
+  "model": "Kling 2.5 Turbo",
+  "source": "assets/sources/原地重力下蹲压缩-kling.mp4",
+  "sourceSha256": "764ef87a2630d35947aa47d6a881278c8557d8c724dcc87dcbce986e2ddaea2e",
+  "prompt": "assets/sources/原地重力下蹲压缩-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceAverageFrameRate": "1506250003/62760417",
+  "sourceDurationSeconds": 10.053991,
+  "preparedFPS": 24,
+  "output": "assets/webm/原地重力下蹲压缩.webm",
+  "outputSha256": "1cea178fcd3a1ef1baed2a33d720642810c1d6a05b0c607b16c49862614d70d3",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] retaining the character coordinates; watermarked source export retained",
+    "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
+    "Include dark saturated green shadows in the HSV background mask; preserve neutral black outlines",
+    "Remove the source audio; suppress green spill in the white/lavender edges",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      401,
+      20,
+      922,
+      681
+    ],
+    "greenSpillFraction": 3.2775046599900308e-06,
+    "loopAlphaMeanDifference": 0.033782552083333334,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: knees bend into a deep squat, the body holds the compressed pose, then springs upward and settles. Dark green generated ground shadow was removed. The final half-second locally estimates the first standing pose; the complete crouch and spring motion remain from the source. Full body, alpha bounds and 1205-frame timing passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 119.94002998500748,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "postprocessingScript": "scripts/finish-standing.py"
+}
