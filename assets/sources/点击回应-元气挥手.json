@@ -1,0 +1,44 @@
+{
+  "name": "点击回应-元气挥手",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/点击回应-元气挥手-doubao.mp4",
+  "sourceSha256": "bba440cf34ff0d764654216accb90937a7d208512ec0ba2321f2c1450abfbd86",
+  "prompt": "assets/sources/点击回应-元气挥手-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/点击回应-元气挥手.webm",
+  "outputSha256": "9b7d8957761b7a36587b850fe6c4f1800156054f45503a905990ffd9a6079936",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      202,
+      46,
+      435,
+      333
+    ],
+    "greenSpillFraction": 0.000008366662696095813,
+    "loopAlphaMeanDifference": 1.9493229166666666,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: both hands wave, smiling closed eyes, musical note, small V gesture, then returns to neutral; note fades out and no clipping."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

@@ -1,0 +1,44 @@
+{
+  "name": "螃蟹走路",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/螃蟹走路-doubao.mp4",
+  "sourceSha256": "671c5a34a6b97af3965dfde98c924835365b915cb7970e0a12281288080b5c75",
+  "prompt": "assets/sources/螃蟹走路-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/螃蟹走路.webm",
+  "outputSha256": "195465276bef621f1fa5909f0762fdb75bc52d92cfefcfd8e88624672160a1e1",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      190,
+      63,
+      477,
+      332
+    ],
+    "greenSpillFraction": 0.0000028973817866519996,
+    "loopAlphaMeanDifference": 0.6774088541666666,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: alternating sideways in-place steps, left-leaning body, alternating arm swing and tail sway, then returns to neutral; no clipping or ground shadow."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

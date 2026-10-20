@@ -1,0 +1,44 @@
+{
+  "name": "点击回应-挠痒咯咯笑",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/点击回应-挠痒咯咯笑-doubao.mp4",
+  "sourceSha256": "354b18700a207c5b84d370f49d6d8f78e1f475c417b3129dc7ec8212a2c25add",
+  "prompt": "assets/sources/点击回应-挠痒咯咯笑-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/点击回应-挠痒咯咯笑.webm",
+  "outputSha256": "96c99d2c64897522b3a7b18b2420eed5100aa8da421ff8e2cce3aa0486206909",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      194,
+      60,
+      438,
+      331
+    ],
+    "greenSpillFraction": 0.000005488165098641274,
+    "loopAlphaMeanDifference": 0.6633767361111111,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: surprised expression, smiling laughter, shoulder and torso movement with one hand over mouth, then returns to neutral; no clipping."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

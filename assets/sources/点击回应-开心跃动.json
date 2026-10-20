@@ -1,0 +1,45 @@
+{
+  "name": "点击回应-开心跃动",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/点击回应-开心跃动-doubao.mp4",
+  "sourceSha256": "89d1ba749bfc052f12d76ef7bf75d7ac1c58c4830d2e5e6a4593937ec0e03be7",
+  "prompt": "assets/sources/点击回应-开心跃动-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/点击回应-开心跃动.webm",
+  "outputSha256": "e584787e58d455e3ace5fd22e024d14160e4f3528d2017d09873e0410d4961c7",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      182,
+      6,
+      463,
+      333
+    ],
+    "greenSpillFraction": 0.000005736051451008407,
+    "loopAlphaMeanDifference": 2.3352864583333335,
+    "uniqueDecodedFrameHashes": 1205,
+    "limitation": "At the highest point the heart has about 6 pixels of headroom after standing normalization. All-frame bounds checks found no clipping.",
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: crouch, small happy jump with raised arms and one heart, landing and return to neutral; heart and body remain fully visible."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

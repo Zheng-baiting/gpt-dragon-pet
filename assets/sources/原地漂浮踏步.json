@@ -1,0 +1,44 @@
+{
+  "name": "原地漂浮踏步",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/原地漂浮踏步-doubao.mp4",
+  "sourceSha256": "1f676d6b97e8042dd3a4df802336b4a228877159d9935adb1b6201dd0bcdd530",
+  "prompt": "assets/sources/原地漂浮踏步-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/原地漂浮踏步.webm",
+  "outputSha256": "faf8d8033e31f9c305d2b60aa153abfccfa59f8b0ce398196778fec5ab374a46",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      194,
+      51,
+      443,
+      334
+    ],
+    "greenSpillFraction": 0.0000036254972857575126,
+    "loopAlphaMeanDifference": 0.9012239583333334,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: alternating in-place steps and arm swing, gentle hair and tail motion, then returns to neutral; full body remains visible."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}
