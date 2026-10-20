@@ -15,14 +15,16 @@
   "preparedFPS": 24,
   "sourceDurationSeconds": 5.088005,
   "output": "assets/webm/工作状态-雀跃庆祝.webm",
-  "outputSha256": "1b7f13b3732e4a2001942eb13e47278d80f1c4127d5dc5a5abb4be0981f53a90",
+  "outputSha256": "b22d17ca0a729f2c1fe8f48e99cd04a81d3e29c2a558162d99df5b225783b271",
   "durationSeconds": 5.041,
   "outputFPS": 120,
   "processing": [
     "Central extraction [256,0,768,720] preserving character coordinates; original dsh-pet HSV key",
     "Original dsh-pet standing normalization and encoding",
     "Only detached sparkles above source y=60 are fitted into the safe area: first resize upper 60 rows to 50 at y=10, then to 40 at y=20; character pixels below y=60 are unchanged.",
-    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18",
+    "Prepared 24 fps frame 33 contains generated motion blur; replace it with clear frame 34, uniformly aligned to the mean body position and height of frames 32 and 34. This estimates a clear neighbouring pose rather than restoring lost image detail.",
+    "For intervals 32 to 33 and 33 to 34, preserve the nearest clear pose while smoothly interpolating whole-character position and scale; keep existing optical flow elsewhere. Duration and 120 fps remain unchanged."
   ],
   "quality": {
     "frames": 605,
@@ -33,11 +35,11 @@
       458,
       336
     ],
-    "greenSpillFraction": 0.000005869410227664038,
-    "loopAlphaMeanDifference": 0.5110894097222223,
+    "greenSpillFraction": 8.133175507556466e-7,
+    "loopAlphaMeanDifference": 0.5111979166666667,
     "uniqueDecodedFrameHashes": 605,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed frames: in-place happy jump, raised hands and clap, compact stars fade, full body returns to neutral. Upper detached sparkles were fitted to avoid cropping without moving the character; fast jump contains brief optical-flow softness."
+    "reviewNotes": "Reviewed the corrected full-clip contact sheet and the rapid jump. One blurred generated pose is replaced from its clear neighbour; face and clothing avoid the old double-image mixture. Pose changes remain limited by the source 24 fps. Alpha bounds, loop seam and all 605 frames pass."
   },
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
 }
