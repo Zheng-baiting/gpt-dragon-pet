@@ -18,7 +18,7 @@ class PipelineTest(unittest.TestCase):
             source = folder / 'fixture.mp4'
             run([FFMPEG, '-y', '-loglevel', 'error', '-f', 'lavfi', '-i',
                  'color=0x00FF00:s=1280x720:r=24', '-vf',
-                 'drawbox=x=590:y=180:w=100:h=432:color=white:t=fill,drawbox=x=20:y=20:w=20:h=20:color=white:t=fill',
+                 'drawbox=x=590:y=180:w=100:h=432:color=white:t=fill,drawbox=x=570:y=620:w=140:h=8:color=0x001a00:t=fill,drawbox=x=20:y=20:w=20:h=20:color=white:t=fill',
                  '-t', '0.5', '-c:v', 'libx264', '-crf', '18', str(source)], check=True)
             # Isolate all fixture outputs from real generation jobs.
             from unittest.mock import patch
@@ -50,6 +50,9 @@ class PipelineTest(unittest.TestCase):
                     self.assertLessEqual(abs(int(y.max())-height*1115/1215), 2)
                     self.assertGreater(pixels[height//2, width//2, 3], 240)
                     self.assertLess(pixels[0, 0, 3], 5)
+                    solid = pixels[...,3] > 128
+                    rgb = pixels[...,:3].astype(np.int16)
+                    self.assertEqual(int((solid & (rgb[...,1]-np.maximum(rgb[...,0],rgb[...,2]) > 30)).sum()), 0)
                     report = json.loads((output.parent / 'report.json').read_text(encoding='utf-8'))
                     self.assertEqual(report['frames'], 60)
                     self.assertEqual((report['outputWidth'], report['outputHeight']), (width, height))

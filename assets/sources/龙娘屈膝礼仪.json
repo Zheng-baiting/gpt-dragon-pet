@@ -1,0 +1,52 @@
+{
+  "name": "龙娘屈膝礼仪",
+  "aiGenerated": true,
+  "provider": "可灵 AI",
+  "model": "Kling 2.5 Turbo",
+  "source": "assets/sources/龙娘屈膝礼仪-kling.mp4",
+  "sourceSha256": "d835371d8dd1b3f3fb341ea5b41a359e9870188cad65b5eaba6b45c45b0e84bd",
+  "prompt": "assets/sources/龙娘屈膝礼仪-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceAverageFrameRate": "1506250003/62760417",
+  "sourceDurationSeconds": 10.053991,
+  "preparedFPS": 24,
+  "output": "assets/webm/龙娘屈膝礼仪.webm",
+  "outputSha256": "1bc2e5aca5da9709b63ddf6080cb19447106229b4782276695c493422f4e4f37",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] retaining the character coordinates; watermarked source export retained",
+    "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
+    "Remove the source audio; suppress green spill in the white/lavender edges",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "After the full curtsy has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      390,
+      120,
+      861,
+      667
+    ],
+    "greenSpillFraction": 2.8052530204884664E-06,
+    "loopAlphaMeanDifference": 0.03449327256944444,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed the 720p source and twelve processed samples: lifts the skirt edges, bends the knees and bows, rises and returns to a clean neutral pose. The final half-second standing return is a local optical-flow estimate; the complete curtsy remains from the generated source. Full body, alpha boundaries and 1205-frame timing passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.2528105598747,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

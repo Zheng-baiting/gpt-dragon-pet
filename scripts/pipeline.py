@@ -190,6 +190,9 @@ def process(name, source, green, region=None, output_height=360):
         run([FFMPEG, '-y', '-loglevel', 'error', '-i', str(source), '-vf', ','.join(filters),
              '-an', '-c:v', 'libx264', '-crf', '18', str(prepared)], check=True)
         chroma = original('chroma_step02.py')
+        # This white/lavender character has no green parts. Include dark green
+        # generated floor shadows without removing neutral black line work.
+        chroma.VAL_MIN = 0.0
         chroma.convert_video(prepared, keyed, chroma.sample_background_color(prepared))
     elif source.suffix.lower() == '.webm':
         assert_alpha(source)
@@ -222,6 +225,7 @@ def process(name, source, green, region=None, output_height=360):
     report = {'name': name, 'upstream': 'dsh-pet@0.3.7', 'sourceFPS': 24, 'fps': 120, 'frames': frames,
               'duration': info(candidate)['duration'], 'standing': standing, 'contentUnion': union,
               'scale': scale, 'extractionRegion': region, 'greenEdgeDespill': green,
+              'darkGreenShadowRemoval': green,
               'outputWidth': encoding.TARGET_W, 'outputHeight': encoding.TARGET_H, 'manualReviewRequired': True}
     candidate.replace(final)
     (folder / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
