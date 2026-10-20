@@ -1,0 +1,43 @@
+{
+  "name": "工作状态-雀跃庆祝",
+  "aiGenerated": true,
+  "provider": "即梦",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/工作状态-雀跃庆祝-jimeng.mp4",
+  "sourceSha256": "37e979df35c34956e39f987e9f42863c08a2bc88c81bac8cd1b2c27b05884f19",
+  "prompt": "assets/sources/工作状态-雀跃庆祝-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceAverageFrameRate": "7260/301",
+  "preparedFPS": 24,
+  "sourceDurationSeconds": 5.088005,
+  "output": "assets/webm/工作状态-雀跃庆祝.webm",
+  "outputSha256": "1b7f13b3732e4a2001942eb13e47278d80f1c4127d5dc5a5abb4be0981f53a90",
+  "durationSeconds": 5.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] preserving character coordinates; original dsh-pet HSV key",
+    "Original dsh-pet standing normalization and encoding",
+    "Only detached sparkles above source y=60 are fitted into the safe area: first resize upper 60 rows to 50 at y=10, then to 40 at y=20; character pixels below y=60 are unchanged.",
+    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 605,
+    "fps": 120,
+    "contentBounds": [
+      183,
+      4,
+      458,
+      336
+    ],
+    "greenSpillFraction": 0.000005869410227664038,
+    "loopAlphaMeanDifference": 0.5110894097222223,
+    "uniqueDecodedFrameHashes": 605,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed frames: in-place happy jump, raised hands and clap, compact stars fade, full body returns to neutral. Upper detached sparkles were fitted to avoid cropping without moving the character; fast jump contains brief optical-flow softness."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

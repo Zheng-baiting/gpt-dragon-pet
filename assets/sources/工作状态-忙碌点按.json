@@ -1,0 +1,42 @@
+{
+  "name": "工作状态-忙碌点按",
+  "aiGenerated": true,
+  "provider": "即梦",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/工作状态-忙碌点按-jimeng.mp4",
+  "sourceSha256": "4fa25a538e1a6d6c358c272a25bcf9b87df29e7533487ad85b38e6d8fdada146",
+  "prompt": "assets/sources/工作状态-忙碌点按-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceAverageFrameRate": "7260/301",
+  "preparedFPS": 24,
+  "sourceDurationSeconds": 5.088005,
+  "output": "assets/webm/工作状态-忙碌点按.webm",
+  "outputSha256": "4ce7adc48caf7685ae7b8272f291575a6444f73efb98010d910777db3718ced3",
+  "durationSeconds": 5.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] preserving character coordinates; original dsh-pet HSV key",
+    "Original dsh-pet standing normalization and encoding",
+    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 605,
+    "fps": 120,
+    "contentBounds": [
+      207,
+      26,
+      434,
+      335
+    ],
+    "greenSpillFraction": 0.00000928820823847422,
+    "loopAlphaMeanDifference": 0.5862760416666667,
+    "uniqueDecodedFrameHashes": 604,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed frames: alternating small hand presses, four compact tools orbit above the head then disappear, subtle focus and nod, returns to clean neutral pose; character and effect bounds remain inside canvas."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

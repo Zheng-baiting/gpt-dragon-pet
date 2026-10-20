@@ -1,0 +1,43 @@
+{
+  "name": "工作状态-清点归档",
+  "aiGenerated": true,
+  "provider": "TapNow",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/工作状态-清点归档-tapnow.mp4",
+  "sourceSha256": "176cfdbc88aeae562c7d6fa94300b024efdc48698fbc100f5ef4b5ea3bd30df8",
+  "prompt": "assets/sources/工作状态-清点归档-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
+  "sourceWidth": 836,
+  "sourceHeight": 480,
+  "sourceAverageFrameRate": "24/1",
+  "preparedFPS": 24,
+  "sourceDurationSeconds": 5.041667,
+  "output": "assets/webm/工作状态-清点归档.webm",
+  "outputSha256": "b325fdd770a86a10b377b2ee8c06a4d877f8d52275f330dbcead2e8c1e16a593",
+  "durationSeconds": 5.041,
+  "outputFPS": 120,
+  "processing": [
+    "Pad 836x480 source to 854x480 with nine green pixels on each side; no stretching",
+    "Central extraction [171,0,512,480] preserving character coordinates; original dsh-pet HSV key",
+    "Original dsh-pet standing normalization and encoding",
+    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 605,
+    "fps": 120,
+    "contentBounds": [
+      208,
+      31,
+      431,
+      333
+    ],
+    "greenSpillFraction": 0.000008083979054186956,
+    "loopAlphaMeanDifference": 1.5599869791666667,
+    "uniqueDecodedFrameHashes": 605,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed the second source take and twelve processed frames: two sheets appear in the hands, are checked and gathered at chest height, then vanish before the return to neutral. No paper leaves the frame; first rejected take was not imported. All alpha bounds and green edges pass."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}
