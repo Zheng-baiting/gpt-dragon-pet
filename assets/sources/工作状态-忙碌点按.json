@@ -15,28 +15,36 @@
   "preparedFPS": 24,
   "sourceDurationSeconds": 5.088005,
   "output": "assets/webm/工作状态-忙碌点按.webm",
-  "outputSha256": "4ce7adc48caf7685ae7b8272f291575a6444f73efb98010d910777db3718ced3",
+  "outputSha256": "786d76d129a695be50cda22b9a17ca81d126210654b6f20183de436161df3f01",
   "durationSeconds": 5.041,
   "outputFPS": 120,
   "processing": [
     "Central extraction [256,0,768,720] preserving character coordinates; original dsh-pet HSV key",
-    "Original dsh-pet standing normalization and encoding",
+    "Original dsh-pet standing normalization; encode 1280x720 from the normalized master before interpolation, without enlarging a 360p export",
     "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
   ],
   "quality": {
     "frames": 605,
     "fps": 120,
     "contentBounds": [
-      207,
-      26,
-      434,
-      335
+      414,
+      52,
+      865,
+      668
     ],
-    "greenSpillFraction": 0.00000928820823847422,
-    "loopAlphaMeanDifference": 0.5862760416666667,
+    "greenSpillFraction": 0.000004513221114281211,
+    "loopAlphaMeanDifference": 0.5694694010416667,
     "uniqueDecodedFrameHashes": 604,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed frames: alternating small hand presses, four compact tools orbit above the head then disappear, subtle focus and nod, returns to clean neutral pose; character and effect bounds remain inside canvas."
+    "reviewNotes": "Reviewed the HD output at six timeline positions and in the original native player: hand pressing, compact orbiting tools, their disappearance and return to neutral remain complete; face/hair detail is retained from the 720p source. Full frame scan passed transparency, bounds and spill checks.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.01333481497942,
+      "droppedFrames": 0,
+      "returnedToIdle": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720
 }

@@ -95,8 +95,13 @@ test('import preserves the 120 fps file exactly and refuses to overwrite an acti
   try {
     for (const folder of ['src', 'scripts', 'assets']) await mkdir(join(directory, folder));
     for (const file of ['src/paths.mjs', 'scripts/media.mjs']) await copyFile(join(root, file), join(directory, file));
-    await writeFile(join(directory, 'assets/actions.json'), JSON.stringify([{ name: 'fixture', file: 'fixture.webm' }]));
+    await writeFile(join(directory, 'assets/actions.json'), JSON.stringify([
+      { name: 'fixture', file: 'fixture.webm' }, { name: 'hd', file: 'hd.webm' },
+    ]));
     await copyFile(join(root, 'assets/basic/Q版-点击招手.webm'), join(directory, 'source.webm'));
+    runVideo(['-y', '-c:v', 'libvpx-vp9', '-i', join(directory, 'source.webm'), '-t', '0.1',
+      '-vf', 'scale=1280:720', '-an', '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p',
+      '-auto-alt-ref', '0', '-threads', '2', join(directory, 'hd-source.webm')]);
     const worker = spawnSync(process.execPath, ['--input-type=module'], {
       cwd: directory, encoding: 'utf8', windowsHide: true,
       input: `import assert from 'node:assert/strict';
@@ -104,7 +109,9 @@ test('import preserves the 120 fps file exactly and refuses to overwrite an acti
         import { importVideo } from './scripts/media.mjs';
         await importVideo('fixture', 'source.webm');
         assert.deepEqual(await readFile('source.webm'), await readFile('assets/webm/fixture.webm'));
-        await assert.rejects(importVideo('fixture', 'source.webm'), /已经存在/);`,
+        await assert.rejects(importVideo('fixture', 'source.webm'), /已经存在/);
+        await importVideo('hd', 'hd-source.webm');
+        assert.deepEqual(await readFile('hd-source.webm'), await readFile('assets/webm/hd.webm'));`,
     });
     assert.equal(worker.status, 0, worker.stderr);
   } finally {

@@ -31,24 +31,30 @@ class PipelineTest(unittest.TestCase):
                 shutil.copytree(ROOT / 'vendor/dsh-pet', folder / 'vendor/dsh-pet')
                 with contextlib.redirect_stdout(io.StringIO()):
                     process('fixture', source, True, (240, 0, 800, 720))
-            output = folder / 'work/pipeline/fixture/video-120fps.webm'
-            metadata = info(output)
-            self.assertEqual(metadata['r_frame_rate'], '120/1')
-            self.assertAlmostEqual(metadata['duration'], .5, delta=.02)
-            assert_alpha(output)
-            decoded = run([FFMPEG, '-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', str(output),
-                           '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
-                          check=True, capture_output=True).stdout
-            pixels = np.frombuffer(decoded, np.uint8).reshape(360, 640, 4)
-            y, x = np.where(pixels[:, :, 3] > 128)
-            self.assertLessEqual(abs(float(x.mean())-320), 2)
-            self.assertLessEqual(abs(int(y.max())-330), 2)
-            self.assertGreater(pixels[200, 320, 3], 240)
-            self.assertLess(pixels[0, 0, 3], 5)
-            report = json.loads((output.parent / 'report.json').read_text(encoding='utf-8'))
-            self.assertEqual(report['frames'], 60)
-            self.assertTrue(report['manualReviewRequired'])
-            self.assertEqual(report['extractionRegion'], [240, 0, 800, 720])
+                    process('fixture', source, True, (240, 0, 800, 720), 720)
+            for height, name in [(360, 'pipeline'), (720, 'pipeline-hd')]:
+                with self.subTest(height=height):
+                    width = height*16//9
+                    output = folder / f'work/{name}/fixture/video-120fps.webm'
+                    metadata = info(output)
+                    self.assertEqual((metadata['width'], metadata['height']), (width, height))
+                    self.assertEqual(metadata['r_frame_rate'], '120/1')
+                    self.assertAlmostEqual(metadata['duration'], .5, delta=.02)
+                    assert_alpha(output)
+                    decoded = run([FFMPEG, '-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', str(output),
+                                   '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
+                                  check=True, capture_output=True).stdout
+                    pixels = np.frombuffer(decoded, np.uint8).reshape(height, width, 4)
+                    y, x = np.where(pixels[:, :, 3] > 128)
+                    self.assertLessEqual(abs(float(x.mean())-width/2), 2)
+                    self.assertLessEqual(abs(int(y.max())-height*1115/1215), 2)
+                    self.assertGreater(pixels[height//2, width//2, 3], 240)
+                    self.assertLess(pixels[0, 0, 3], 5)
+                    report = json.loads((output.parent / 'report.json').read_text(encoding='utf-8'))
+                    self.assertEqual(report['frames'], 60)
+                    self.assertEqual((report['outputWidth'], report['outputHeight']), (width, height))
+                    self.assertTrue(report['manualReviewRequired'])
+                    self.assertEqual(report['extractionRegion'], [240, 0, 800, 720])
 
     def test_motion_has_a_new_intermediate_position(self):
         frames = []

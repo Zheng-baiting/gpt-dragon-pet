@@ -88,28 +88,30 @@ def reference():
 
 def retime(source, target, despill=False):
     metadata = info(source)
-    if (metadata['width'], metadata['height'], metadata['r_frame_rate']) != (640, 360, '24/1'):
-        raise ValueError('补帧输入必须是原管线的 640×360、24 fps 成品。')
+    size = (metadata['width'], metadata['height'])
+    if size not in ((640, 360), (1280, 720)) or metadata['r_frame_rate'] != '24/1':
+        raise ValueError('补帧输入必须是 640×360 或 1280×720、24 fps 的透明成品。')
+    frame_bytes = size[0]*size[1]*4
     decoder = subprocess.Popen(bounded([FFMPEG, '-loglevel', 'error', '-c:v', 'libvpx-vp9',
         '-i', str(source), '-an', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-']), stdout=subprocess.PIPE)
     encoder = subprocess.Popen(bounded([FFMPEG, '-y', '-loglevel', 'error', '-f', 'rawvideo',
-        '-pix_fmt', 'rgba', '-s', '640x360', '-r', '120', '-i', '-', '-an', '-c:v', 'libvpx-vp9',
+        '-pix_fmt', 'rgba', '-s', f'{size[0]}x{size[1]}', '-r', '120', '-i', '-', '-an', '-c:v', 'libvpx-vp9',
         '-pix_fmt', 'yuva420p', '-b:v', '0', '-crf', '18', '-deadline', 'good', '-cpu-used', '4',
         '-auto-alt-ref', '0', '-tile-columns', '1', '-row-mt', '1', str(target)]), stdin=subprocess.PIPE)
     read_exact = original('chroma_step02.py').read_exact
     count = 0
     try:
-        data = read_exact(decoder.stdout, 640*360*4)
-        if len(data) != 640*360*4:
+        data = read_exact(decoder.stdout, frame_bytes)
+        if len(data) != frame_bytes:
             raise ValueError('视频没有完整帧。')
-        first = clean_edge(data) if despill else Image.frombytes('RGBA', (640, 360), data)
+        first = clean_edge(data, size) if despill else Image.frombytes('RGBA', size, data)
         while True:
-            data = read_exact(decoder.stdout, 640*360*4)
+            data = read_exact(decoder.stdout, frame_bytes)
             if not data:
                 break
-            if len(data) != 640*360*4:
+            if len(data) != frame_bytes:
                 raise ValueError('视频帧不完整。')
-            second = clean_edge(data) if despill else Image.frombytes('RGBA', (640, 360), data)
+            second = clean_edge(data, size) if despill else Image.frombytes('RGBA', size, data)
             pair = prepare_pair(first, second)
             for phase in range(5):
                 frame = first if phase == 0 else interpolate(pair, phase/5).convert('RGBA')
@@ -132,10 +134,10 @@ def retime(source, target, despill=False):
     return count
 
 
-def clean_edge(data):
+def clean_edge(data, size=(640, 360)):
     # This white/lavender character has no green parts. Remove key/4:2:0 spill
     # before optical flow so green contours cannot spread into intermediate frames.
-    frame = np.frombuffer(data, np.uint8).reshape(360, 640, 4).copy()
+    frame = np.frombuffer(data, np.uint8).reshape(size[1], size[0], 4).copy()
     frame[..., 1] = np.minimum(frame[..., 1], np.maximum(frame[..., 0], frame[..., 2]))
     return Image.fromarray(frame)
 
@@ -156,7 +158,9 @@ def review(video, target):
     canvas.save(target)
 
 
-def process(name, source, green, region=None):
+def process(name, source, green, region=None, output_height=360):
+    if output_height not in (360, 720):
+        raise ValueError('输出高度只能为 360 或 720。')
     actions = json.loads((ROOT / 'assets/actions.json').read_text(encoding='utf-8'))
     if name not in {action['name'] for action in actions}:
         raise ValueError('未知动作名。')
@@ -170,7 +174,7 @@ def process(name, source, green, region=None):
         x, y, width, height = region
         if not green or min(x, y) < 0 or min(width, height) <= 0 or x+width > metadata['width'] or y+height > metadata['height']:
             raise ValueError('提取范围须位于绿幕源视频内部；请先检查完整动作不会被裁切。')
-    folder = ROOT / 'work/pipeline' / name
+    folder = ROOT / ('work/pipeline' if output_height == 360 else 'work/pipeline-hd') / name
     folder.mkdir(parents=True, exist_ok=True)
     keyed = folder / 'step02.webm'
     normalized = folder / 'step03.webm'
@@ -210,13 +214,15 @@ def process(name, source, green, region=None):
         '[0:v]scale=', '[0:v]fps=24,settb=1/24,setpts=N,scale=')
     normalization.convert_video(keyed, normalized, filters)
     encoding = original('encode_thumbs.py')
+    encoding.TARGET_W, encoding.TARGET_H = output_height*16//9, output_height
     encoding.CRF = 18
     encoding.convert_video(normalized, original_clip)
     frames = retime(original_clip, candidate, despill=green)
     review(candidate, folder / 'review.png')
     report = {'name': name, 'upstream': 'dsh-pet@0.3.7', 'sourceFPS': 24, 'fps': 120, 'frames': frames,
               'duration': info(candidate)['duration'], 'standing': standing, 'contentUnion': union,
-              'scale': scale, 'extractionRegion': region, 'greenEdgeDespill': green, 'manualReviewRequired': True}
+              'scale': scale, 'extractionRegion': region, 'greenEdgeDespill': green,
+              'outputWidth': encoding.TARGET_W, 'outputHeight': encoding.TARGET_H, 'manualReviewRequired': True}
     candidate.replace(final)
     (folder / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({'video': str(final), 'review': str(folder / 'review.png'), **report}, ensure_ascii=False))
@@ -230,13 +236,14 @@ if __name__ == '__main__':
     media.add_argument('name')
     media.add_argument('source')
     media.add_argument('--green', action='store_true')
+    media.add_argument('--height', type=int, choices=(360, 720), default=360)
     media.add_argument('--region', type=int, nargs=4, metavar=('X', 'Y', 'WIDTH', 'HEIGHT'))
     args = parser.parse_args()
     try:
         if args.command == 'reference':
             reference()
         else:
-            process(args.name, args.source, args.green, args.region)
+            process(args.name, args.source, args.green, args.region, args.height)
     except (ValueError, RuntimeError, subprocess.CalledProcessError) as error:
         print(str(error), file=sys.stderr)
         raise SystemExit(1)

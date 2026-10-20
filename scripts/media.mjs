@@ -49,7 +49,7 @@ async function actionFor(name) {
   return action;
 }
 
-export async function processVideo(name, input, chroma, region) {
+export async function processVideo(name, input, chroma, region, height = 360) {
   await actionFor(name);
   if (chroma && !/^0x00ff00$/i.test(chroma)) throw Error('原项目 HSV 抠像入口只接受绿幕；其他背景请先手工抠像导出透明 MOV。');
   input = resolve(input);
@@ -57,8 +57,9 @@ export async function processVideo(name, input, chroma, region) {
   const python = process.env.GPT_PET_PYTHON;
   if (!python) throw Error('制作流程需要已有 Python；请仅在当前进程设置 GPT_PET_PYTHON 为其可执行文件路径。');
   if (region && (region.length !== 4 || !region.every(Number.isInteger))) throw Error('--region 须为 x,y,width,height 四个整数。');
+  if (![360, 720].includes(height)) throw Error('--height 只能为 360 或 720。');
   const result = spawnSync(python, [join(root, 'scripts/pipeline.py'), 'process', name, input,
-    ...(chroma ? ['--green'] : []), ...(region ? ['--region', ...region.map(String)] : [])],
+    ...(chroma ? ['--green'] : []), ...(region ? ['--region', ...region.map(String)] : []), '--height', String(height)],
     { cwd: root, env: { ...process.env, PYTHONUTF8: '1' }, windowsHide: true, encoding: 'utf8', maxBuffer: 8*1024*1024 });
   if (result.error || result.status !== 0) throw Error(result.stderr?.slice(-2400) || '素材处理未完成。');
   return JSON.parse(result.stdout.trim());
@@ -73,9 +74,10 @@ export async function importVideo(name, input) {
   const metadata = probe(input);
   const video = metadata.streams.find(stream => stream.codec_type === 'video');
   const rate = value => { const [a,b = 1] = String(value).split('/').map(Number); return a/b; };
-  if (video?.width !== 640 || video?.height !== 360 || rate(video.r_frame_rate) !== 120 || rate(video.avg_frame_rate) !== 120 ||
+  const supportedSize = video && [[640, 360], [1280, 720]].some(([width, height]) => video.width === width && video.height === height);
+  if (!supportedSize || rate(video.r_frame_rate) !== 120 || rate(video.avg_frame_rate) !== 120 ||
       metadata.streams.some(stream => stream.codec_type === 'audio') || !(Number(metadata.format.duration) > 0 && Number(metadata.format.duration) <= 10.2)) {
-    throw Error('正式素材须为 640×360、120 fps、无音轨且不超过 10.2 秒；请先执行 media:process。');
+    throw Error('正式素材须为 640×360 或 1280×720、120 fps、无音轨且不超过 10.2 秒；请先执行 media:process。');
   }
   assertAlpha(input);
   await mkdir(join(root, 'assets/webm'), { recursive: true });
@@ -94,13 +96,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     } else if (command === 'process' && name && input) {
       const flags = new Map();
       for (let i = 0; i < options.length; i += 2) {
-        if (!['--chroma', '--region'].includes(options[i]) || !options[i+1] || flags.has(options[i])) throw Error('制作选项为 --chroma <颜色> 和 --region <x,y,width,height>，各使用一次。');
+        if (!['--chroma', '--region', '--height'].includes(options[i]) || !options[i+1] || flags.has(options[i])) throw Error('制作选项为 --chroma <颜色>、--region <x,y,width,height> 和 --height <360|720>，各使用一次。');
         flags.set(options[i], options[i+1]);
       }
       const region = flags.get('--region')?.split(',').map(Number);
-      console.log(JSON.stringify(await processVideo(name, input, flags.get('--chroma'), region), null, 2));
+      const height = flags.has('--height') ? Number(flags.get('--height')) : 360;
+      console.log(JSON.stringify(await processVideo(name, input, flags.get('--chroma'), region, height), null, 2));
     } else if (command === 'import' && name && input && !options.length) {
       console.log('已导入：' + await importVideo(name, input));
-    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] [--region x,y,width,height] | import <动作名> <已检查的120fps视频>');
+    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] [--region x,y,width,height] [--height 360|720] | import <动作名> <已检查的120fps视频>');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }

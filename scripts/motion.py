@@ -1,4 +1,4 @@
-"""Premultiplied-alpha, bidirectional motion interpolation for 640x360 clips."""
+"""Premultiplied-alpha, bidirectional motion interpolation for transparent clips."""
 import sys
 from pathlib import Path
 
