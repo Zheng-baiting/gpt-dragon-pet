@@ -10,7 +10,7 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/点击回应-开心跃动.webm",
-  "outputSha256": "e584787e58d455e3ace5fd22e024d14160e4f3528d2017d09873e0410d4961c7",
+  "outputSha256": "4c89ee2626ecb5b7582b82367a32fb2656eb4eb46c291d0266501722604c7975",
   "durationSeconds": 10.041,
   "outputFPS": 120,
   "extractionRegion": [
@@ -23,23 +23,34 @@
     "Central extraction without moving the original character coordinates",
     "Original dsh-pet HSV chroma key, standing normalization and encoding",
     "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export",
+    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
   ],
   "quality": {
     "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      182,
-      6,
-      463,
-      333
+      361,
+      8,
+      929,
+      668
     ],
-    "greenSpillFraction": 0.000005736051451008407,
-    "loopAlphaMeanDifference": 2.3352864583333335,
+    "greenSpillFraction": 1.7555617511563435e-06,
+    "loopAlphaMeanDifference": 0.03328559027777778,
     "uniqueDecodedFrameHashes": 1205,
-    "limitation": "At the highest point the heart has about 6 pixels of headroom after standing normalization. All-frame bounds checks found no clipping.",
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed samples: crouch, small happy jump with raised arms and one heart, landing and return to neutral; heart and body remain fully visible."
+    "reviewNotes": "Reviewed source and twelve processed samples: crouch, small happy jump with raised arms and one heart, landing and return to neutral; heart and body remain fully visible. HD output: Reviewed twelve HD timeline samples: full crouch, happy jump with raised arms and heart, landing and neutral return. Both the heart and character remain within bounds; final half-second estimates first standing pose to close the seam. Full 1205-frame scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.23263617045093,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "normalizedMasterSha256": "76abcf08f8f746fcd2857fb2688217665e9d289e3c0444f0e777d3c967f62166",
+  "postprocessingScript": "scripts/finish-standing.py"
 }
