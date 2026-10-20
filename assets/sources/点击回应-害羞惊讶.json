@@ -10,7 +10,7 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/点击回应-害羞惊讶.webm",
-  "outputSha256": "de1e46f2a35a6f6f950f2a66f07995174bc43d53a45d5df68f2cada3de9cc413",
+  "outputSha256": "44c86471753e829e015ae0671fef6a9716e5e3d745553f51e0ee3767cfa041ae",
   "durationSeconds": 10.041,
   "outputFPS": 120,
   "extractionRegion": [
@@ -23,21 +23,34 @@
     "Central extraction without moving the original character coordinates",
     "Original dsh-pet HSV chroma key, standing normalization and encoding",
     "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export",
+    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
   ],
   "quality": {
     "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      202,
-      54,
-      442,
-      334
+      404,
+      109,
+      886,
+      670
     ],
-    "greenSpillFraction": 4.396452063185009e-06,
-    "loopAlphaMeanDifference": 4.114639756944444,
+    "greenSpillFraction": 1.2049317824539755e-06,
+    "loopAlphaMeanDifference": 0.03230360243055556,
+    "uniqueDecodedFrameHashes": 1205,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and processed contact sheets: consistent character, hands to cheeks, shy eyes, swaying and return to the original standing pose; no cropped parts."
+    "reviewNotes": "Reviewed source and processed contact sheets: consistent character, hands to cheeks, shy eyes, swaying and return to the original standing pose; no cropped parts. HD output: Reviewed twelve HD timeline samples: hands to cheeks, shy expressions and side sway remain complete; horns, wings, dress and tail retain source detail. Final half-second estimates return to first standing pose, with full frame bounds and green spill scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 117.8170501278203,
+      "droppedFrames": 2,
+      "advancedToNextAction": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "normalizedMasterSha256": "4b2ce4ee2ca94d53a9c248502b6b3910f2cd91b1b3a98df6721db6bb20e82a2f",
+  "postprocessingScript": "scripts/finish-standing.py"
 }
