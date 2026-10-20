@@ -10,7 +10,7 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/螃蟹走路.webm",
-  "outputSha256": "195465276bef621f1fa5909f0762fdb75bc52d92cfefcfd8e88624672160a1e1",
+  "outputSha256": "2db64bbc61d60f3dad04117761a101ee9e1be6c35baf02902823c41331b160bd",
   "durationSeconds": 10.041,
   "outputFPS": 120,
   "extractionRegion": [
@@ -23,22 +23,32 @@
     "Central extraction without moving the original character coordinates",
     "Original dsh-pet HSV chroma key, standing normalization and encoding",
     "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
   ],
   "quality": {
     "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      190,
-      63,
-      477,
-      332
+      381,
+      126,
+      956,
+      666
     ],
-    "greenSpillFraction": 0.0000028973817866519996,
-    "loopAlphaMeanDifference": 0.6774088541666666,
-    "uniqueDecodedFrameHashes": 1205,
+    "greenSpillFraction": 2.2126552382947574e-06,
+    "loopAlphaMeanDifference": 0.6674273003472222,
+    "uniqueDecodedFrameHashes": 1204,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed samples: alternating sideways in-place steps, left-leaning body, alternating arm swing and tail sway, then returns to neutral; no clipping or ground shadow."
+    "reviewNotes": "Reviewed source and twelve processed samples: alternating sideways in-place steps, left-leaning body, alternating arm swing and tail sway, then returns to neutral; no clipping or ground shadow. HD output: Reviewed twelve HD samples: left-leaning sideways steps, alternating arms, tail balancing to the right, then neutral. Character stays intact and on the original baseline; full 1205-frame bounds, transparency, spill and loop scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.25953686094621,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "normalizedMasterSha256": "ef39dfe73016e8e259298e65be0faa6fc8d711dfd894ca1dd708fb29f0a8d443"
 }
