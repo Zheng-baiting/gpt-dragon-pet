@@ -1,0 +1,56 @@
+{
+  "name": "原地小憩沉眠",
+  "aiGenerated": true,
+  "provider": "可灵 AI",
+  "model": "Kling 2.5 Turbo",
+  "source": "assets/sources/原地小憩沉眠-kling.mp4",
+  "sourceSha256": "325bab5d6e27e32894e3f11704e7155842fd17fada06dc7f3a52af5ab53b6732",
+  "prompt": "assets/sources/原地小憩沉眠-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceAverageFrameRate": "1506250003/62760417",
+  "sourceDurationSeconds": 10.053991,
+  "preparedFPS": 24,
+  "output": "assets/webm/原地小憩沉眠.webm",
+  "outputSha256": "19601b8e15392781ba1afc579f1dff7f2d783322820705f0ed7bdca971c2013c",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] retaining the character coordinates; watermarked source export retained",
+    "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
+    "Remove the source audio; suppress green spill in the white/lavender edges",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "Separate the largest connected character component from detached sleep bubbles after HSV keying, including dark green shadows. Keep the character motion, fit the original detached bubbles within 160x70 source pixels above the head, and fade them from 7s to 8.5s. Do not draw new bubbles.",
+    "After the sleep bubbles have disappeared, estimate the final 0.5s return from frame 1140 to the first clean standing pose with eased bidirectional optical flow; preserve 1205 frames.",
+    "Remove only small detached bubble ghosts touching the top edge, bottom y at most 128, maximum alpha 160, area at most 4096; retain the largest character component"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      387,
+      16,
+      901,
+      667
+    ],
+    "greenSpillFraction": 2.1137154459367746e-07,
+    "loopAlphaMeanDifference": 0.03307074652777778,
+    "uniqueDecodedFrameHashes": 1204,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve processed timeline frames: eyes close, body lowers into a nap, original sleep bubbles rise and fade, then the character wakes and returns to neutral. Fitted the original detached effects above the head and removed five small top-edge ghost components; full 1205-frame transparency, bounds, spill and loop scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.29317965646507,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
+  },
+  "preparationScript": "assets/sources/原地小憩沉眠-processing.py",
+  "postprocessingScript": "assets/sources/原地小憩沉眠-finishing.py",
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

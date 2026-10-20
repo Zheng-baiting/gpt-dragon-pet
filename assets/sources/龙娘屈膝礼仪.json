@@ -36,7 +36,7 @@
       861,
       667
     ],
-    "greenSpillFraction": 2.8052530204884664E-06,
+    "greenSpillFraction": 2.8052530204884664e-06,
     "loopAlphaMeanDifference": 0.03449327256944444,
     "uniqueDecodedFrameHashes": 1205,
     "manualReviewPassed": true,
@@ -48,5 +48,6 @@
       "advancedToNextAction": true
     }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "postprocessingScript": "scripts/finish-standing.py"
 }

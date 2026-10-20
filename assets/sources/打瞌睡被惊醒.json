@@ -1,0 +1,54 @@
+{
+  "name": "打瞌睡被惊醒",
+  "aiGenerated": true,
+  "provider": "可灵 AI",
+  "model": "Kling 2.5 Turbo",
+  "source": "assets/sources/打瞌睡被惊醒-kling.mp4",
+  "sourceSha256": "ef27fa857335aa91a01152d859d729f731068934d4905de111e57f5c4c6ff9c1",
+  "prompt": "assets/sources/打瞌睡被惊醒-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceAverageFrameRate": "1506250003/62760417",
+  "sourceDurationSeconds": 10.053991,
+  "preparedFPS": 24,
+  "output": "assets/webm/打瞌睡被惊醒.webm",
+  "outputSha256": "823a0049c1ca5298c049a0ae24a897ae01e5554c424e7b18f300eb1dd7e619e5",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] retaining the character coordinates; watermarked source export retained",
+    "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
+    "Include dark saturated green shadows in the HSV background mask; preserve neutral black outlines",
+    "Remove the source audio; suppress green spill in the white/lavender edges",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      241,
+      76,
+      1023,
+      668
+    ],
+    "greenSpillFraction": 3.1859308348601714e-06,
+    "loopAlphaMeanDifference": 0.03399197048611111,
+    "uniqueDecodedFrameHashes": 1204,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve processed timeline frames: sleepy head nod, startled eyes and small lift, embarrassed recovery and neutral return are complete; white hair, horns, purple eyes, dress and tail remain consistent. Full 1205-frame alpha, bounds, spill and loop scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 119.84392419175028,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "postprocessingScript": "scripts/finish-standing.py"
+}

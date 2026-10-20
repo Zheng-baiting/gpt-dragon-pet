@@ -1,0 +1,54 @@
+{
+  "name": "轻快摇摆舞",
+  "aiGenerated": true,
+  "provider": "可灵 AI",
+  "model": "Kling 2.5 Turbo",
+  "source": "assets/sources/轻快摇摆舞-kling.mp4",
+  "sourceSha256": "6050e0d839900dbecd13e2d148faa89a166d1f8547c2ac5add4d149fdf305d63",
+  "prompt": "assets/sources/轻快摇摆舞-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceAverageFrameRate": "1506250003/62760417",
+  "sourceDurationSeconds": 10.053991,
+  "preparedFPS": 24,
+  "output": "assets/webm/轻快摇摆舞.webm",
+  "outputSha256": "5d6d0571d7ff3892a5e5486e829e0a20885216dd1821e0da7a622fe16a96c94a",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "processing": [
+    "Central extraction [256,0,768,720] retaining the character coordinates; watermarked source export retained",
+    "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
+    "Include dark saturated green shadows in the HSV background mask; preserve neutral black outlines",
+    "Remove the source audio; suppress green spill in the white/lavender edges",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      365,
+      106,
+      894,
+      673
+    ],
+    "greenSpillFraction": 4.771076483685365e-06,
+    "loopAlphaMeanDifference": 0.03277669270833333,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve processed timeline frames: alternating sway, hand and foot gestures, brief side turn and return to neutral are complete; identity and tail remain consistent and unclipped. Full 1205-frame transparency, bounds, spill and loop scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 119.98000333277817,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "postprocessingScript": "scripts/finish-standing.py"
+}
