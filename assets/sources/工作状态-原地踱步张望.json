@@ -1,0 +1,44 @@
+{
+  "name": "工作状态-原地踱步张望",
+  "aiGenerated": true,
+  "provider": "TapNow",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/工作状态-原地踱步张望-tapnow.mp4",
+  "sourceSha256": "cc0ee08af35b46c414a51b00db6f4e0bd7c37d46e9206a9db0f4ceaeaca76409",
+  "prompt": "assets/sources/工作状态-原地踱步张望-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
+  "sourceWidth": 836,
+  "sourceHeight": 480,
+  "sourceAverageFrameRate": "24/1",
+  "preparedFPS": 24,
+  "sourceDurationSeconds": 5.041667,
+  "output": "assets/webm/工作状态-原地踱步张望.webm",
+  "outputSha256": "04ca15e3399f655f09cc497de40841f373945db252774e474a991c5acce12547",
+  "durationSeconds": 5.041,
+  "outputFPS": 120,
+  "processing": [
+    "Pad 836x480 source to 854x480 with nine green pixels on each side; no stretching",
+    "Central extraction [171,0,512,480] preserving character coordinates; original dsh-pet HSV key",
+    "Original dsh-pet standing normalization and encoding",
+    "After the effect has disappeared, replace final 0.5s with eased bidirectional optical flow from frame 108 to the first clean standing frame.",
+    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 605,
+    "fps": 120,
+    "contentBounds": [
+      200,
+      9,
+      440,
+      342
+    ],
+    "greenSpillFraction": 0.000006234037508065001,
+    "loopAlphaMeanDifference": 0.050594618055555554,
+    "uniqueDecodedFrameHashes": 605,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed frames: restrained in-place weight shifts and side glances, compact hourglass appears and fades, no body clipping; final half-second returns to the first clean standing pose using eased optical flow. Full-frame loop alpha mean difference 0.051/255."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}
