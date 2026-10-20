@@ -10,7 +10,7 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/点击回应-傲娇生气.webm",
-  "outputSha256": "aa222bd21ba9d332a5d181155a39ad68e1c3fabb824332a8fc9be7dfe13bbbd6",
+  "outputSha256": "3e251f07c977547e92f6337c60065e86fb46e032682abf20cdff40266836ca4b",
   "durationSeconds": 10.041,
   "outputFPS": 120,
   "extractionRegion": [
@@ -23,23 +23,32 @@
     "Central extraction without moving the original character coordinates",
     "Original dsh-pet HSV chroma key, standing normalization and encoding",
     "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
   ],
   "quality": {
     "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      198,
-      63,
-      503,
-      359
+      395,
+      125,
+      1006,
+      717
     ],
-    "greenSpillFraction": 0.000006421860792545192,
-    "loopAlphaMeanDifference": 1.4205425347222222,
-    "uniqueDecodedFrameHashes": 1205,
+    "greenSpillFraction": 3.3277743886257913e-06,
+    "loopAlphaMeanDifference": 1.4265060763888888,
+    "uniqueDecodedFrameHashes": 1203,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed samples across the full action: hands on hips, closed eyes, turn through rear and side views, then return to the initial front pose; all parts remain within the frame.",
-    "recipeDeviation": "The generated turn briefly passes through a rear view, instead of stopping directly at the requested 90-degree side view."
+    "reviewNotes": "Reviewed source and twelve processed samples across the full action: hands on hips, closed eyes, turn through rear and side views, then return to the initial front pose; all parts remain within the frame. HD output: Reviewed twelve HD samples: hands on hips, closed-eye turn through the rear and side views, then front neutral; original recipe variation remains documented. Full 1205-frame bounds and spill scan passed, including the close 3-pixel bottom margin during the turn.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.23936021475294,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "normalizedMasterSha256": "3f9430c1fe117f0894edf08860fee33301664a28225fadf4765391b1829ca211"
 }
