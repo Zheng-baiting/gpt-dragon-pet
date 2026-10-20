@@ -10,7 +10,7 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/点击回应-挠痒咯咯笑.webm",
-  "outputSha256": "96c99d2c64897522b3a7b18b2420eed5100aa8da421ff8e2cce3aa0486206909",
+  "outputSha256": "f541c8afe980380858bd8793b0c1a8c6c8b7739309f08e492c026445ff34f88f",
   "durationSeconds": 10.041,
   "outputFPS": 120,
   "extractionRegion": [
@@ -23,22 +23,32 @@
     "Central extraction without moving the original character coordinates",
     "Original dsh-pet HSV chroma key, standing normalization and encoding",
     "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
   ],
   "quality": {
     "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      194,
-      60,
-      438,
-      331
+      389,
+      116,
+      876,
+      663
     ],
-    "greenSpillFraction": 0.000005488165098641274,
-    "loopAlphaMeanDifference": 0.6633767361111111,
+    "greenSpillFraction": 2.743292620965774e-06,
+    "loopAlphaMeanDifference": 0.6568359375,
     "uniqueDecodedFrameHashes": 1205,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed samples: surprised expression, smiling laughter, shoulder and torso movement with one hand over mouth, then returns to neutral; no clipping."
+    "reviewNotes": "Reviewed source and twelve processed samples: surprised expression, smiling laughter, shoulder and torso movement with one hand over mouth, then returns to neutral; no clipping. HD output: Reviewed twelve HD samples: startled shoulders, smiling laughter and hand over mouth, then front neutral; full body and tail remain visible throughout. Full 1205-frame transparency, bounds, green spill and loop scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.30664204577307,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "normalizedMasterSha256": "efc0d87897426ddf6959218ccea149ef4fc2f760ab44b9b57308b9ed089f83db"
 }
