@@ -117,6 +117,8 @@ def retime(source, target, despill=False):
                 frame = first if phase == 0 else interpolate(pair, phase/5).convert('RGBA')
                 encoder.stdin.write(frame.tobytes())
                 count += 1
+            if count % 120 == 0:
+                print(f'补帧进度：{count}/{round(metadata["duration"]*120)} 帧', file=sys.stderr, flush=True)
             first = second
         for _ in range(5):
             encoder.stdin.write(first.tobytes())
