@@ -15,7 +15,7 @@
   "preparedFPS": 24,
   "sourceDurationSeconds": 5.088005,
   "output": "assets/webm/工作状态-雀跃庆祝.webm",
-  "outputSha256": "b22d17ca0a729f2c1fe8f48e99cd04a81d3e29c2a558162d99df5b225783b271",
+  "outputSha256": "16881824dc651afc076f5c00f7401cf56d84927cd1c1fdd916be3e393bc4ba4a",
   "durationSeconds": 5.041,
   "outputFPS": 120,
   "processing": [
@@ -24,22 +24,33 @@
     "Only detached sparkles above source y=60 are fitted into the safe area: first resize upper 60 rows to 50 at y=10, then to 40 at y=20; character pixels below y=60 are unchanged.",
     "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18",
     "Prepared 24 fps frame 33 contains generated motion blur; replace it with clear frame 34, uniformly aligned to the mean body position and height of frames 32 and 34. This estimates a clear neighbouring pose rather than restoring lost image detail.",
-    "For intervals 32 to 33 and 33 to 34, preserve the nearest clear pose while smoothly interpolating whole-character position and scale; keep existing optical flow elsewhere. Duration and 120 fps remain unchanged."
+    "For intervals 32 to 33 and 33 to 34, preserve the nearest clear pose while smoothly interpolating whole-character position and scale; keep existing optical flow elsewhere. Duration and 120 fps remain unchanged.",
+    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
   ],
   "quality": {
     "frames": 605,
     "fps": 120,
     "contentBounds": [
-      183,
-      4,
-      458,
-      336
+      367,
+      8,
+      915,
+      674
     ],
-    "greenSpillFraction": 8.133175507556466e-7,
-    "loopAlphaMeanDifference": 0.5111979166666667,
-    "uniqueDecodedFrameHashes": 605,
+    "greenSpillFraction": 5.651138663752548e-07,
+    "loopAlphaMeanDifference": 0.49087456597222223,
+    "uniqueDecodedFrameHashes": 604,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed the corrected full-clip contact sheet and the rapid jump. One blurred generated pose is replaced from its clear neighbour; face and clothing avoid the old double-image mixture. Pose changes remain limited by the source 24 fps. Alpha bounds, loop seam and all 605 frames pass."
+    "reviewNotes": "Reviewed the corrected full-clip contact sheet and the rapid jump. One blurred generated pose is replaced from its clear neighbour; face and clothing avoid the old double-image mixture. Pose changes remain limited by the source 24 fps. Alpha bounds, loop seam and all 605 frames pass. HD output: Reviewed twelve HD output samples: both jumps, cheering arms and compact sparkles remain complete, props disappear before neutral return; the generated blurred pose is still replaced with its clear neighbour and the two adjacent rapid transitions retain a clear pose. Full 605-frame bounds, spill and loop scan passed.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.26626391452712,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
   },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "normalizedMasterSha256": "350d7a84f4b7f24bbc07b2513ca526266d9aa6d17115636f9096b31416c1b5ed",
+  "postprocessingScript": "assets/sources/工作状态-雀跃庆祝-finishing.py"
 }
