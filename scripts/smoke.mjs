@@ -126,8 +126,10 @@ try {
   const corrected = expression.replace(/(pointerId: 94 \}\)\);\s*window\.dispatchEvent\(new MouseEvent\('mousemove', \{)/,
     '$1 buttons: 1,');
   assert.notEqual(corrected, expression, 'Upstream synthetic drag event changed.');
-  expression = corrected.replace('var during = { x: d.dragPos.x, y: d.dragPos.y };',
-    'var during = { x: d.dragPos.x, y: d.dragPos.y }; var duringAnimation = sprites[0].anim;');
+  // Observe the animation immediately after the synthetic drag crosses its
+  // threshold; native pointer-capture loss can release a synthetic hold later.
+  expression = corrected.replace('await sleep(400); // 弹簧跟随收敛',
+    'var duringAnimation = sprites[0].anim; await sleep(400); // 弹簧跟随收敛');
   assert.notEqual(expression, corrected, 'Upstream drag observation changed.');
   expression = expression.replace('during: during,', 'during: during, animation: duringAnimation,');
   const dump = await evaluate(expression);

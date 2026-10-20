@@ -1,0 +1,46 @@
+{
+  "name": "被鼠标拖拽悬空反馈",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/被鼠标拖拽悬空反馈-doubao.mp4",
+  "sourceSha256": "b115dad2853ba5fdf50bc2544599c32e60ce4f8ab56e95aa23ad0496aade59c8",
+  "recipePrompt": "assets/sources/被鼠标拖拽悬空反馈-recipe.md",
+  "promptRecord": "Adapted original recipe; the exact submitted chat prompt is not archived locally.",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/被鼠标拖拽悬空反馈.webm",
+  "outputSha256": "a9bb2d11f18a191770bbf2ae28edc6da4df349e8ef56e3f38a3da1e8560ed4c4",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      196,
+      3,
+      453,
+      332
+    ],
+    "greenSpillFraction": 0.0000044799550255800025,
+    "loopAlphaMeanDifference": 1.7684635416666667,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples: character rises, floats with subtle swaying, and returns to the front standing pose. Horns, wings, tail and feet remain within the frame; no ground shadow remains after keying.",
+    "limitation": "The rise is larger than the requested safe margin. The normalized animation has about 3 pixels of headroom at its highest point; all-frame bounds checks found no clipping."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}

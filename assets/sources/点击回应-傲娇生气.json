@@ -1,0 +1,45 @@
+{
+  "name": "点击回应-傲娇生气",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/点击回应-傲娇生气-doubao.mp4",
+  "sourceSha256": "c355e5e4d8edd9b503e3b74ea2a6917b08b1ea2314b8bd1aae01718d90dacad8",
+  "prompt": "assets/sources/点击回应-傲娇生气-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceFPS": 24,
+  "output": "assets/webm/点击回应-傲娇生气.webm",
+  "outputSha256": "aa222bd21ba9d332a5d181155a39ad68e1c3fabb824332a8fc9be7dfe13bbbd6",
+  "durationSeconds": 10.041,
+  "outputFPS": 120,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Central extraction without moving the original character coordinates",
+    "Original dsh-pet HSV chroma key, standing normalization and encoding",
+    "White/lavender green-spill suppression",
+    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18"
+  ],
+  "quality": {
+    "frames": 1205,
+    "fps": 120,
+    "contentBounds": [
+      198,
+      63,
+      503,
+      359
+    ],
+    "greenSpillFraction": 0.000006421860792545192,
+    "loopAlphaMeanDifference": 1.4205425347222222,
+    "uniqueDecodedFrameHashes": 1205,
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed source and twelve processed samples across the full action: hands on hips, closed eyes, turn through rear and side views, then return to the initial front pose; all parts remain within the frame.",
+    "recipeDeviation": "The generated turn briefly passes through a rear view, instead of stopping directly at the requested 90-degree side view."
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}
