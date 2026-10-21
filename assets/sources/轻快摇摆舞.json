@@ -15,7 +15,7 @@
   "sourceDurationSeconds": 10.053991,
   "preparedFPS": 24,
   "output": "assets/webm/轻快摇摆舞.webm",
-  "outputSha256": "5d6d0571d7ff3892a5e5486e829e0a20885216dd1821e0da7a622fe16a96c94a",
+  "outputSha256": "a87f5aca73cc98dbd4bed999a107c63c1772994460fd3aa0100270e12f47d40a",
   "outputWidth": 1280,
   "outputHeight": 720,
   "durationSeconds": 10.041,
@@ -26,7 +26,8 @@
     "Include dark saturated green shadows in the HSV background mask; preserve neutral black outlines",
     "Remove the source audio; suppress green spill in the white/lavender edges",
     "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration.",
+    "Match pale white/lavender material to HD idle with a fixed per-channel curve; preserve dark outlines and white highlight anchors, motion and alpha before VP9 Alpha CRF 18 re-encoding. Retain unchanged idle endpoints in existing shared-standing bridges. See colourMatch for the prior output, calibration and rebuild parameters."
   ],
   "quality": {
     "frames": 1205,
@@ -37,18 +38,121 @@
       894,
       673
     ],
-    "greenSpillFraction": 4.771076483685365e-06,
-    "loopAlphaMeanDifference": 0.03277669270833333,
-    "uniqueDecodedFrameHashes": 1205,
+    "greenSpillFraction": 3.572213172197378e-06,
+    "alphaMeanAbsoluteDifferenceToPrior": 0.03436933062471185,
+    "alphaMaximumFrameMeanDifferenceToPrior": 0.055372178819444444,
+    "loopAlphaMeanDifference": 0.0458984375,
+    "uniqueDecodedFrameHashes": 1204,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve processed timeline frames: alternating sway, hand and foot gestures, brief side turn and return to neutral are complete; identity and tail remain consistent and unclipped. Full 1205-frame transparency, bounds, spill and loop scan passed.",
+    "reviewNotes": "Reviewed twelve full-action frames, existing shared-standing bridge samples and dark/light background composites. Exposure/pale lavender closer to HD idle, complete original action retained. Full decoded frame count, bounds, alpha comparison and green-spill checks passed. Drawing-style and shape differences remain.",
     "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.07631017843134,
+      "droppedFrames": 0,
+      "advancedToNextAction": true,
+      "actualEndedEventObserved": true
+    }
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "postprocessingScript": "scripts/finish-standing.py",
+  "colourMatch": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "inputCommit": "47c7692456a16674e9ddf7a78135add9a1a87155",
+    "inputSha256": "5d6d0571d7ff3892a5e5486e829e0a20885216dd1821e0da7a622fe16a96c94a",
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "materialMask": "Alpha >245, min(RGB)>95, max(RGB)-min(RGB)<65, B>=R-3, G<=R+3; decoded at 640x360.",
+    "sourceQuantiles": [
+      [
+        201.0,
+        188.0,
+        214.0
+      ],
+      [
+        225.0,
+        214.0,
+        235.0
+      ],
+      [
+        243.0,
+        236.0,
+        245.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        165.0,
+        148.0,
+        181.0
+      ],
+      [
+        196.0,
+        180.0,
+        207.0
+      ],
+      [
+        222.0,
+        208.0,
+        225.0
+      ]
+    ],
+    "curve": "Per-channel piecewise linear interpolation through (0,0), (64,64), the three material quantiles, and (255,255), rounded to uint8. One fixed curve throughout the central action.",
+    "preserveCommonStanding": false,
+    "standingBlend": "For the existing common-standing clips, identity LUT through frame 18, smoothstep over frames 18..54; reverse over frames N-55..N-19, then identity. Motion unchanged.",
+    "priorNativePlayback": {
       "sampleSeconds": 1.8,
       "observedFPS": 119.98000333277817,
       "droppedFrames": 0,
       "advancedToNextAction": true
-    }
-  },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "postprocessingScript": "scripts/finish-standing.py"
+    },
+    "measurement": {
+      "before": [
+        [
+          201.0,
+          188.0,
+          214.0
+        ],
+        [
+          225.0,
+          214.0,
+          235.0
+        ],
+        [
+          243.0,
+          236.0,
+          245.0
+        ]
+      ],
+      "after": [
+        [
+          164.0,
+          147.0,
+          179.0
+        ],
+        [
+          191.0,
+          175.0,
+          205.0
+        ],
+        [
+          218.0,
+          206.0,
+          224.0
+        ]
+      ],
+      "beforeMedianMeanChannelDistance": 30.333333333333332,
+      "afterMedianMeanChannelDistance": 4.0
+    },
+    "script": "scripts/match-colour.py",
+    "limitations": "Matches exposure and pale white/lavender material, not character geometry or drawing style. Fixed curves do not remove generated lighting changes within an action."
+  }
 }

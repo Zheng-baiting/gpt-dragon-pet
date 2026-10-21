@@ -15,7 +15,7 @@
   "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
   "output": "assets/webm/哈欠连天.webm",
-  "outputSha256": "4dfb41b9ab0631e0d6a8bb92e9b81eaeb5cc37021e4072e331b08b5d34b713f1",
+  "outputSha256": "8f97a161b941699e6321463aa8afe720ac0c97ba8d116140709fe2d7d4b01901",
   "outputWidth": 1280,
   "outputHeight": 720,
   "durationSeconds": 10.041,
@@ -24,7 +24,8 @@
     "Same approved standing reference supplied as both first and last frame; original marked source export retained.",
     "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
     "720p encode directly from the normalized master, green edge suppression, audio removal, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
-    "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete yawn, eye rub, head motion and recovery remain from the generated source."
+    "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete yawn, eye rub, head motion and recovery remain from the generated source.",
+    "Match pale white/lavender material to HD idle with a fixed per-channel curve; preserve dark outlines and white highlight anchors, motion and alpha before VP9 Alpha CRF 18 re-encoding. Retain unchanged idle endpoints in existing shared-standing bridges. See colourMatch for the prior output, calibration and rebuild parameters."
   ],
   "commonStanding": {
     "reference": "assets/webm/待机呼吸休闲.webm",
@@ -43,17 +44,20 @@
       975,
       667
     ],
-    "greenSpillFraction": 6.331302561613636e-7,
-    "loopAlphaMeanDifference": 0.03326280381944444,
-    "uniqueDecodedFrameHashes": 1184,
+    "greenSpillFraction": 4.563745284857007e-06,
+    "alphaMeanAbsoluteDifferenceToPrior": 0.032247332800253575,
+    "alphaMaximumFrameMeanDifferenceToPrior": 0.046371527777777775,
+    "loopAlphaMeanDifference": 0.04580512152777778,
+    "uniqueDecodedFrameHashes": 1187,
     "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve full-action frames, existing shared-standing bridge samples and dark/light background composites. Exposure/pale lavender closer to HD idle, complete original action retained. Full decoded frame count, bounds, alpha comparison and green-spill checks passed. Drawing-style and shape differences remain.",
     "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 120.22591287815246,
+      "observedFPS": 120.19230769230774,
       "droppedFrames": 0,
-      "advancedToNextAction": true
-    },
-    "reviewNotes": "Reviewed twelve full-action and sixteen boundary samples. Clear shoulder-height yawn, both-eye rubbing, gentle sleepy head motion and neutral recovery; the tail remains white and fluffy. Full frame/alpha/spill scan passed. Short head/tail bridges are local optical-flow estimates; source style differences and other mid-action cuts remain."
+      "advancedToNextAction": true,
+      "actualEndedEventObserved": true
+    }
   },
   "supersedes": {
     "provider": "TapNow",
@@ -64,5 +68,105 @@
     "outputHeight": 360
   },
   "postprocessingScript": "scripts/finish-common-standing.py",
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "colourMatch": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "inputCommit": "47c7692456a16674e9ddf7a78135add9a1a87155",
+    "inputSha256": "4dfb41b9ab0631e0d6a8bb92e9b81eaeb5cc37021e4072e331b08b5d34b713f1",
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "materialMask": "Alpha >245, min(RGB)>95, max(RGB)-min(RGB)<65, B>=R-3, G<=R+3; decoded at 640x360.",
+    "sourceQuantiles": [
+      [
+        145.0,
+        127.0,
+        158.0
+      ],
+      [
+        169.0,
+        150.0,
+        177.0
+      ],
+      [
+        204.0,
+        187.0,
+        205.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        165.0,
+        148.0,
+        181.0
+      ],
+      [
+        196.0,
+        180.0,
+        207.0
+      ],
+      [
+        222.0,
+        208.0,
+        225.0
+      ]
+    ],
+    "curve": "Per-channel piecewise linear interpolation through (0,0), (64,64), the three material quantiles, and (255,255), rounded to uint8. One fixed curve throughout the central action.",
+    "preserveCommonStanding": true,
+    "standingBlend": "For the existing common-standing clips, identity LUT through frame 18, smoothstep over frames 18..54; reverse over frames N-55..N-19, then identity. Motion unchanged.",
+    "priorNativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.22591287815246,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    },
+    "measurement": {
+      "before": [
+        [
+          145.0,
+          127.0,
+          158.0
+        ],
+        [
+          169.0,
+          150.0,
+          177.0
+        ],
+        [
+          204.0,
+          187.0,
+          205.0
+        ]
+      ],
+      "after": [
+        [
+          170.0,
+          153.0,
+          185.0
+        ],
+        [
+          204.0,
+          187.0,
+          211.0
+        ],
+        [
+          228.0,
+          214.0,
+          228.0
+        ]
+      ],
+      "beforeMedianMeanChannelDistance": 29.0,
+      "afterMedianMeanChannelDistance": 6.333333333333333
+    },
+    "script": "scripts/match-colour.py",
+    "limitations": "Matches exposure and pale white/lavender material, not character geometry or drawing style. Fixed curves do not remove generated lighting changes within an action."
+  }
 }

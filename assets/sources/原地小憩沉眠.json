@@ -15,7 +15,7 @@
   "sourceDurationSeconds": 10.053991,
   "preparedFPS": 24,
   "output": "assets/webm/原地小憩沉眠.webm",
-  "outputSha256": "19601b8e15392781ba1afc579f1dff7f2d783322820705f0ed7bdca971c2013c",
+  "outputSha256": "77ccdf2004881b40fafd84610ab6166647f1cecfe71882d0da083c8282e71c03",
   "outputWidth": 1280,
   "outputHeight": 720,
   "durationSeconds": 10.041,
@@ -27,7 +27,8 @@
     "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
     "Separate the largest connected character component from detached sleep bubbles after HSV keying, including dark green shadows. Keep the character motion, fit the original detached bubbles within 160x70 source pixels above the head, and fade them from 7s to 8.5s. Do not draw new bubbles.",
     "After the sleep bubbles have disappeared, estimate the final 0.5s return from frame 1140 to the first clean standing pose with eased bidirectional optical flow; preserve 1205 frames.",
-    "Remove only small detached bubble ghosts touching the top edge, bottom y at most 128, maximum alpha 160, area at most 4096; retain the largest character component"
+    "Remove only small detached bubble ghosts touching the top edge, bottom y at most 128, maximum alpha 160, area at most 4096; retain the largest character component",
+    "Match pale white/lavender material to HD idle with a fixed per-channel curve; preserve dark outlines and white highlight anchors, motion and alpha before VP9 Alpha CRF 18 re-encoding. Retain unchanged idle endpoints in existing shared-standing bridges. See colourMatch for the prior output, calibration and rebuild parameters."
   ],
   "quality": {
     "frames": 1205,
@@ -38,19 +39,122 @@
       901,
       667
     ],
-    "greenSpillFraction": 2.1137154459367746e-07,
-    "loopAlphaMeanDifference": 0.03307074652777778,
-    "uniqueDecodedFrameHashes": 1204,
+    "greenSpillFraction": 8.551266921604858e-06,
+    "alphaMeanAbsoluteDifferenceToPrior": 0.027707238358690642,
+    "alphaMaximumFrameMeanDifferenceToPrior": 0.048006727430555556,
+    "loopAlphaMeanDifference": 0.046793619791666664,
+    "uniqueDecodedFrameHashes": 1205,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve processed timeline frames: eyes close, body lowers into a nap, original sleep bubbles rise and fade, then the character wakes and returns to neutral. Fitted the original detached effects above the head and removed five small top-edge ghost components; full 1205-frame transparency, bounds, spill and loop scan passed.",
+    "reviewNotes": "Reviewed twelve full-action frames, existing shared-standing bridge samples and dark/light background composites. Exposure/pale lavender closer to HD idle, complete original action retained. Full decoded frame count, bounds, alpha comparison and green-spill checks passed. Drawing-style and shape differences remain.",
     "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 120.29317965646507,
+      "observedFPS": 119.96001332889037,
       "droppedFrames": 0,
-      "advancedToNextAction": true
+      "advancedToNextAction": true,
+      "actualEndedEventObserved": true
     }
   },
   "preparationScript": "assets/sources/原地小憩沉眠-processing.py",
   "postprocessingScript": "assets/sources/原地小憩沉眠-finishing.py",
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "colourMatch": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "inputCommit": "47c7692456a16674e9ddf7a78135add9a1a87155",
+    "inputSha256": "19601b8e15392781ba1afc579f1dff7f2d783322820705f0ed7bdca971c2013c",
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "materialMask": "Alpha >245, min(RGB)>95, max(RGB)-min(RGB)<65, B>=R-3, G<=R+3; decoded at 640x360.",
+    "sourceQuantiles": [
+      [
+        195.0,
+        180.0,
+        211.0
+      ],
+      [
+        223.0,
+        210.0,
+        233.0
+      ],
+      [
+        243.0,
+        235.0,
+        246.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        165.0,
+        148.0,
+        181.0
+      ],
+      [
+        196.0,
+        180.0,
+        207.0
+      ],
+      [
+        222.0,
+        208.0,
+        225.0
+      ]
+    ],
+    "curve": "Per-channel piecewise linear interpolation through (0,0), (64,64), the three material quantiles, and (255,255), rounded to uint8. One fixed curve throughout the central action.",
+    "preserveCommonStanding": false,
+    "standingBlend": "For the existing common-standing clips, identity LUT through frame 18, smoothstep over frames 18..54; reverse over frames N-55..N-19, then identity. Motion unchanged.",
+    "priorNativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.29317965646507,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    },
+    "measurement": {
+      "before": [
+        [
+          195.0,
+          180.0,
+          211.0
+        ],
+        [
+          223.0,
+          210.0,
+          233.0
+        ],
+        [
+          243.0,
+          235.0,
+          246.0
+        ]
+      ],
+      "after": [
+        [
+          163.0,
+          145.0,
+          180.0
+        ],
+        [
+          192.0,
+          174.0,
+          205.0
+        ],
+        [
+          218.0,
+          205.0,
+          223.0
+        ]
+      ],
+      "beforeMedianMeanChannelDistance": 27.666666666666668,
+      "afterMedianMeanChannelDistance": 4.0
+    },
+    "script": "scripts/match-colour.py",
+    "limitations": "Matches exposure and pale white/lavender material, not character geometry or drawing style. Fixed curves do not remove generated lighting changes within an action."
+  }
 }
