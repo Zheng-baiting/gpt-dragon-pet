@@ -6,7 +6,8 @@ import extract from '@electron-internal/extract-zip';
 import { root, upstream, runtime, profile, json } from './paths.mjs';
 import { mediaStatus } from '../scripts/media.mjs';
 import { configurePreview } from './preview-config.mjs';
-import { patchVideoSwitch } from './video-switch.mjs';
+import { patchVideoSwitch, patchVideoComposition } from './video-switch.mjs';
+import { mediaResponse } from './media-response.mjs';
 
 export const electronPath = join(runtime, 'electron', process.platform === 'win32' ? 'electron.exe' : 'electron');
 
@@ -59,9 +60,14 @@ if (process.env.GPT_PET_DEBUG_PORT) {
   app.commandLine.appendSwitch('remote-debugging-address', '127.0.0.1');
   app.commandLine.appendSwitch('remote-debugging-port', process.env.GPT_PET_DEBUG_PORT);
 }`;
-  await writeFile(helper, text.replace(marker, isolation));
+  const fileResponse = 'return new Response(new Uint8Array(data), { status: resp.status || 200, headers });';
+  if (text.split(fileResponse).length !== 2) throw Error('上游素材读取入口已变化，停止修改。');
+  await writeFile(helper, text.replace(marker, isolation + '\n' + mediaResponse.toString())
+    .replace(fileResponse, "return mediaResponse(data, request.headers.get('range'), headers, method);"));
   const sprite = join(engine, 'runtime/electron-helper/sprite.js');
   await writeFile(sprite, patchVideoSwitch(await readFile(sprite, 'utf8')));
+  const page = join(engine, 'runtime/electron-helper/index.html');
+  await writeFile(page, patchVideoComposition(await readFile(page, 'utf8')));
   let config = JSON.parse(await readFile(join(root, preview ? 'config/preview.json' : 'config/gpt.json'), 'utf8'));
   const data = join(base, 'data/dsh-pet/main-animation/webm');
   await mkdir(data, { recursive: true });

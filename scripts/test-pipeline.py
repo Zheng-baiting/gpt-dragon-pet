@@ -12,7 +12,7 @@ from motion import prepare_pair, interpolate
 
 
 class PipelineTest(unittest.TestCase):
-    def test_green_to_normalized_transparent_120fps(self):
+    def test_green_to_normalized_transparent_24fps(self):
         with tempfile.TemporaryDirectory(dir=ROOT / 'work', prefix='pipeline-test-') as directory:
             folder = Path(directory)
             source = folder / 'fixture.mp4'
@@ -31,14 +31,15 @@ class PipelineTest(unittest.TestCase):
                 shutil.copytree(ROOT / 'vendor/dsh-pet', folder / 'vendor/dsh-pet')
                 with contextlib.redirect_stdout(io.StringIO()):
                     process('fixture', source, True, (240, 0, 800, 720))
-                    process('fixture', source, True, (240, 0, 800, 720), 720)
-            for height, name in [(360, 'pipeline'), (720, 'pipeline-hd')]:
+                    with self.assertRaises(ValueError):
+                        process('fixture', source, True, (240, 0, 800, 720), 720)
+            for height, name in [(360, 'pipeline')]:
                 with self.subTest(height=height):
                     width = height*16//9
-                    output = folder / f'work/{name}/fixture/video-120fps.webm'
+                    output = folder / f'work/{name}/fixture/video-24fps.webm'
                     metadata = info(output)
                     self.assertEqual((metadata['width'], metadata['height']), (width, height))
-                    self.assertEqual(metadata['r_frame_rate'], '120/1')
+                    self.assertEqual(metadata['r_frame_rate'], '24/1')
                     self.assertAlmostEqual(metadata['duration'], .5, delta=.02)
                     assert_alpha(output)
                     decoded = run([FFMPEG, '-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', str(output),
@@ -54,7 +55,7 @@ class PipelineTest(unittest.TestCase):
                     rgb = pixels[...,:3].astype(np.int16)
                     self.assertEqual(int((solid & (rgb[...,1]-np.maximum(rgb[...,0],rgb[...,2]) > 30)).sum()), 0)
                     report = json.loads((output.parent / 'report.json').read_text(encoding='utf-8'))
-                    self.assertEqual(report['frames'], 60)
+                    self.assertEqual(report['frames'], 12)
                     self.assertEqual((report['outputWidth'], report['outputHeight']), (width, height))
                     self.assertTrue(report['manualReviewRequired'])
                     self.assertEqual(report['extractionRegion'], [240, 0, 800, 720])

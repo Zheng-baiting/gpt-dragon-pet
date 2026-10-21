@@ -1,4 +1,7 @@
-"""Run the original dsh-pet material pipeline, then interpolate to 120 fps."""
+"""Run the original dsh-pet material pipeline at 640x360/24fps.
+
+retime() remains available only for rebuilding historical 120fps artifacts.
+"""
 import argparse
 import importlib.util
 import json
@@ -161,8 +164,8 @@ def review(video, target):
 
 
 def process(name, source, green, region=None, output_height=360):
-    if output_height not in (360, 720):
-        raise ValueError('输出高度只能为 360 或 720。')
+    if output_height != 360:
+        raise ValueError('按原版输出 640×360、24 fps。')
     actions = json.loads((ROOT / 'assets/actions.json').read_text(encoding='utf-8'))
     if name not in {action['name'] for action in actions}:
         raise ValueError('未知动作名。')
@@ -181,8 +184,8 @@ def process(name, source, green, region=None, output_height=360):
     keyed = folder / 'step02.webm'
     normalized = folder / 'step03.webm'
     original_clip = folder / 'step04-24fps.webm'
-    final = folder / 'video-120fps.webm'
-    candidate = folder / 'video-120fps.pending.webm'
+    final = folder / 'video-24fps.webm'
+    candidate = folder / 'video-24fps.pending.webm'
     if green:
         prepared = folder / 'step01.mp4'
         filters = []
@@ -222,9 +225,18 @@ def process(name, source, green, region=None, output_height=360):
     encoding.TARGET_W, encoding.TARGET_H = output_height*16//9, output_height
     encoding.CRF = 18
     encoding.convert_video(normalized, original_clip)
-    frames = retime(original_clip, candidate, despill=green)
+    # Preserve the original frame grid; no fivefold optical-flow interpolation.
+    filters = 'fps=24'
+    if green:
+        filters += ",format=rgba,geq=r='r(X,Y)':g='min(g(X,Y),max(r(X,Y),b(X,Y)))':b='b(X,Y)':a='alpha(X,Y)'"
+    run([FFMPEG, '-y', '-loglevel', 'error', '-c:v', 'libvpx-vp9', '-i', str(original_clip),
+         '-vf', filters, '-an', '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p',
+         '-b:v', '0', '-crf', '18', '-deadline', 'good', '-cpu-used', '4',
+         '-auto-alt-ref', '0', str(candidate)], check=True)
+    assert_alpha(candidate)
+    frames = round(info(candidate)['duration']*24)
     review(candidate, folder / 'review.png')
-    report = {'name': name, 'upstream': 'dsh-pet@0.3.7', 'sourceFPS': 24, 'fps': 120, 'frames': frames,
+    report = {'name': name, 'upstream': 'dsh-pet@0.3.7', 'sourceFPS': 24, 'fps': 24, 'frames': frames,
               'duration': info(candidate)['duration'], 'standing': standing, 'contentUnion': union,
               'scale': scale, 'extractionRegion': region, 'greenEdgeDespill': green,
               'darkGreenShadowRemoval': green,
@@ -242,7 +254,7 @@ if __name__ == '__main__':
     media.add_argument('name')
     media.add_argument('source')
     media.add_argument('--green', action='store_true')
-    media.add_argument('--height', type=int, choices=(360, 720), default=360)
+    media.add_argument('--height', type=int, choices=(360,), default=360)
     media.add_argument('--region', type=int, nargs=4, metavar=('X', 'Y', 'WIDTH', 'HEIGHT'))
     args = parser.parse_args()
     try:

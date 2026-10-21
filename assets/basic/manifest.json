@@ -2,21 +2,33 @@
   {
     "name": "Q版-眨眼呼吸",
     "file": "Q版-眨眼呼吸.webm",
-    "frames": 540,
-    "fps": 120,
+    "frames": 108,
+    "fps": 24,
     "duration": 4.5,
-    "uniqueRenderedFrames": 309,
     "interpolation": "bidirectional-optical-flow",
-    "originalKeyframes": 8
+    "originalKeyframes": 8,
+    "uniqueDecodedFrames": 108,
+    "historical120FPS": {
+      "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+      "inputSha256": "2bb1b5a8c2319dfbb3bd1fbdb1314b9e5248376368995f170421878174f402fa",
+      "uniqueRenderedFrames": 309
+    },
+    "outputSha256": "40998f49be3b8650bf16b0d0039d1dbe8ed5d1d98154ec33eb0abe8e85016fa4"
   },
   {
     "name": "Q版-点击招手",
     "file": "Q版-点击招手.webm",
-    "frames": 288,
-    "fps": 120,
-    "duration": 2.4,
-    "uniqueRenderedFrames": 223,
+    "frames": 58,
+    "fps": 24,
+    "duration": 2.4166666666666665,
     "interpolation": "bidirectional-optical-flow",
-    "originalKeyframes": 6
+    "originalKeyframes": 6,
+    "uniqueDecodedFrames": 58,
+    "historical120FPS": {
+      "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+      "inputSha256": "b1685fc0221d990a72d2abc008d6e80c9d9c8ccb6a314924e67ba55472611146",
+      "uniqueRenderedFrames": 223
+    },
+    "outputSha256": "7b26bb5b858221255603c514cb1528367abee75e0e3efb7b548e94bbec09e8be"
   }
 ]

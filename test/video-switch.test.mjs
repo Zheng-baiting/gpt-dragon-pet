@@ -4,7 +4,7 @@ import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { upstream } from '../src/paths.mjs';
-import { switchVideo, patchVideoSwitch } from '../src/video-switch.mjs';
+import { switchVideo, patchVideoSwitch, patchVideoComposition } from '../src/video-switch.mjs';
 
 function fixture() {
   let id = 0;
@@ -101,4 +101,9 @@ test('the pinned upstream sprite accepts the scoped patch and retains unrelated 
   assert(patched.endsWith(source.slice(source.indexOf('\n  playOnce(name) {'))));
   assert.match(patched, /dispose\(\) \{\n    this.pending\?\.cancel/);
   assert.throws(() => patchVideoSwitch('changed upstream'), /入口已变化/);
+  const page = await readFile(join(upstream, 'runtime/electron-helper/index.html'), 'utf8');
+  const composed = patchVideoComposition(page);
+  assert(composed.includes('.pet-stage {\n        isolation: isolate;'));
+  assert(composed.includes('video.pet-video {\n        mix-blend-mode: plus-lighter;'));
+  assert.throws(() => patchVideoComposition('changed upstream'), /入口已变化/);
 });

@@ -10,45 +10,98 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/螃蟹走路.webm",
-  "outputSha256": "2db64bbc61d60f3dad04117761a101ee9e1be6c35baf02902823c41331b160bd",
-  "durationSeconds": 10.041,
-  "outputFPS": 120,
+  "outputSha256": "2c616dc720c41fd1e73bfa0927f46d156e753ef1a4caf7acf51967a0aeb6ca65",
   "extractionRegion": [
     256,
     0,
     768,
     720
   ],
-  "processing": [
-    "Central extraction without moving the original character coordinates",
-    "Original dsh-pet HSV chroma key, standing normalization and encoding",
-    "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
-  ],
-  "quality": {
-    "frames": 1205,
-    "fps": 120,
-    "contentBounds": [
-      381,
-      126,
-      956,
-      666
-    ],
-    "greenSpillFraction": 2.2126552382947574e-06,
-    "loopAlphaMeanDifference": 0.6674273003472222,
-    "uniqueDecodedFrameHashes": 1204,
-    "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed samples: alternating sideways in-place steps, left-leaning body, alternating arm swing and tail sway, then returns to neutral; no clipping or ground shadow. HD output: Reviewed twelve HD samples: left-leaning sideways steps, alternating arms, tail balancing to the right, then neutral. Character stays intact and on the original baseline; full 1205-frame bounds, transparency, spill and loop scan passed.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 120.25953686094621,
-      "droppedFrames": 0,
-      "advancedToNextAction": true
-    }
-  },
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "outputWidth": 1280,
-  "outputHeight": 720,
-  "normalizedMasterSha256": "ef39dfe73016e8e259298e65be0faa6fc8d711dfd894ca1dd708fb29f0a8d443"
+  "normalizedMasterSha256": "ef39dfe73016e8e259298e65be0faa6fc8d711dfd894ca1dd708fb29f0a8d443",
+  "originalRateMigration": {
+    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+    "script": "scripts/restore-original-rate.py",
+    "inputSha256": "2db64bbc61d60f3dad04117761a101ee9e1be6c35baf02902823c41331b160bd",
+    "inputBytes": 27629582,
+    "outputBytes": 3183943,
+    "previousOutput": {
+      "outputWidth": 1280,
+      "outputHeight": 720,
+      "outputFPS": 120,
+      "durationSeconds": 10.041,
+      "processing": [
+        "Central extraction without moving the original character coordinates",
+        "Original dsh-pet HSV chroma key, standing normalization and encoding",
+        "White/lavender green-spill suppression",
+        "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+        "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
+      ],
+      "quality": {
+        "frames": 1205,
+        "fps": 120,
+        "contentBounds": [
+          381,
+          126,
+          956,
+          666
+        ],
+        "greenSpillFraction": 2.2126552382947574e-06,
+        "loopAlphaMeanDifference": 0.6674273003472222,
+        "uniqueDecodedFrameHashes": 1204,
+        "manualReviewPassed": true,
+        "reviewNotes": "Reviewed source and twelve processed samples: alternating sideways in-place steps, left-leaning body, alternating arm swing and tail sway, then returns to neutral; no clipping or ground shadow. HD output: Reviewed twelve HD samples: left-leaning sideways steps, alternating arms, tail balancing to the right, then neutral. Character stays intact and on the original baseline; full 1205-frame bounds, transparency, spill and loop scan passed.",
+        "nativePlayback": {
+          "sampleSeconds": 1.8,
+          "observedFPS": 120.25953686094621,
+          "droppedFrames": 0,
+          "advancedToNextAction": true
+        }
+      }
+    },
+    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
+    "newMotionInterpolation": false,
+    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  },
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "processing": [
+    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
+    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
+    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "bridgeFrames": 9,
+    "holdFrames": 0,
+    "fps": 24,
+    "headSeconds": 0.375,
+    "tailSeconds": 0.4166666666666667,
+    "script": "scripts/finish-common-standing.py",
+    "estimatedMotion": true
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      191,
+      63,
+      477,
+      332
+    ],
+    "greenSpillFraction": 0.0,
+    "loopAlphaMeanDifference": 0.05872829861111111,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless."
+  }
 }

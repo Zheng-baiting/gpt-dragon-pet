@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / 'work' / 'tools' / 'python'))
 import numpy as np
 from PIL import Image, ImageChops, ImageDraw
 from motion import prepare_pair, interpolate
-FPS = 120
+FPS = 24
 FFMPEG = os.environ.get("GPT_PET_FFMPEG", "ffmpeg")
 
 
@@ -98,7 +98,7 @@ def animate(frames, timeline, folder, output, breathe=False):
             process.stdin.write(data)
             if number in {0, round(count/4), round(count/2), round(count*3/4), count-1}:
                 frame.save(folder / f'{number:04}.png')
-            if number % (FPS//10) == 0:
+            if number == round(len(rendered)*FPS/10):
                 rendered.append(frame.resize((480,270), Image.Resampling.LANCZOS))
         process.stdin.close()
         error = process.stderr.read().decode('utf-8', errors='replace')

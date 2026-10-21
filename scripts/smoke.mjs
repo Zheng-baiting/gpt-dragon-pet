@@ -132,6 +132,12 @@ try {
     'var duringAnimation = sprites[0].anim; await sleep(400); // 弹簧跟随收敛');
   assert.notEqual(expression, corrected, 'Upstream drag observation changed.');
   expression = expression.replace('during: during,', 'during: during, animation: duringAnimation,');
+  // Compare the authoritative position immediately before release. The upstream
+  // debug snapshot was sampled 200ms earlier while the spring could still move.
+  const releaseMarker = 'await sleep(200); // 轨迹过期 → 估速 null → 温柔放下（不抛掷）';
+  assert(expression.includes(releaseMarker), 'Upstream release observation changed.');
+  expression = expression.replace(releaseMarker, releaseMarker +
+    '\n                during = { x: sprites[0].pos.x, y: sprites[0].pos.y };');
   const dump = await evaluate(expression);
   await mkdir(join(root, 'work'), { recursive: true });
   await writeFile(join(root, 'work/smoke-raw.json'), json(dump));

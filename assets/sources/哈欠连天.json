@@ -15,50 +15,7 @@
   "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
   "output": "assets/webm/哈欠连天.webm",
-  "outputSha256": "8f97a161b941699e6321463aa8afe720ac0c97ba8d116140709fe2d7d4b01901",
-  "outputWidth": 1280,
-  "outputHeight": 720,
-  "durationSeconds": 10.041,
-  "outputFPS": 120,
-  "processing": [
-    "Same approved standing reference supplied as both first and last frame; original marked source export retained.",
-    "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
-    "720p encode directly from the normalized master, green edge suppression, audio removal, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
-    "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete yawn, eye rub, head motion and recovery remain from the generated source.",
-    "Match pale white/lavender material to HD idle with a fixed per-channel curve; preserve dark outlines and white highlight anchors, motion and alpha before VP9 Alpha CRF 18 re-encoding. Retain unchanged idle endpoints in existing shared-standing bridges. See colourMatch for the prior output, calibration and rebuild parameters."
-  ],
-  "commonStanding": {
-    "reference": "assets/webm/待机呼吸休闲.webm",
-    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
-    "referenceFrame": 0,
-    "inputSha256": "a916581b76de6031949450ab06851b894a35934b80c4a43bd7928d29a75139a1",
-    "headSeconds": 0.45,
-    "tailSeconds": 0.4583333333333333
-  },
-  "quality": {
-    "frames": 1205,
-    "fps": 120,
-    "contentBounds": [
-      411,
-      123,
-      975,
-      667
-    ],
-    "greenSpillFraction": 4.563745284857007e-06,
-    "alphaMeanAbsoluteDifferenceToPrior": 0.032247332800253575,
-    "alphaMaximumFrameMeanDifferenceToPrior": 0.046371527777777775,
-    "loopAlphaMeanDifference": 0.04580512152777778,
-    "uniqueDecodedFrameHashes": 1187,
-    "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve full-action frames, existing shared-standing bridge samples and dark/light background composites. Exposure/pale lavender closer to HD idle, complete original action retained. Full decoded frame count, bounds, alpha comparison and green-spill checks passed. Drawing-style and shape differences remain.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 120.19230769230774,
-      "droppedFrames": 0,
-      "advancedToNextAction": true,
-      "actualEndedEventObserved": true
-    }
-  },
+  "outputSha256": "18aa5462a7264f4b0e98331144354479d2f002014abf7f5c8fcf8a5a923801f6",
   "supersedes": {
     "provider": "TapNow",
     "source": "assets/sources/哈欠连天-tapnow.mp4",
@@ -67,7 +24,6 @@
     "outputWidth": 640,
     "outputHeight": 360
   },
-  "postprocessingScript": "scripts/finish-common-standing.py",
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
   "colourMatch": {
     "reference": "assets/webm/待机呼吸休闲.webm",
@@ -168,5 +124,102 @@
     },
     "script": "scripts/match-colour.py",
     "limitations": "Matches exposure and pale white/lavender material, not character geometry or drawing style. Fixed curves do not remove generated lighting changes within an action."
+  },
+  "originalRateMigration": {
+    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+    "script": "scripts/restore-original-rate.py",
+    "inputSha256": "8f97a161b941699e6321463aa8afe720ac0c97ba8d116140709fe2d7d4b01901",
+    "inputBytes": 21085853,
+    "outputBytes": 2552435,
+    "previousOutput": {
+      "outputWidth": 1280,
+      "outputHeight": 720,
+      "outputFPS": 120,
+      "durationSeconds": 10.041,
+      "processing": [
+        "Same approved standing reference supplied as both first and last frame; original marked source export retained.",
+        "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
+        "720p encode directly from the normalized master, green edge suppression, audio removal, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
+        "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete yawn, eye rub, head motion and recovery remain from the generated source.",
+        "Match pale white/lavender material to HD idle with a fixed per-channel curve; preserve dark outlines and white highlight anchors, motion and alpha before VP9 Alpha CRF 18 re-encoding. Retain unchanged idle endpoints in existing shared-standing bridges. See colourMatch for the prior output, calibration and rebuild parameters."
+      ],
+      "quality": {
+        "frames": 1205,
+        "fps": 120,
+        "contentBounds": [
+          411,
+          123,
+          975,
+          667
+        ],
+        "greenSpillFraction": 4.563745284857007e-06,
+        "alphaMeanAbsoluteDifferenceToPrior": 0.032247332800253575,
+        "alphaMaximumFrameMeanDifferenceToPrior": 0.046371527777777775,
+        "loopAlphaMeanDifference": 0.04580512152777778,
+        "uniqueDecodedFrameHashes": 1187,
+        "manualReviewPassed": true,
+        "reviewNotes": "Reviewed twelve full-action frames, existing shared-standing bridge samples and dark/light background composites. Exposure/pale lavender closer to HD idle, complete original action retained. Full decoded frame count, bounds, alpha comparison and green-spill checks passed. Drawing-style and shape differences remain.",
+        "nativePlayback": {
+          "sampleSeconds": 1.8,
+          "observedFPS": 120.19230769230774,
+          "droppedFrames": 0,
+          "advancedToNextAction": true,
+          "actualEndedEventObserved": true
+        }
+      },
+      "commonStanding": {
+        "reference": "assets/webm/待机呼吸休闲.webm",
+        "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+        "referenceFrame": 0,
+        "inputSha256": "a916581b76de6031949450ab06851b894a35934b80c4a43bd7928d29a75139a1",
+        "headSeconds": 0.45,
+        "tailSeconds": 0.4583333333333333
+      },
+      "postprocessingScript": "scripts/finish-common-standing.py"
+    },
+    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
+    "newMotionInterpolation": false,
+    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  },
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "processing": [
+    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
+    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
+    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "bridgeFrames": 9,
+    "holdFrames": 0,
+    "fps": 24,
+    "headSeconds": 0.375,
+    "tailSeconds": 0.4166666666666667,
+    "script": "scripts/finish-common-standing.py",
+    "estimatedMotion": true
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      205,
+      63,
+      487,
+      333
+    ],
+    "greenSpillFraction": 2.2020778586466404e-07,
+    "loopAlphaMeanDifference": 0.057951388888888886,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless."
   }
 }

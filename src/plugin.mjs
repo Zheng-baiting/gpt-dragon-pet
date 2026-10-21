@@ -20,7 +20,7 @@ async function call(name, args) {
   if (name === 'get_gpt_pet_status') {
     const actions = await mediaStatus();
     return { preview: await status(true), pet: await status(false),
-      videos: `${actions.filter((a) => a.available).length}/${actions.length}`, basicAnimations: 2, basicVideoFPS: 120,
+      videos: `${actions.filter((a) => a.available).length}/${actions.length}`, basicAnimations: 2, basicVideoFPS: 24,
       originalActionRecipes: (await recipes()).length, previewIsStatic: false };
   }
   if (name === 'hide_gpt_pet') { await stop(); return { ok: true }; }

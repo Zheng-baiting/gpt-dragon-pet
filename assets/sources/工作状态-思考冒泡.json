@@ -15,46 +15,7 @@
   "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
   "output": "assets/webm/工作状态-思考冒泡.webm",
-  "outputSha256": "b97dc28c4c822e982244692d1fe64ba97edae267573130ba201403df56e75cc8",
-  "outputWidth": 1280,
-  "outputHeight": 720,
-  "durationSeconds": 10.041,
-  "outputFPS": 120,
-  "processing": [
-    "Original marked source export retained; no audio in the formal output.",
-    "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
-    "720p encode directly from the normalized master, green edge suppression, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
-    "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete thinking and effects remain from the generated source."
-  ],
-  "commonStanding": {
-    "reference": "assets/webm/待机呼吸休闲.webm",
-    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
-    "referenceFrame": 0,
-    "inputSha256": "5a079207f73f183eb993107c029ef3844e24a15ed5b756503c2125f347b495d9",
-    "headSeconds": 0.45,
-    "tailSeconds": 0.4583333333333333
-  },
-  "quality": {
-    "frames": 1205,
-    "fps": 120,
-    "contentBounds": [
-      394,
-      23,
-      861,
-      669
-    ],
-    "greenSpillFraction": 3.2671291511326212e-06,
-    "loopAlphaMeanDifference": 0.03344835069444444,
-    "uniqueDecodedFrameHashes": 1182,
-    "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve full-action and sixteen head/tail samples: hand-to-chin thinking, question mark, small blue/gold light points and neutral recovery remain intact. White fluffy tail stays consistent; no visible green floor shadow or clipped character/effects. Full frame bounds/alpha/spill scan passed. The short common standing bridges use local optical-flow estimates; other actions and mid-action interruptions are not yet unified.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 119.81720909496211,
-      "droppedFrames": 0,
-      "advancedToNextAction": true
-    }
-  },
+  "outputSha256": "b51ea0bb2fdb33000aa9e5f4b4e24631cbb3068331603faaa807afbf2bc24a7c",
   "supersedes": {
     "provider": "TapNow",
     "source": "assets/sources/工作状态-思考冒泡-tapnow.mp4",
@@ -63,6 +24,98 @@
     "outputWidth": 640,
     "outputHeight": 360
   },
-  "postprocessingScript": "scripts/finish-common-standing.py",
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "originalRateMigration": {
+    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+    "script": "scripts/restore-original-rate.py",
+    "inputSha256": "b97dc28c4c822e982244692d1fe64ba97edae267573130ba201403df56e75cc8",
+    "inputBytes": 22122858,
+    "outputBytes": 2496578,
+    "previousOutput": {
+      "outputWidth": 1280,
+      "outputHeight": 720,
+      "outputFPS": 120,
+      "durationSeconds": 10.041,
+      "processing": [
+        "Original marked source export retained; no audio in the formal output.",
+        "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
+        "720p encode directly from the normalized master, green edge suppression, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
+        "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete thinking and effects remain from the generated source."
+      ],
+      "quality": {
+        "frames": 1205,
+        "fps": 120,
+        "contentBounds": [
+          394,
+          23,
+          861,
+          669
+        ],
+        "greenSpillFraction": 3.2671291511326212e-06,
+        "loopAlphaMeanDifference": 0.03344835069444444,
+        "uniqueDecodedFrameHashes": 1182,
+        "manualReviewPassed": true,
+        "reviewNotes": "Reviewed twelve full-action and sixteen head/tail samples: hand-to-chin thinking, question mark, small blue/gold light points and neutral recovery remain intact. White fluffy tail stays consistent; no visible green floor shadow or clipped character/effects. Full frame bounds/alpha/spill scan passed. The short common standing bridges use local optical-flow estimates; other actions and mid-action interruptions are not yet unified.",
+        "nativePlayback": {
+          "sampleSeconds": 1.8,
+          "observedFPS": 119.81720909496211,
+          "droppedFrames": 0,
+          "advancedToNextAction": true
+        }
+      },
+      "commonStanding": {
+        "reference": "assets/webm/待机呼吸休闲.webm",
+        "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+        "referenceFrame": 0,
+        "inputSha256": "5a079207f73f183eb993107c029ef3844e24a15ed5b756503c2125f347b495d9",
+        "headSeconds": 0.45,
+        "tailSeconds": 0.4583333333333333
+      },
+      "postprocessingScript": "scripts/finish-common-standing.py"
+    },
+    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
+    "newMotionInterpolation": false,
+    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  },
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "processing": [
+    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
+    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
+    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "bridgeFrames": 9,
+    "holdFrames": 0,
+    "fps": 24,
+    "headSeconds": 0.375,
+    "tailSeconds": 0.4166666666666667,
+    "script": "scripts/finish-common-standing.py",
+    "estimatedMotion": true
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      197,
+      13,
+      429,
+      332
+    ],
+    "greenSpillFraction": 2.5481317153657105e-06,
+    "loopAlphaMeanDifference": 0.056592881944444444,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless."
+  }
 }

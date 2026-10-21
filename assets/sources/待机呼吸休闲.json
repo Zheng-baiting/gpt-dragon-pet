@@ -10,39 +10,87 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/待机呼吸休闲.webm",
-  "outputSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
-  "durationSeconds": 10.041,
-  "outputFPS": 120,
+  "outputSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "originalRateMigration": {
+    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+    "script": "scripts/restore-original-rate.py",
+    "inputSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "inputBytes": 20287167,
+    "outputBytes": 2399595,
+    "previousOutput": {
+      "outputWidth": 1280,
+      "outputHeight": 720,
+      "outputFPS": 120,
+      "durationSeconds": 10.041,
+      "processing": [
+        "Central character region x=320,y=96,width=640,height=576, padded back to original 1280x720 coordinates",
+        "Original dsh-pet HSV chroma key and standing normalization; include dark saturated green shadows in the mask; encode 1280x720 directly from the normalized master before interpolation",
+        "White/lavender character green-spill suppression",
+        "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+        "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+      ],
+      "quality": {
+        "frames": 1205,
+        "fps": 120,
+        "contentBounds": [
+          395,
+          118,
+          872,
+          668
+        ],
+        "greenSpillFraction": 2.096417604340414e-06,
+        "loopAlphaMeanDifference": 0.03317599826388889,
+        "uniqueDecodedFrameHashes": 1205,
+        "manualReviewPassed": true,
+        "reviewNotes": "Reviewed twelve processed timeline frames: breathing, blinking, head turns and return to neutral remain complete, with consistent horns, wings, dress and tail. HD output comes directly from the original normalized source master. Full frame bounds, transparency, green spill and loop scan passed.",
+        "nativePlayback": {
+          "sampleSeconds": 1.8,
+          "observedFPS": 120,
+          "droppedFrames": 0,
+          "advancedToNextAction": true
+        }
+      },
+      "postprocessingScript": "scripts/finish-standing.py"
+    },
+    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
+    "newMotionInterpolation": false,
+    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  },
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
   "processing": [
-    "Central character region x=320,y=96,width=640,height=576, padded back to original 1280x720 coordinates",
-    "Original dsh-pet HSV chroma key and standing normalization; include dark saturated green shadows in the mask; encode 1280x720 directly from the normalized master before interpolation",
-    "White/lavender character green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
+    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation."
   ],
   "quality": {
-    "frames": 1205,
-    "fps": 120,
+    "frames": 241,
+    "fps": 24,
     "contentBounds": [
-      395,
-      118,
-      872,
-      668
+      198,
+      61,
+      436,
+      332
     ],
-    "greenSpillFraction": 2.096417604340414e-06,
-    "loopAlphaMeanDifference": 0.03317599826388889,
-    "uniqueDecodedFrameHashes": 1205,
+    "greenSpillFraction": 0.0,
+    "loopAlphaMeanDifference": 0.06796875,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve processed timeline frames: breathing, blinking, head turns and return to neutral remain complete, with consistent horns, wings, dress and tail. HD output comes directly from the original normalized source master. Full frame bounds, transparency, green spill and loop scan passed.",
+    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless.",
     "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 120,
+      "sampleSeconds": 3,
+      "observedFPS": 24.010821778829897,
       "droppedFrames": 0,
-      "advancedToNextAction": true
+      "advancedToNextAction": true,
+      "outputFPS": 24
     }
-  },
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "outputWidth": 1280,
-  "outputHeight": 720,
-  "postprocessingScript": "scripts/finish-standing.py"
+  }
 }

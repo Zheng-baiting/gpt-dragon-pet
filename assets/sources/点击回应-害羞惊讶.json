@@ -10,47 +10,100 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/点击回应-害羞惊讶.webm",
-  "outputSha256": "44c86471753e829e015ae0671fef6a9716e5e3d745553f51e0ee3767cfa041ae",
-  "durationSeconds": 10.041,
-  "outputFPS": 120,
+  "outputSha256": "d8444232636db2091cd01d7210a07c65a5abb6e646bcca62d509331a82c4d3ca",
   "extractionRegion": [
     256,
     0,
     768,
     720
   ],
-  "processing": [
-    "Central extraction without moving the original character coordinates",
-    "Original dsh-pet HSV chroma key, standing normalization and encoding",
-    "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export",
-    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
-  ],
-  "quality": {
-    "frames": 1205,
-    "fps": 120,
-    "contentBounds": [
-      404,
-      109,
-      886,
-      670
-    ],
-    "greenSpillFraction": 1.2049317824539755e-06,
-    "loopAlphaMeanDifference": 0.03230360243055556,
-    "uniqueDecodedFrameHashes": 1205,
-    "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and processed contact sheets: consistent character, hands to cheeks, shy eyes, swaying and return to the original standing pose; no cropped parts. HD output: Reviewed twelve HD timeline samples: hands to cheeks, shy expressions and side sway remain complete; horns, wings, dress and tail retain source detail. Final half-second estimates return to first standing pose, with full frame bounds and green spill scan passed.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 117.8170501278203,
-      "droppedFrames": 2,
-      "advancedToNextAction": true
-    }
-  },
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "outputWidth": 1280,
-  "outputHeight": 720,
   "normalizedMasterSha256": "4b2ce4ee2ca94d53a9c248502b6b3910f2cd91b1b3a98df6721db6bb20e82a2f",
-  "postprocessingScript": "scripts/finish-standing.py"
+  "originalRateMigration": {
+    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+    "script": "scripts/restore-original-rate.py",
+    "inputSha256": "44c86471753e829e015ae0671fef6a9716e5e3d745553f51e0ee3767cfa041ae",
+    "inputBytes": 24842041,
+    "outputBytes": 2975938,
+    "previousOutput": {
+      "outputWidth": 1280,
+      "outputHeight": 720,
+      "outputFPS": 120,
+      "durationSeconds": 10.041,
+      "processing": [
+        "Central extraction without moving the original character coordinates",
+        "Original dsh-pet HSV chroma key, standing normalization and encoding",
+        "White/lavender green-spill suppression",
+        "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+        "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export",
+        "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+      ],
+      "quality": {
+        "frames": 1205,
+        "fps": 120,
+        "contentBounds": [
+          404,
+          109,
+          886,
+          670
+        ],
+        "greenSpillFraction": 1.2049317824539755e-06,
+        "loopAlphaMeanDifference": 0.03230360243055556,
+        "uniqueDecodedFrameHashes": 1205,
+        "manualReviewPassed": true,
+        "reviewNotes": "Reviewed source and processed contact sheets: consistent character, hands to cheeks, shy eyes, swaying and return to the original standing pose; no cropped parts. HD output: Reviewed twelve HD timeline samples: hands to cheeks, shy expressions and side sway remain complete; horns, wings, dress and tail retain source detail. Final half-second estimates return to first standing pose, with full frame bounds and green spill scan passed.",
+        "nativePlayback": {
+          "sampleSeconds": 1.8,
+          "observedFPS": 117.8170501278203,
+          "droppedFrames": 2,
+          "advancedToNextAction": true
+        }
+      },
+      "postprocessingScript": "scripts/finish-standing.py"
+    },
+    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
+    "newMotionInterpolation": false,
+    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  },
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "processing": [
+    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
+    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
+    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "bridgeFrames": 9,
+    "holdFrames": 0,
+    "fps": 24,
+    "headSeconds": 0.375,
+    "tailSeconds": 0.4166666666666667,
+    "script": "scripts/finish-common-standing.py",
+    "estimatedMotion": true
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      202,
+      54,
+      443,
+      335
+    ],
+    "greenSpillFraction": 1.4418638286054248e-06,
+    "loopAlphaMeanDifference": 0.0582421875,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless."
+  }
 }

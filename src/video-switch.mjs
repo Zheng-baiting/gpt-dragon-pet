@@ -94,3 +94,15 @@ export function patchVideoSwitch(source) {
   return (source.slice(0, begin) + '  ' + method + '\n' + source.slice(end))
     .replace(dispose, dispose + '\n    this.pending?.cancel?.();\n    ++this.gen;');
 }
+
+export function patchVideoComposition(source) {
+  const stage = '\n      .pet-stage {';
+  const video = '\n      video.pet-video {';
+  if (source.split(stage).length !== 2 || source.split(video).length !== 2) {
+    throw Error('上游视频样式入口已变化，停止修改。');
+  }
+  // Source-over fades lose 25% opacity halfway through even for identical frames.
+  // Isolated additive blending preserves premultiplied colour and alpha weights.
+  return source.replace(stage, stage + '\n        isolation: isolate;')
+    .replace(video, video + '\n        mix-blend-mode: plus-lighter;');
+}

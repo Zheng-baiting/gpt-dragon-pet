@@ -10,47 +10,100 @@
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
   "sourceFPS": 24,
   "output": "assets/webm/点击回应-开心跃动.webm",
-  "outputSha256": "4c89ee2626ecb5b7582b82367a32fb2656eb4eb46c291d0266501722604c7975",
-  "durationSeconds": 10.041,
-  "outputFPS": 120,
+  "outputSha256": "2a94f97d505d5d0a30eb120b8a0454e7b820933260badd289384424b3be70dfc",
   "extractionRegion": [
     256,
     0,
     768,
     720
   ],
-  "processing": [
-    "Central extraction without moving the original character coordinates",
-    "Original dsh-pet HSV chroma key, standing normalization and encoding",
-    "White/lavender green-spill suppression",
-    "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-    "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export",
-    "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
-  ],
-  "quality": {
-    "frames": 1205,
-    "fps": 120,
-    "contentBounds": [
-      361,
-      8,
-      929,
-      668
-    ],
-    "greenSpillFraction": 1.7555617511563435e-06,
-    "loopAlphaMeanDifference": 0.03328559027777778,
-    "uniqueDecodedFrameHashes": 1205,
-    "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed samples: crouch, small happy jump with raised arms and one heart, landing and return to neutral; heart and body remain fully visible. HD output: Reviewed twelve HD timeline samples: full crouch, happy jump with raised arms and heart, landing and neutral return. Both the heart and character remain within bounds; final half-second estimates first standing pose to close the seam. Full 1205-frame scan passed.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 120.23263617045093,
-      "droppedFrames": 0,
-      "advancedToNextAction": true
-    }
-  },
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "outputWidth": 1280,
-  "outputHeight": 720,
   "normalizedMasterSha256": "76abcf08f8f746fcd2857fb2688217665e9d289e3c0444f0e777d3c967f62166",
-  "postprocessingScript": "scripts/finish-standing.py"
+  "originalRateMigration": {
+    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
+    "script": "scripts/restore-original-rate.py",
+    "inputSha256": "4c89ee2626ecb5b7582b82367a32fb2656eb4eb46c291d0266501722604c7975",
+    "inputBytes": 22981141,
+    "outputBytes": 2691923,
+    "previousOutput": {
+      "outputWidth": 1280,
+      "outputHeight": 720,
+      "outputFPS": 120,
+      "durationSeconds": 10.041,
+      "processing": [
+        "Central extraction without moving the original character coordinates",
+        "Original dsh-pet HSV chroma key, standing normalization and encoding",
+        "White/lavender green-spill suppression",
+        "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
+        "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export",
+        "After the complete generated action has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+      ],
+      "quality": {
+        "frames": 1205,
+        "fps": 120,
+        "contentBounds": [
+          361,
+          8,
+          929,
+          668
+        ],
+        "greenSpillFraction": 1.7555617511563435e-06,
+        "loopAlphaMeanDifference": 0.03328559027777778,
+        "uniqueDecodedFrameHashes": 1205,
+        "manualReviewPassed": true,
+        "reviewNotes": "Reviewed source and twelve processed samples: crouch, small happy jump with raised arms and one heart, landing and return to neutral; heart and body remain fully visible. HD output: Reviewed twelve HD timeline samples: full crouch, happy jump with raised arms and heart, landing and neutral return. Both the heart and character remain within bounds; final half-second estimates first standing pose to close the seam. Full 1205-frame scan passed.",
+        "nativePlayback": {
+          "sampleSeconds": 1.8,
+          "observedFPS": 120.23263617045093,
+          "droppedFrames": 0,
+          "advancedToNextAction": true
+        }
+      },
+      "postprocessingScript": "scripts/finish-standing.py"
+    },
+    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
+    "newMotionInterpolation": false,
+    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  },
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "processing": [
+    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
+    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
+    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "bridgeFrames": 9,
+    "holdFrames": 0,
+    "fps": 24,
+    "headSeconds": 0.375,
+    "tailSeconds": 0.4166666666666667,
+    "script": "scripts/finish-common-standing.py",
+    "estimatedMotion": true
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      182,
+      6,
+      462,
+      333
+    ],
+    "greenSpillFraction": 3.319957593075011e-07,
+    "loopAlphaMeanDifference": 0.05833767361111111,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless."
+  }
 }

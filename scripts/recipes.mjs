@@ -32,7 +32,7 @@ export async function recipes() {
     const body = sections.get(action.sourceName);
     if (!body) throw Error(`原项目动作配方缺失：${action.sourceName}`);
     return { name: action.name, sourceName: action.sourceName, duration: 10,
-      sourceVideoFPS: 24, outputFPS: 120,
+      sourceVideoFPS: 24, outputFPS: 24,
       prompt: `${character.trim()}\n\n${dragon(common)}\n\n## ${action.name}\n\n${dragon(body)}\n` };
   });
 }

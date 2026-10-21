@@ -45,7 +45,7 @@ test('all original menu actions are mapped once; basic preview uses real clips',
   assert(tree[0].children.some((group) => group.label === '时节'));
 });
 
-test('transparent clips decode at 120 fps with changing in-between frames; opaque video is rejected', async () => {
+test('transparent clips decode at 24 fps with changing frames; opaque video is rejected', async () => {
   const folder = join(root, 'work/test-media');
   await mkdir(folder, { recursive: true });
   const opaque = join(folder, 'opaque.webm');
@@ -53,20 +53,20 @@ test('transparent clips decode at 120 fps with changing in-between frames; opaqu
     '-c:v', 'libvpx-vp9', '-threads', '1', opaque]);
   assert.throws(() => assertAlpha(opaque));
   const manifest = JSON.parse(await readFile(join(root, 'assets/basic/manifest.json'), 'utf8'));
-  for (const [name, frames] of [['Q版-眨眼呼吸', 540], ['Q版-点击招手', 288]]) {
+  for (const [name, frames] of [['Q版-眨眼呼吸', 108], ['Q版-点击招手', 58]]) {
     const file = join(root, 'assets/basic', name + '.webm');
     assertAlpha(file);
     const decoded = runVideo(['-c:v', 'libvpx-vp9', '-i', file, '-an', '-f', 'framemd5', '-']).stdout;
-    assert.match(decoded, /#tb 0: 1\/120\s/);
+    assert.match(decoded, /#tb 0: 1\/24\s/);
     const rows = decoded.split('\n').filter((line) => line && !line.startsWith('#'));
     assert.equal(rows.length, frames);
     const hashes = rows.map(line => line.split(',').at(-1).trim());
-    // Four copies of each 30 fps frame would have at most 25% unique frames.
-    assert(new Set(hashes).size > frames / 2, 'Interpolation must produce changing intermediate frames.');
+    // Reject a static placeholder masquerading as an animation.
+    assert(new Set(hashes).size > frames / 2, 'Animation must contain changing frames.');
     const entry = manifest.find(item => item.name === name);
-    assert.equal(entry.fps, 120);
+    assert.equal(entry.fps, 24);
     assert.equal(entry.frames, frames);
-    assert.equal(entry.duration, frames / 120);
+    assert.equal(entry.duration, frames / 24);
   }
 });
 
@@ -89,7 +89,7 @@ test('preview activates completed interactions without referencing missing clips
   assert.deepEqual(base.animations.drag, []);
 });
 
-test('import preserves the 120 fps file exactly and refuses to overwrite an action', async () => {
+test('import preserves the 24 fps file exactly and refuses to overwrite an action', async () => {
   await mkdir(join(root, 'work'), { recursive: true });
   const directory = await mkdtemp(join(root, 'work/import-test-'));
   try {
@@ -110,8 +110,7 @@ test('import preserves the 120 fps file exactly and refuses to overwrite an acti
         await importVideo('fixture', 'source.webm');
         assert.deepEqual(await readFile('source.webm'), await readFile('assets/webm/fixture.webm'));
         await assert.rejects(importVideo('fixture', 'source.webm'), /已经存在/);
-        await importVideo('hd', 'hd-source.webm');
-        assert.deepEqual(await readFile('hd-source.webm'), await readFile('assets/webm/hd.webm'));`,
+        await assert.rejects(importVideo('hd', 'hd-source.webm'), /640×360、24 fps/);`,
     });
     assert.equal(worker.status, 0, worker.stderr);
   } finally {

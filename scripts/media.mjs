@@ -57,7 +57,7 @@ export async function processVideo(name, input, chroma, region, height = 360) {
   const python = process.env.GPT_PET_PYTHON;
   if (!python) throw Error('制作流程需要已有 Python；请仅在当前进程设置 GPT_PET_PYTHON 为其可执行文件路径。');
   if (region && (region.length !== 4 || !region.every(Number.isInteger))) throw Error('--region 须为 x,y,width,height 四个整数。');
-  if (![360, 720].includes(height)) throw Error('--height 只能为 360 或 720。');
+  if (height !== 360) throw Error('按原版输出 640×360、24 fps。');
   const result = spawnSync(python, [join(root, 'scripts/pipeline.py'), 'process', name, input,
     ...(chroma ? ['--green'] : []), ...(region ? ['--region', ...region.map(String)] : []), '--height', String(height)],
     { cwd: root, env: { ...process.env, PYTHONUTF8: '1' }, windowsHide: true, encoding: 'utf8', maxBuffer: 8*1024*1024 });
@@ -74,14 +74,14 @@ export async function importVideo(name, input) {
   const metadata = probe(input);
   const video = metadata.streams.find(stream => stream.codec_type === 'video');
   const rate = value => { const [a,b = 1] = String(value).split('/').map(Number); return a/b; };
-  const supportedSize = video && [[640, 360], [1280, 720]].some(([width, height]) => video.width === width && video.height === height);
-  if (!supportedSize || rate(video.r_frame_rate) !== 120 || rate(video.avg_frame_rate) !== 120 ||
+  const supportedSize = video?.width === 640 && video?.height === 360;
+  if (!supportedSize || rate(video.r_frame_rate) !== 24 || rate(video.avg_frame_rate) !== 24 ||
       metadata.streams.some(stream => stream.codec_type === 'audio') || !(Number(metadata.format.duration) > 0 && Number(metadata.format.duration) <= 10.2)) {
-    throw Error('正式素材须为 640×360 或 1280×720、120 fps、无音轨且不超过 10.2 秒；请先执行 media:process。');
+    throw Error('正式素材须为 640×360、24 fps、无音轨且不超过 10.2 秒；请先执行 media:process。');
   }
   assertAlpha(input);
   await mkdir(join(root, 'assets/webm'), { recursive: true });
-  // Preserve interpolated frames exactly; importing must not downsample to 30 fps.
+  // Import reviewed 24fps clips byte-for-byte without another encode.
   await copyFile(input, join(root, 'assets/webm', action.file), constants.COPYFILE_EXCL);
   return action.file;
 }
@@ -96,7 +96,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     } else if (command === 'process' && name && input) {
       const flags = new Map();
       for (let i = 0; i < options.length; i += 2) {
-        if (!['--chroma', '--region', '--height'].includes(options[i]) || !options[i+1] || flags.has(options[i])) throw Error('制作选项为 --chroma <颜色>、--region <x,y,width,height> 和 --height <360|720>，各使用一次。');
+        if (!['--chroma', '--region', '--height'].includes(options[i]) || !options[i+1] || flags.has(options[i])) throw Error('制作选项为 --chroma <颜色>、--region <x,y,width,height> 和 --height <360>，各使用一次。');
         flags.set(options[i], options[i+1]);
       }
       const region = flags.get('--region')?.split(',').map(Number);
@@ -104,6 +104,6 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
       console.log(JSON.stringify(await processVideo(name, input, flags.get('--chroma'), region, height), null, 2));
     } else if (command === 'import' && name && input && !options.length) {
       console.log('已导入：' + await importVideo(name, input));
-    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] [--region x,y,width,height] [--height 360|720] | import <动作名> <已检查的120fps视频>');
+    } else throw Error('用法：media.mjs list | process <动作名> <视频路径> [--chroma 0x00FF00] [--region x,y,width,height] [--height 360] | import <动作名> <已检查的24fps视频>');
   } catch (error) { console.error(error.message); process.exitCode = 1; }
 }
