@@ -1,44 +1,68 @@
 {
   "name": "哈欠连天",
   "aiGenerated": true,
-  "provider": "TapNow",
+  "provider": "Seko",
   "model": "Seedance 2.0 Mini",
-  "source": "assets/sources/哈欠连天-tapnow.mp4",
-  "sourceSha256": "3d04a641679e5ee21f72ba00c172ddd363d9ed300e64a621763456f90bff02c8",
-  "prompt": "assets/sources/哈欠连天-prompt.txt",
+  "source": "assets/sources/哈欠连天-seko.mp4",
+  "sourceSha256": "6ca1b6f83b26cc9d510d3229c4f85eb9d18bfb10e8c2c9f6f83b31a5d8f07fa9",
+  "prompt": "assets/sources/哈欠连天-seko-prompt.txt",
   "reference": "assets/gpt-video-reference.png",
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
-  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
-  "sourceWidth": 836,
-  "sourceHeight": 480,
-  "sourceAverageFrameRate": "24/1",
+  "recipeAdaptation": "Complete original ten-second yawn phases, replacing the earlier five-second short variant.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
-  "sourceDurationSeconds": 5.041667,
   "output": "assets/webm/哈欠连天.webm",
-  "outputSha256": "14d3e85df995a1e477cf07e927da27ca9e1f535758186b9c10332cd9ad0c67b3",
-  "durationSeconds": 5.041,
+  "outputSha256": "4dfb41b9ab0631e0d6a8bb92e9b81eaeb5cc37021e4072e331b08b5d34b713f1",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
   "outputFPS": 120,
   "processing": [
-    "Pad 836x480 source to 854x480 with nine green pixels on each side; no stretching",
-    "Central extraction [171,0,512,480] preserving character coordinates; original dsh-pet HSV key",
-    "Original dsh-pet standing normalization and encoding",
-    "After the effect has disappeared, replace final 0.5s with eased bidirectional optical flow from frame 108 to the first clean standing frame.",
-    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+    "Same approved standing reference supplied as both first and last frame; original marked source export retained.",
+    "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
+    "720p encode directly from the normalized master, green edge suppression, audio removal, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
+    "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete yawn, eye rub, head motion and recovery remain from the generated source."
   ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "referenceFrame": 0,
+    "inputSha256": "a916581b76de6031949450ab06851b894a35934b80c4a43bd7928d29a75139a1",
+    "headSeconds": 0.45,
+    "tailSeconds": 0.4583333333333333
+  },
   "quality": {
-    "frames": 605,
+    "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      205,
-      62,
-      437,
-      335
+      411,
+      123,
+      975,
+      667
     ],
-    "greenSpillFraction": 0.000006586246926209915,
-    "loopAlphaMeanDifference": 0.05399305555555556,
-    "uniqueDecodedFrameHashes": 605,
+    "greenSpillFraction": 6.331302561613636e-7,
+    "loopAlphaMeanDifference": 0.03326280381944444,
+    "uniqueDecodedFrameHashes": 1184,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed source and twelve processed frames: sleepy eyes, one full yawn with arms at shoulder height, rubbing eyes and gentle head motion, returns to clean neutral. Final half-second uses eased optical-flow return to the first standing pose; no props or clipping, all edges pass."
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 120.22591287815246,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    },
+    "reviewNotes": "Reviewed twelve full-action and sixteen boundary samples. Clear shoulder-height yawn, both-eye rubbing, gentle sleepy head motion and neutral recovery; the tail remains white and fluffy. Full frame/alpha/spill scan passed. Short head/tail bridges are local optical-flow estimates; source style differences and other mid-action cuts remain."
   },
+  "supersedes": {
+    "provider": "TapNow",
+    "source": "assets/sources/哈欠连天-tapnow.mp4",
+    "outputSha256": "14d3e85df995a1e477cf07e927da27ca9e1f535758186b9c10332cd9ad0c67b3",
+    "durationSeconds": 5.041,
+    "outputWidth": 640,
+    "outputHeight": 360
+  },
+  "postprocessingScript": "scripts/finish-common-standing.py",
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
 }
