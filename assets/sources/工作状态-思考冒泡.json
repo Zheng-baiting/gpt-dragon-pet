@@ -1,43 +1,68 @@
 {
   "name": "工作状态-思考冒泡",
   "aiGenerated": true,
-  "provider": "TapNow",
+  "provider": "豆包",
   "model": "Seedance 2.0 Mini",
-  "source": "assets/sources/工作状态-思考冒泡-tapnow.mp4",
-  "sourceSha256": "ee96ee0cd4645080a6b0a5ba54c7e7d1f52aa4a212ba0e8ce508b9b01040c960",
-  "prompt": "assets/sources/工作状态-思考冒泡-prompt.txt",
+  "source": "assets/sources/工作状态-思考冒泡-doubao.mp4",
+  "sourceSha256": "4bcf398cbfd80a5a2f9c2a7fd00beb35d56b69b5ab7de511b805966a5dedf11b",
+  "prompt": "assets/sources/工作状态-思考冒泡-doubao-prompt.txt",
   "reference": "assets/gpt-video-reference.png",
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
-  "recipeAdaptation": "Complete five-second short variant of the original ten-second thinking action; not the original ten-second timing.",
-  "sourceWidth": 836,
-  "sourceHeight": 480,
-  "sourceFPS": 24,
-  "sourceDurationSeconds": 5.041666666666667,
+  "recipeAdaptation": "Original full ten-second thinking action, replacing the earlier five-second short variant.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceDurationSeconds": 10.08,
+  "preparedFPS": 24,
   "output": "assets/webm/工作状态-思考冒泡.webm",
-  "outputSha256": "40936d3858575dcddf73fd42d51db7afc428fa6ffff0e7b4f3dadda0163192ef",
-  "durationSeconds": 5.041,
+  "outputSha256": "b97dc28c4c822e982244692d1fe64ba97edae267573130ba201403df56e75cc8",
+  "outputWidth": 1280,
+  "outputHeight": 720,
+  "durationSeconds": 10.041,
   "outputFPS": 120,
   "processing": [
-    "Pad 836x480 source to 854x480 with nine green pixels on each side; no stretching",
-    "Extract central region [171,0,512,480], preserving character coordinates; original dsh-pet HSV key",
-    "Compress only detached effect above y=140 in the 1280x720 keyed image to 1280x91, place at [0,49]; character pixels below y=140 unchanged",
-    "Original dsh-pet standing normalization and encoding",
-    "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
+    "Original marked source export retained; no audio in the formal output.",
+    "Central extraction [256,0,768,720] retaining character coordinates; original dsh-pet HSV key with dark green removal and standing normalization.",
+    "720p encode directly from the normalized master, green edge suppression, bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18.",
+    "Use the HD idle first frame as a shared standing pose over the first 0.45s and final 55/120s; hold about 0.15s at each end, with eased optical-flow bridges. Complete thinking and effects remain from the generated source."
   ],
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "referenceFrame": 0,
+    "inputSha256": "5a079207f73f183eb993107c029ef3844e24a15ed5b756503c2125f347b495d9",
+    "headSeconds": 0.45,
+    "tailSeconds": 0.4583333333333333
+  },
   "quality": {
-    "frames": 605,
+    "frames": 1205,
     "fps": 120,
     "contentBounds": [
-      207,
-      16,
-      436,
-      332
+      394,
+      23,
+      861,
+      669
     ],
-    "greenSpillFraction": 0.000009571258173642035,
-    "loopAlphaMeanDifference": 0.9606987847222223,
-    "uniqueDecodedFrameHashes": 604,
+    "greenSpillFraction": 3.2671291511326212e-06,
+    "loopAlphaMeanDifference": 0.03344835069444444,
+    "uniqueDecodedFrameHashes": 1182,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve processed samples and all-frame bounds: identity and body retained, detached question mark and two blue points appear then disappear, subtle thinking expression, returns to neutral, no clipping. Shorter five-second variant."
+    "reviewNotes": "Reviewed twelve full-action and sixteen head/tail samples: hand-to-chin thinking, question mark, small blue/gold light points and neutral recovery remain intact. White fluffy tail stays consistent; no visible green floor shadow or clipped character/effects. Full frame bounds/alpha/spill scan passed. The short common standing bridges use local optical-flow estimates; other actions and mid-action interruptions are not yet unified.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 119.81720909496211,
+      "droppedFrames": 0,
+      "advancedToNextAction": true
+    }
   },
+  "supersedes": {
+    "provider": "TapNow",
+    "source": "assets/sources/工作状态-思考冒泡-tapnow.mp4",
+    "outputSha256": "40936d3858575dcddf73fd42d51db7afc428fa6ffff0e7b4f3dadda0163192ef",
+    "durationSeconds": 5.041,
+    "outputWidth": 640,
+    "outputHeight": 360
+  },
+  "postprocessingScript": "scripts/finish-common-standing.py",
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
 }
