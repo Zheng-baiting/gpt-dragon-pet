@@ -6,6 +6,7 @@ import extract from '@electron-internal/extract-zip';
 import { root, upstream, runtime, profile, json } from './paths.mjs';
 import { mediaStatus } from '../scripts/media.mjs';
 import { configurePreview } from './preview-config.mjs';
+import { patchVideoSwitch } from './video-switch.mjs';
 
 export const electronPath = join(runtime, 'electron', process.platform === 'win32' ? 'electron.exe' : 'electron');
 
@@ -59,6 +60,8 @@ if (process.env.GPT_PET_DEBUG_PORT) {
   app.commandLine.appendSwitch('remote-debugging-port', process.env.GPT_PET_DEBUG_PORT);
 }`;
   await writeFile(helper, text.replace(marker, isolation));
+  const sprite = join(engine, 'runtime/electron-helper/sprite.js');
+  await writeFile(sprite, patchVideoSwitch(await readFile(sprite, 'utf8')));
   let config = JSON.parse(await readFile(join(root, preview ? 'config/preview.json' : 'config/gpt.json'), 'utf8'));
   const data = join(base, 'data/dsh-pet/main-animation/webm');
   await mkdir(data, { recursive: true });
