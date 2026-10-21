@@ -15,7 +15,7 @@
   "sourceDurationSeconds": 10.053991,
   "preparedFPS": 24,
   "output": "assets/webm/龙娘屈膝礼仪.webm",
-  "outputSha256": "1bc2e5aca5da9709b63ddf6080cb19447106229b4782276695c493422f4e4f37",
+  "outputSha256": "d28956eb214721e240366fe70c672e225d910cfde7f52117975d9786918a078c",
   "outputWidth": 1280,
   "outputHeight": 720,
   "durationSeconds": 10.041,
@@ -25,7 +25,8 @@
     "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
     "Remove the source audio; suppress green spill in the white/lavender edges",
     "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-    "After the full curtsy has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration."
+    "After the full curtsy has finished, replace the final 0.5 seconds with an eased bidirectional-flow estimate from playback frame 1140 to the first clean standing pose; keep 1205 frames and the original duration.",
+    "Use the decoded first frame of the HD idle as a shared neutral pose: hold 0.15s, ease with bidirectional flow to original frame 54 (0.45s); ease from original frame 1150 (9.5833s) to the same pose over 0.3s, then hold through the end. Preserve the complete curtsy and 1205 frames."
   ],
   "quality": {
     "frames": 1205,
@@ -33,21 +34,29 @@
     "contentBounds": [
       390,
       120,
-      861,
-      667
+      862,
+      666
     ],
-    "greenSpillFraction": 2.8052530204884664e-06,
-    "loopAlphaMeanDifference": 0.03449327256944444,
-    "uniqueDecodedFrameHashes": 1205,
+    "greenSpillFraction": 0.0000025023772583954757,
+    "loopAlphaMeanDifference": 0.03474500868055556,
+    "uniqueDecodedFrameHashes": 1184,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed the 720p source and twelve processed samples: lifts the skirt edges, bends the knees and bows, rises and returns to a clean neutral pose. The final half-second standing return is a local optical-flow estimate; the complete curtsy remains from the generated source. Full body, alpha boundaries and 1205-frame timing passed.",
+    "reviewNotes": "Reviewed sixteen boundary samples and twelve full-action samples: the common neutral pose blends without detached body parts; skirt lift, knee bend, bow and recovery remain intact. Full alpha, spill and frame scan passed. Optical flow estimates the short head/tail bridge, not new drawn poses. Other actions and mid-action interruptions still have unmatched poses.",
     "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 120.2528105598747,
+      "observedFPS": 120.27972027972028,
       "droppedFrames": 0,
       "advancedToNextAction": true
     }
   },
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "postprocessingScript": "scripts/finish-standing.py"
+  "postprocessingScript": "scripts/finish-common-standing.py",
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
+    "referenceFrame": 0,
+    "inputSha256": "1bc2e5aca5da9709b63ddf6080cb19447106229b4782276695c493422f4e4f37",
+    "headSeconds": 0.45,
+    "tailSeconds": 0.4583333333333333
+  }
 }
