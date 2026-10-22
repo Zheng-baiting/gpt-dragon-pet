@@ -21,7 +21,7 @@
   "preparedFrames": 241,
   "preparedDurationSeconds": 10.041666666666666,
   "output": "assets/webm/工作状态-原地踱步张望.webm",
-  "outputSha256": "05b07f353099265ad2bba272cc103ca17d726f104365de5a9d33fbb68ff773a3",
+  "outputSha256": "828b526892a4693853f340edb35fa9658e2efb298ceb72c13ed7e9096c423d58",
   "outputWidth": 640,
   "outputHeight": 360,
   "outputFPS": 24,
@@ -39,7 +39,8 @@
     "Central extraction at original coordinates and original HSV key, including dark saturated green; suppress green spill.",
     "Only detached upper-right effect components are shrunk to 30% and moved from source centre (860,184) to (640,107); fade at 8.8-9.4s; assert all protected foreground pixels unchanged before encoding.",
     "Original standing normalization, 640x360/24fps VP9 Alpha CRF18; no full-clip interpolation.",
-    "Fixed RGB curves calibrated against current idle, alpha unchanged before encoding; then nine-frame eased common-standing bridges without static hold."
+    "Fixed RGB curves calibrated against current idle, alpha unchanged before encoding; then nine-frame eased common-standing bridges without static hold.",
+    "Refine existing 24fps pale white/lavender palette against current idle using one bounded fixed RGB LUT; ease colour correction across the existing nine-frame standing bridges, preserving action, frame grid and alpha before encoding. See paletteUnification for the input commit, exact LUT and measurements."
   ],
   "localEffectRepair": {
     "frames": 241,
@@ -137,26 +138,32 @@
   "quality": {
     "frames": 241,
     "fps": 24,
-    "contentBounds": [
-      195,
-      24,
-      446,
-      335
-    ],
-    "greenSpillFraction": 2.241030443726269e-07,
-    "loopAlphaMeanDifference": 0.05716579861111111,
-    "uniqueDecodedFrameHashes": 241,
     "format": {
       "width": 640,
       "height": 360,
       "r_frame_rate": "24/1",
       "duration": 10.042
     },
+    "contentBounds": [
+      195,
+      24,
+      446,
+      335
+    ],
+    "greenSpillFraction": 0.0,
+    "alphaMeanAbsoluteDifferenceToPrior": 0.053902594081373906,
+    "alphaMaximumFrameMeanDifferenceToPrior": 0.08068142361111111,
+    "endpointOpaqueRGBMeanDifferences": [
+      1.3444166983334238,
+      2.0145234411054105
+    ],
+    "loopAlphaMeanDifference": 0.07654947916666667,
+    "uniqueDecodedFrameHashes": 241,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed twelve full-timeline samples, sixteen boundary samples, three times on black/white backgrounds and the idle/before/after colour comparison. Retains alternating glances, mild turns, hand clasp, small tiptoe, hourglass and neutral return. Timing is approximate: hourglass starts earlier than requested. Shrink and reposition only the detached hourglass/sparkles; character and all non-selected foreground pixels remain unchanged before effect encoding. White fluffy tail retained. Fixed RGB curves and short estimated standing bridges reduce brightness/pose mismatch; source drawing differences and minor bridge softness remain.",
+    "reviewNotes": "Colour-only acceptance: reviewed comparison sheets for all16 adjusted clips, full decoded alpha/shape correspondence, centre-action samples and endpoints. Fixed palette reduces brightness differences while retaining existing motion. Source drawing, horn/tail shape and low-resolution limitations remain; see docs/CHARACTER.md.",
     "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 24.042493709812693,
+      "observedFPS": 23.978077186572296,
       "droppedFrames": 0,
       "advancedToNextAction": true,
       "outputFPS": 24
@@ -176,5 +183,164 @@
     "uploadedFileName": "gpt-source-reference.png",
     "uploadedSha256": "a7f4812f180ac52081f0896b5d7661a7bd902d5085266be1342449351a675550",
     "description": "Same existing GPT character reference on green background, used for both first and last frame in Jimeng."
+  },
+  "paletteUnification": {
+    "inputSha256": "05b07f353099265ad2bba272cc103ca17d726f104365de5a9d33fbb68ff773a3",
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        168.0,
+        153.0,
+        182.0
+      ],
+      [
+        201.0,
+        187.0,
+        210.0
+      ],
+      [
+        226.0,
+        214.0,
+        227.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": true,
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "manualReviewRequired": true,
+    "method": "One fixed RGB LUT from three material samples, refined in memory with a 24/255 adjustment bound. Black/white anchors retained; RGB correction eases through existing nine-frame standing bridges. No new motion, geometry change, hold, per-frame exposure or alpha edits before encoding.",
+    "refinementQuantiles": [
+      [
+        [
+          168.0,
+          153.0,
+          182.0
+        ],
+        [
+          201.0,
+          187.0,
+          210.0
+        ],
+        [
+          226.0,
+          214.0,
+          227.0
+        ]
+      ],
+      [
+        [
+          166.0,
+          150.0,
+          181.0
+        ],
+        [
+          198.0,
+          183.0,
+          207.0
+        ],
+        [
+          222.0,
+          211.0,
+          225.0
+        ]
+      ]
+    ],
+    "maxChannelAdjustment": 24,
+    "standingBridgeFrames": 9,
+    "predictedQuantiles": [
+      [
+        166.0,
+        150.0,
+        181.0
+      ],
+      [
+        198.0,
+        183.0,
+        207.0
+      ],
+      [
+        222.0,
+        211.0,
+        225.0
+      ]
+    ],
+    "outputSha256": "828b526892a4693853f340edb35fa9658e2efb298ceb72c13ed7e9096c423d58",
+    "measuredOutputQuantiles": [
+      [
+        165.0,
+        149.0,
+        180.0
+      ],
+      [
+        197.0,
+        182.0,
+        207.0
+      ],
+      [
+        221.0,
+        209.0,
+        224.0
+      ]
+    ],
+    "inputCommit": "7dfa9ab8b777a9d2620a68a925ccddc8ab618b36",
+    "script": "scripts/match-colour.py",
+    "arguments": "--calibrate --refine-existing",
+    "measurement": {
+      "beforeMedianDistance": 5.0,
+      "afterMedianDistance": 1.0,
+      "afterQuantiles": [
+        [
+          165.0,
+          149.0,
+          180.0
+        ],
+        [
+          197.0,
+          182.0,
+          207.0
+        ],
+        [
+          221.0,
+          209.0,
+          224.0
+        ]
+      ]
+    },
+    "priorNativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 24.042493709812693,
+      "droppedFrames": 0,
+      "advancedToNextAction": true,
+      "outputFPS": 24
+    },
+    "limitations": "Colour-only correction; it does not make generated face geometry, horns, tail or line style identical.",
+    "lutHex": "0000000101010202020303030404040505050606060707070808080909090a0a0a0b0b0b0c0c0c0d0d0d0e0e0e0f0f0f1010101111111212121313131414141515151616161717171818181919191a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1f2020202121212222222323232424242525252626262727272828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f3030303131313232323333333434343535353636363737373838383939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f4040404141414242424343434444444545454646464747474848484949494a4a4a4b4b4b4c4b4c4d4c4d4e4d4e4f4e4f504f5050505151515252525353535454545555555656565757575858585959595a5a5a5b5b5b5c5c5c5d5d5d5e5e5e5f5f5f606060616160626261636362646463646564656665666766676867686968696a696a6b6a6b6c6b6c6d6c6d6e6d6e6f6e6f6f6f7070707171717272727373737474747575757676757777767878777979787a7a797b7b7a7c7c7b7d7d7c7e7e7d7f7f7e80807f8181808282818383828484838585848686858787868888878989888a8a898b8b8a8c8c8a8d8d8b8e8e8c8f8f8d908f8e91908f9291909392919493929594939695949796959897969998979a99989b9a999c9b9a9d9c9b9e9d9c9f9e9da09f9ea1a09fa2a1a0a3a2a1a4a3a2a5a4a3a6a5a4a7a6a5a8a7a6a9a8a7aaa9a8abaaa9acabaaadacaaadadabaeaeacafafadb0b0aeb1b1afb2b1b0b3b2b1b4b3b2b5b4b3b6b5b4b7b6b5b8b7b6b9b8b7bab9b8bbbab9bcbbbabdbcbbbebdbcbfbebdc0bfbec1c0bfc2c1c0c3c2c2c3c3c3c4c4c4c5c5c5c6c6c6c7c7c7c8c8c8c9c9c9cacacacbcbcbcccccccdcdcdcecececfcfcfd0d0d0d1d1d1d2d2d2d3d3d3d4d4d4d5d5d5d6d6d6d8d7d7d9d8d9dad9dadbdadbdcdbdcdddcdddedddedfdedfe0dfe0e1e0e1e2e1e2e4e3e4e5e4e5e6e5e6e7e6e7e8e7e8e9e8e9eae9eaebebebecececedededeeeeefefeff0f0f0f1f1f1f2f2f2f3f3f4f4f4f5f5f5f6f6f7f7f7f8f8f8f9f9fafafafbfbfcfcfcfdfdfdfefefeffffff",
+    "lutFormat": "256x3 uint8 interleaved RGB, hexadecimal"
   }
 }

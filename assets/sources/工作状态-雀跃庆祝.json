@@ -15,7 +15,7 @@
   "preparedFPS": 24,
   "sourceDurationSeconds": 5.088005,
   "output": "assets/webm/工作状态-雀跃庆祝.webm",
-  "outputSha256": "dd743aa6d9ca4862de602e1d978fd865c9e042af034d779008ba6191d7bdd7ae",
+  "outputSha256": "4cab59220ad602671706f45ba8217a2538ee78f7bcd88128efc86fcefb7dc95b",
   "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
   "normalizedMasterSha256": "350d7a84f4b7f24bbc07b2513ca526266d9aa6d17115636f9096b31416c1b5ed",
   "originalRateMigration": {
@@ -72,7 +72,8 @@
   "processing": [
     "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
     "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
-    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding.",
+    "Refine existing 24fps pale white/lavender palette against current idle using one bounded fixed RGB LUT; ease colour correction across the existing nine-frame standing bridges, preserving action, frame grid and alpha before encoding. See paletteUnification for the input commit, exact LUT and measurements."
   ],
   "commonStanding": {
     "reference": "assets/webm/待机呼吸休闲.webm",
@@ -88,29 +89,194 @@
   "quality": {
     "frames": 121,
     "fps": 24,
-    "contentBounds": [
-      184,
-      4,
-      457,
-      336
-    ],
-    "greenSpillFraction": 1.352441833730801e-06,
-    "loopAlphaMeanDifference": 0.0005902777777777778,
-    "uniqueDecodedFrameHashes": 121,
     "format": {
       "width": 640,
       "height": 360,
       "r_frame_rate": "24/1",
       "duration": 5.042
     },
+    "contentBounds": [
+      184,
+      4,
+      457,
+      336
+    ],
+    "greenSpillFraction": 0.0,
+    "alphaMeanAbsoluteDifferenceToPrior": 0.06711041523186409,
+    "alphaMaximumFrameMeanDifferenceToPrior": 0.112265625,
+    "endpointOpaqueRGBMeanDifferences": [
+      1.3444166983334238,
+      1.3444166983334238
+    ],
+    "loopAlphaMeanDifference": 0.0006857638888888889,
+    "uniqueDecodedFrameHashes": 121,
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless.",
+    "reviewNotes": "Colour-only acceptance: reviewed comparison sheets for all16 adjusted clips, full decoded alpha/shape correspondence, centre-action samples and endpoints. Fixed palette reduces brightness differences while retaining existing motion. Source drawing, horn/tail shape and low-resolution limitations remain; see docs/CHARACTER.md.",
     "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 23.984923762206733,
+      "droppedFrames": 0,
+      "advancedToNextAction": true,
+      "outputFPS": 24
+    }
+  },
+  "paletteUnification": {
+    "inputSha256": "dd743aa6d9ca4862de602e1d978fd865c9e042af034d779008ba6191d7bdd7ae",
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        169.0,
+        155.0,
+        185.0
+      ],
+      [
+        199.0,
+        186.0,
+        210.0
+      ],
+      [
+        224.0,
+        213.0,
+        228.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": true,
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "manualReviewRequired": true,
+    "method": "One fixed RGB LUT from three material samples, refined in memory with a 24/255 adjustment bound. Black/white anchors retained; RGB correction eases through existing nine-frame standing bridges. No new motion, geometry change, hold, per-frame exposure or alpha edits before encoding.",
+    "refinementQuantiles": [
+      [
+        [
+          169.0,
+          155.0,
+          185.0
+        ],
+        [
+          199.0,
+          186.0,
+          210.0
+        ],
+        [
+          224.0,
+          213.0,
+          228.0
+        ]
+      ],
+      [
+        [
+          165.0,
+          149.0,
+          180.0
+        ],
+        [
+          196.0,
+          181.0,
+          207.0
+        ],
+        [
+          222.0,
+          210.0,
+          226.0
+        ]
+      ]
+    ],
+    "maxChannelAdjustment": 24,
+    "standingBridgeFrames": 9,
+    "predictedQuantiles": [
+      [
+        165.0,
+        149.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        207.0
+      ],
+      [
+        222.0,
+        210.0,
+        226.0
+      ]
+    ],
+    "outputSha256": "4cab59220ad602671706f45ba8217a2538ee78f7bcd88128efc86fcefb7dc95b",
+    "measuredOutputQuantiles": [
+      [
+        164.0,
+        149.0,
+        180.0
+      ],
+      [
+        195.0,
+        180.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "inputCommit": "7dfa9ab8b777a9d2620a68a925ccddc8ab618b36",
+    "script": "scripts/match-colour.py",
+    "arguments": "--calibrate --refine-existing",
+    "measurement": {
+      "beforeMedianDistance": 4.0,
+      "afterMedianDistance": 0.6666666666666666,
+      "afterQuantiles": [
+        [
+          164.0,
+          149.0,
+          180.0
+        ],
+        [
+          195.0,
+          180.0,
+          206.0
+        ],
+        [
+          221.0,
+          209.0,
+          225.0
+        ]
+      ]
+    },
+    "priorNativePlayback": {
       "sampleSeconds": 1.8,
       "observedFPS": 23.984923762206634,
       "droppedFrames": 0,
       "advancedToNextAction": true,
       "outputFPS": 24
-    }
+    },
+    "limitations": "Colour-only correction; it does not make generated face geometry, horns, tail or line style identical.",
+    "lutHex": "0000000101010202020303030404040505050606060707070808080909090a0a0a0b0b0b0c0c0c0d0d0d0e0e0e0f0f0f1010101111111212121313131414141515151616161717171818181919191a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1f2020202121212222222323232424242525252626262727272828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f3030303131313232323333333434343535353636363737373838383939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f4040404141414242424343434444444545454646464747474848484948494a494a4b4a4b4c4b4c4d4c4d4d4d4e4e4e4f4f4f4f5050505151515252525353535454545555555656565757575857585958595a595a5b5a5b5c5b5c5d5c5d5e5d5e5f5e5f605f6061606162616263626364636465646566656666666767666868676969686a6a696b6b6a6c6c6b6c6d6c6d6e6d6e6f6e6f706f707170717271727372737473747574757675767775777876787977797a787a7b797b7c7a7c7d7b7d7e7c7e7f7d7f7f7e80807f818180828281838382848483858584868685878785888886898987898a888a8b898b8c8a8c8d8b8d8e8c8e8f8d8f908e90918f9192909293919394929495939596949697949798959898969999989a9a999b9b9a9c9c9b9d9d9c9e9e9d9f9f9ea0a09fa1a1a0a2a2a1a3a3a2a4a4a3a5a5a4a6a6a5a6a7a6a7a8a7a8a9a8a9aaa9aaabaaabacabacadadadaeaeaeb0afafb1b0b0b2b1b1b3b2b2b4b3b3b5b4b4b6b5b5b7b6b6b8b7b7b9b8b8bab9b9bbbababcbbbbbdbcbcbebdbdbfbebec0bfbfc1c0c0c2c1c1c4c2c2c5c3c3c6c4c4c7c5c6c8c6c7c9c8c8cac9c9cbcacacccbcbcdcccccecdcdcfceced0cfcfd1d0d0d2d1d1d3d2d2d4d3d3d5d4d4d6d5d5d7d6d6d8d7d7d9d8d8dad9d9dbdadadcdbdbdddddcdededddfdfdee0e0e0e1e1e1e2e2e2e3e3e3e4e4e4e5e5e5e6e6e6e7e7e7e8e8e8e9e9e9ebebeaececebededeceeeeeeefefeff0f0f0f1f1f1f2f2f2f3f3f3f4f4f4f5f5f5f6f6f6f7f7f7f9f9f8fafafafbfbfbfcfcfcfdfdfdfefefeffffff",
+    "lutFormat": "256x3 uint8 interleaved RGB, hexadecimal"
   }
 }
