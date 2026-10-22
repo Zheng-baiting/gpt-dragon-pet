@@ -1,2 +1,4 @@
 vendor/dsh-pet/* text eol=lf
 vendor/dsh-pet/action-prompts.md whitespace=-blank-at-eol
+assets/sources/*-jimeng-prompt.txt text eol=lf
+assets/sources/*-jimeng-processing.py text eol=lf

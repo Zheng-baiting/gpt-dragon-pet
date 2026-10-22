@@ -132,3 +132,16 @@ python scripts/match-colour.py '动作名' 'work/该动作在7dfa9ab提交的Web
 此模式只用于已有640×360/24fps、121或241帧共同站姿成品。校正强度在现有首9帧与末10帧内平滑渐入/退出，第一帧和末帧编码前RGB不改，不重做光流、不添加静止帧。普通`--calibrate`新片流程和历史120fps重建模式保持原行为。
 
 来源JSON新增`paletteUnification`，保留输入提交7dfa9ab、输入摘要、完整256×3查找表（`lutHex`为RGB交错uint8的十六进制）、参考摘要、采样、实测结果及旧实播记录；当前顶层摘要和质量对应新成品。既有`colourMatch`仍描述前一道历史处理，不冒充本次参数。源MP4及实际提示词均未更改。该修正减少明暗差异，不能修复脸型、角尾或画风变化。
+
+## 2026-10-22：螃蟹走路换源
+
+新即梦源保持原始带标记MP4和实际提示词。名义帧率60并不表示真实60帧：241帧VFR覆盖10.016667秒，平均帧率14460/601。专用准备脚本通过`settb=1/24,setpts=N`逐帧保留到24fps，输出241帧、10.041667秒；公开脚本重建的准备片SHA与验收输入相同。
+
+```powershell
+python 'assets/sources/螃蟹走路-jimeng-processing.py' 'assets/sources/螃蟹走路-jimeng.mp4' 'work/crab-rebuild'
+python scripts/pipeline.py process '螃蟹走路' 'work/crab-rebuild/source-cfr24.mp4' --green --region 256 0 768 720
+```
+
+后续按`assets/sources/螃蟹走路.json`的`rebuildCommands`执行固定RGB校准、9帧头桥/10帧尾桥（hold=0），再在已有共同站姿候选上作一次固定LUT微调。`colourMatch`和`paletteRefinement`分别记录这两道色彩处理的输入摘要与参数，不能套用旧片的`paletteUnification`。中心动作没有新插帧、拉伸、换脸或尾部局部绘制；绒毛尾端来自新生成源本身。
+
+逐段对照完整动作与中段造型后只接入螃蟹走路，小憩候选因蹲坐和地面投影拒收。旧素材仍在Git历史，原始旧源保留。正式数量不增加；任意中途打断仍不能保证完全无痕。

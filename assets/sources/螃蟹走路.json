@@ -1,78 +1,184 @@
 {
   "name": "螃蟹走路",
   "aiGenerated": true,
-  "provider": "豆包",
+  "provider": "Jimeng",
   "model": "Seedance 2.0 Mini",
-  "source": "assets/sources/螃蟹走路-doubao.mp4",
-  "sourceSha256": "671c5a34a6b97af3965dfde98c924835365b915cb7970e0a12281288080b5c75",
-  "prompt": "assets/sources/螃蟹走路-prompt.txt",
+  "source": "assets/sources/螃蟹走路-jimeng.mp4",
+  "sourceSha256": "3105306f91784d467a0b417a87d947cc05bfcef9e5b7bfdf4e233d6b139e4d7f",
+  "prompt": "assets/sources/螃蟹走路-jimeng-prompt.txt",
+  "promptSha256": "88df8f70784a848fde6b2c5257f7c5a4c34184dde951b031805da6f19c99d822",
   "reference": "assets/gpt-video-reference.png",
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
-  "sourceFPS": 24,
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "recipeAdaptation": "Same complete ten-second phase sequence. Generated timing is approximate; deceleration is later. No missing phase was fabricated locally.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceNominalFrameRate": "60/1",
+  "sourceAverageFrameRate": "14460/601",
+  "sourceVideoFrames": 241,
+  "sourceVideoDurationSeconds": 10.016667,
+  "sourceDurationSeconds": 10.08,
+  "preparedFPS": 24,
+  "preparedFrames": 241,
+  "preparedDurationSeconds": 10.041666666666666,
   "output": "assets/webm/螃蟹走路.webm",
-  "outputSha256": "a794074a899c3ce4f05400474bb06db76def1c5a79bd953875a455148fc8ffa4",
+  "outputSha256": "d8a743e17c876b8a6e7a73139d2c4a2fb18d4c97bdc7e7b200eff02aa3d42deb",
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
   "extractionRegion": [
     256,
     0,
     768,
     720
   ],
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "normalizedMasterSha256": "ef39dfe73016e8e259298e65be0faa6fc8d711dfd894ca1dd708fb29f0a8d443",
-  "originalRateMigration": {
-    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
-    "script": "scripts/restore-original-rate.py",
-    "inputSha256": "2db64bbc61d60f3dad04117761a101ee9e1be6c35baf02902823c41331b160bd",
-    "inputBytes": 27629582,
-    "outputBytes": 3183943,
-    "previousOutput": {
-      "outputWidth": 1280,
-      "outputHeight": 720,
-      "outputFPS": 120,
-      "durationSeconds": 10.041,
-      "processing": [
-        "Central extraction without moving the original character coordinates",
-        "Original dsh-pet HSV chroma key, standing normalization and encoding",
-        "White/lavender green-spill suppression",
-        "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-        "Re-encode 1280x720 directly from the retained 2160x1215 normalized master before interpolation; do not enlarge the previous 360p export"
-      ],
-      "quality": {
-        "frames": 1205,
-        "fps": 120,
-        "contentBounds": [
-          381,
-          126,
-          956,
-          666
-        ],
-        "greenSpillFraction": 2.2126552382947574e-06,
-        "loopAlphaMeanDifference": 0.6674273003472222,
-        "uniqueDecodedFrameHashes": 1204,
-        "manualReviewPassed": true,
-        "reviewNotes": "Reviewed source and twelve processed samples: alternating sideways in-place steps, left-leaning body, alternating arm swing and tail sway, then returns to neutral; no clipping or ground shadow. HD output: Reviewed twelve HD samples: left-leaning sideways steps, alternating arms, tail balancing to the right, then neutral. Character stays intact and on the original baseline; full 1205-frame bounds, transparency, spill and loop scan passed.",
-        "nativePlayback": {
-          "sampleSeconds": 1.8,
-          "observedFPS": 120.25953686094621,
-          "droppedFrames": 0,
-          "advancedToNextAction": true
-        }
-      }
-    },
-    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
-    "newMotionInterpolation": false,
-    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
+  "preparationScript": "assets/sources/螃蟹走路-jimeng-processing.py",
+  "preparationValidation": {
+    "publicHelperPreparedSha256": "2155ea18b840ef342a851cd5e25502095b87e929f2bd3e4d10a4ed0f6a7d6b68",
+    "matchesReviewedPreparation": true,
+    "originalFrames": 241,
+    "preparedFrames": 241,
+    "frameMapping": "One-to-one settb=1/24,setpts=N; no duplicate or synthesized frames; approximately 25ms duration increase."
   },
-  "outputWidth": 640,
-  "outputHeight": 360,
-  "outputFPS": 24,
-  "durationSeconds": 10.042,
   "processing": [
-    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
-    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
-    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding.",
-    "Refine existing 24fps pale white/lavender palette against current idle using one bounded fixed RGB LUT; ease colour correction across the existing nine-frame standing bridges, preserving action, frame grid and alpha before encoding. See paletteUnification for the input commit, exact LUT and measurements."
+    "Retain marked original VFR MP4 unchanged. Use source-specific public helper to preserve all 241 frames at CFR24 and remove audio.",
+    "Original central extraction [256,0,768,720] without moving source coordinates, full-timeline source bounds [436,136,994,626] checked. Original HSV chroma key including dark green and white/lavender green-spill suppression; no green foreground props.",
+    "Original standing normalization and 640x360/24fps VP9 Alpha CRF18. No full-clip interpolation, geometric warp, face replacement or body repair.",
+    "Fixed RGB curves calibrated to current idle, then existing nine-frame head and ten-frame tail common-standing estimates with zero hold.",
+    "One final bounded fixed RGB LUT refinement on the shared-standing candidate; strength eases within those same existing bridges. Alpha/motion unchanged before encoding. See paletteRefinement for exact LUT."
   ],
+  "rebuildCommands": [
+    [
+      "python",
+      "assets/sources/螃蟹走路-jimeng-processing.py",
+      "assets/sources/螃蟹走路-jimeng.mp4",
+      "{folder}"
+    ],
+    [
+      "python",
+      "scripts/pipeline.py",
+      "process",
+      "螃蟹走路",
+      "{folder}/source-cfr24.mp4",
+      "--green",
+      "--region",
+      "256",
+      "0",
+      "768",
+      "720"
+    ],
+    [
+      "python",
+      "scripts/match-colour.py",
+      "螃蟹走路",
+      "work/pipeline/螃蟹走路/video-24fps.webm",
+      "{folder}/colour-24.webm",
+      "--calibrate"
+    ],
+    [
+      "python",
+      "scripts/finish-common-standing.py",
+      "螃蟹走路",
+      "--input",
+      "{folder}/colour-24.webm",
+      "--output",
+      "{folder}/final-24.webm"
+    ],
+    [
+      "python",
+      "scripts/match-colour.py",
+      "螃蟹走路",
+      "{folder}/final-24.webm",
+      "{folder}/final-matched-24.webm",
+      "--calibrate",
+      "--refine-existing"
+    ]
+  ],
+  "normalization": {
+    "name": "螃蟹走路",
+    "upstream": "dsh-pet@0.3.7",
+    "sourceFPS": 24,
+    "fps": 24,
+    "frames": 241,
+    "duration": 10.042,
+    "standing": {
+      "height": 474.0,
+      "max_y": 614.2222222222222,
+      "center_x": 636.1111111111111
+    },
+    "contentUnion": [
+      436,
+      136,
+      993,
+      625
+    ],
+    "scale": 1.8987341772151898,
+    "extractionRegion": [
+      256,
+      0,
+      768,
+      720
+    ],
+    "greenEdgeDespill": true,
+    "darkGreenShadowRemoval": true,
+    "outputWidth": 640,
+    "outputHeight": 360,
+    "manualReviewRequired": true
+  },
+  "colourMatch": {
+    "inputSha256": "e945145a96d87d229be952893e56a02f3c273408d2077b6a993131bac97960aa",
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        151.0,
+        136.0,
+        161.0
+      ],
+      [
+        176.0,
+        162.0,
+        182.0
+      ],
+      [
+        206.0,
+        193.0,
+        207.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": false,
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "manualReviewRequired": true,
+    "method": "Fixed RGB curves from opaque pale lavender material; anchors 0/64/255. Alpha and motion unchanged before encoding; apply common-standing bridges afterwards.",
+    "outputSha256": "0d869d9bf176de09772853032c359b6f5dfa1fbfcbf1723d173c50c99fef325d"
+  },
   "commonStanding": {
     "reference": "assets/webm/待机呼吸休闲.webm",
     "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
@@ -84,59 +190,25 @@
     "script": "scripts/finish-common-standing.py",
     "estimatedMotion": true
   },
-  "quality": {
-    "frames": 241,
-    "fps": 24,
-    "format": {
-      "width": 640,
-      "height": 360,
-      "r_frame_rate": "24/1",
-      "duration": 10.042
-    },
-    "contentBounds": [
-      191,
-      63,
-      477,
-      332
-    ],
-    "greenSpillFraction": 0.0,
-    "alphaMeanAbsoluteDifferenceToPrior": 0.06057401524319963,
-    "alphaMaximumFrameMeanDifferenceToPrior": 0.08508680555555556,
-    "endpointOpaqueRGBMeanDifferences": [
-      1.3444166983334238,
-      2.02936837627723
-    ],
-    "loopAlphaMeanDifference": 0.07696614583333333,
-    "uniqueDecodedFrameHashes": 241,
-    "manualReviewPassed": true,
-    "reviewNotes": "Colour-only acceptance: reviewed comparison sheets for all16 adjusted clips, full decoded alpha/shape correspondence, centre-action samples and endpoints. Fixed palette reduces brightness differences while retaining existing motion. Source drawing, horn/tail shape and low-resolution limitations remain; see docs/CHARACTER.md.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 23.971234518577628,
-      "droppedFrames": 0,
-      "advancedToNextAction": true,
-      "outputFPS": 24
-    }
-  },
-  "paletteUnification": {
-    "inputSha256": "2c616dc720c41fd1e73bfa0927f46d156e753ef1a4caf7acf51967a0aeb6ca65",
+  "paletteRefinement": {
+    "inputSha256": "e612af1aabab8be6692ac8bf73f127539a7ac04b80f3a29fc575afd2d496a71a",
     "reference": "assets/webm/待机呼吸休闲.webm",
     "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
     "sourceQuantiles": [
       [
-        157.0,
-        143.0,
-        175.0
+        168.0,
+        152.0,
+        181.0
       ],
       [
-        190.0,
-        176.0,
-        201.0
+        201.0,
+        186.0,
+        208.0
       ],
       [
-        220.0,
-        208.0,
-        223.0
+        224.0,
+        212.0,
+        226.0
       ]
     ],
     "targetQuantiles": [
@@ -169,38 +241,40 @@
     ],
     "manualReviewRequired": true,
     "method": "One fixed RGB LUT from three material samples, refined in memory with a 24/255 adjustment bound. Black/white anchors retained; RGB correction eases through existing nine-frame standing bridges. No new motion, geometry change, hold, per-frame exposure or alpha edits before encoding.",
+    "lutHex": "0000000101010202020303030404040505050606060707070808080909090a0a0a0b0b0b0c0c0c0d0d0d0e0e0e0f0f0f1010101111111212121313131414141515151616161717171818181919191a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1f2020202121212222222323232424242525252626262727272828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f3030303131313232323333333434343535353636363737373838383939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f4040404141414242424343434444444545454646464747474848484949494a4a4a4b4b4b4c4c4c4d4d4d4e4d4e4f4e4f504f5050505151515252525353535454545555555656565757575858585959595a5a5a5b5b5b5c5c5c5d5d5d5e5e5e5f5f5f6060606161616262626363636464646565656666666767676868686969686a6a696b6b6a6c6c6b6d6d6c6e6e6d6f6f6e706f6f7170707271717372727473737574747675757776767877777978787a79797b7a7a7c7b7b7d7c7c7e7d7d7f7e7e807f7f8180808281818382828483828584838685848786858887868988878989888a8a898b8b8a8c8c8b8d8d8c8e8e8d8f8f8e908f8f9190909291919392929493939594949695959796969897979998989a99999b9a9a9c9b9b9d9c9c9e9d9d9f9e9ea09f9fa1a0a0a2a1a1a3a2a1a4a3a2a5a4a3a6a5a4a7a6a5a8a7a6a9a8a7aaa9a8abaaa9acabaaadacabaeadacafaeadb0afaeb1b0afb2b1b0b3b1b1b4b2b2b5b3b3b6b4b4b7b5b5b8b6b6b9b7b7bab8b8bbb9b9bcbababdbbbbbebcbcbfbdbdc0bebec1bfc0c2c0c1c3c1c2c4c2c3c5c3c4c6c4c5c7c5c6c8c6c7c9c7c8cac8c9cbc9cacbcacbcccbcccdcccdcecececfcfcfd0d0d1d2d1d2d3d2d3d4d3d4d5d4d5d6d5d6d7d6d7d8d7d8d9d8d9dad9dadbdadbdcdbdcdddddddedededfdfdfe0e0e0e1e1e1e2e2e2e3e3e4e4e4e5e5e5e6e6e6e7e7e7e8e8e8e9e9e9eaeaebebebececedededeeeeeeefefeff0f0f0f1f1f1f2f2f2f3f3f3f4f4f4f5f5f5f6f6f7f7f7f8f8f9f9f9fafafafbfbfbfcfcfcfdfdfdfefefeffffff",
+    "lutFormat": "256x3 uint8 interleaved RGB, hexadecimal",
     "refinementQuantiles": [
       [
         [
-          157.0,
-          143.0,
-          175.0
+          168.0,
+          152.0,
+          181.0
         ],
         [
-          190.0,
-          176.0,
-          201.0
+          201.0,
+          186.0,
+          208.0
         ],
         [
-          220.0,
-          208.0,
-          223.0
+          224.0,
+          212.0,
+          226.0
         ]
       ],
       [
         [
-          163.0,
-          147.0,
+          165.0,
+          149.0,
           180.0
         ],
         [
-          196.0,
-          181.0,
-          206.0
+          198.0,
+          183.0,
+          207.0
         ],
         [
-          221.0,
-          209.0,
+          223.0,
+          211.0,
           225.0
         ]
       ]
@@ -209,66 +283,81 @@
     "standingBridgeFrames": 9,
     "predictedQuantiles": [
       [
-        163.0,
-        147.0,
+        165.0,
+        149.0,
         180.0
       ],
       [
-        196.0,
-        181.0,
-        206.0
+        198.0,
+        183.0,
+        207.0
       ],
       [
-        221.0,
-        209.0,
+        223.0,
+        211.0,
         225.0
       ]
     ],
-    "outputSha256": "a794074a899c3ce4f05400474bb06db76def1c5a79bd953875a455148fc8ffa4",
+    "outputSha256": "d8a743e17c876b8a6e7a73139d2c4a2fb18d4c97bdc7e7b200eff02aa3d42deb",
     "measuredOutputQuantiles": [
       [
-        162.0,
-        146.0,
-        178.0
+        165.0,
+        148.0,
+        179.0
       ],
       [
-        194.0,
-        179.0,
-        204.0
+        197.0,
+        183.0,
+        206.0
       ],
       [
-        220.0,
-        208.0,
-        224.0
+        222.0,
+        209.0,
+        225.0
       ]
+    ]
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      207,
+      60,
+      522,
+      337
     ],
-    "inputCommit": "7dfa9ab8b777a9d2620a68a925ccddc8ab618b36",
-    "script": "scripts/match-colour.py",
-    "arguments": "--calibrate --refine-existing",
-    "measurement": {
-      "beforeMedianDistance": 5.333333333333333,
-      "afterMedianDistance": 2.0,
-      "afterQuantiles": [
-        [
-          162.0,
-          146.0,
-          178.0
-        ],
-        [
-          194.0,
-          179.0,
-          204.0
-        ],
-        [
-          220.0,
-          208.0,
-          224.0
-        ]
-      ]
+    "greenSpillFraction": 7.903149834237077e-07,
+    "loopAlphaMeanDifference": 0.076796875,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
     },
-    "priorNativePlayback": null,
-    "limitations": "Colour-only correction; it does not make generated face geometry, horns, tail or line style identical.",
-    "lutHex": "0000000101010202020303030404040505050606060707070808080909090a0a0a0b0b0b0c0c0c0d0d0d0e0e0e0f0f0f1010101111111212121313131414141515151616161717171818181919191a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1f2020202121212222222323232424242525252626262727272828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f3030303131313232323333333434343535353636363737373838383939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f4040404141414242424343434444444545454646464747474848484a49494b4b4a4c4c4b4d4d4c4e4e4d4f4f4f5050505151515252525353535454545555555656565757575858585959595b5a5a5c5b5b5d5c5c5e5d5d5f5e5e60605f6161606262616363626464636565646666656767666868676969686a6a696b6b6a6d6c6c6e6d6d6f6e6e706f6f7170707271717372727473737575747676757777767878777979787a7a797b7b7a7c7c7b7d7d7c7f7e7d807f7e81807f8281808382818483828584838685848786858887868988878a8a898b8b8a8c8c8b8d8d8c8e8e8d908f8e91908f9291909392919493929594939695949796959897969998979a99989b9a999c9b9a9d9c9b9e9d9c9f9e9da09f9ea2a09fa3a1a0a4a2a1a5a3a2a6a4a3a7a5a4a7a6a6a8a7a7a9a8a8aaa9a9abaaaaacababadacacaeadadafaeaeb0afafb1b0b0b2b1b1b3b2b2b4b3b3b5b4b4b6b5b5b7b6b6b8b7b7b9b8b8bab8b9bbb9babcbabbbdbbbcbebcbdbfbdbec0bebfc1bfc0c2c0c1c3c1c2c4c2c3c5c2c4c5c3c5c6c4c6c7c5c7c8c6c8c9c7c9cac8cacbc9cbcbcacccccacdcdcbcececccfcfcdd0d0ced1d1cfd1d2d0d2d2d1d3d3d2d4d4d3d5d5d4d6d6d5d7d7d6d8d8d7d9d8d8d9d9d9dadadadbdbdbdcdcdcdddddddedededfdfdfe0e0e0e1e1e1e2e2e2e2e3e2e3e4e3e4e5e4e5e6e5e6e7e6e7e8e7e8e9e8e9eae9eaeaeaebebebecececedededeeeeeeefefeff0f0f0f1f1f1f2f2f2f3f3f3f4f4f4f5f5f5f6f6f6f6f7f7f7f8f8f8f9f9f9fafafafbfbfbfcfcfcfdfdfdfefefeffffff",
-    "lutFormat": "256x3 uint8 interleaved RGB, hexadecimal"
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve full-timeline samples, eighteen dense middle samples, sixteen boundary samples, gray idle/old/new comparison and black/white backgrounds. Alternating in-place side steps, arm swings, right-balancing tail and neutral return retained. White fluffy tail tip replaces the old fin. Source timing is approximate, deceleration occurs later than requested; tail root is still longer/smoother than the reference, face/line softness still differs slightly. Fixed RGB correction improves pale material match; this is not identical modeling or guaranteed seamless arbitrary interruption.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 23.96849854476973,
+      "droppedFrames": 0,
+      "advancedToNextAction": true,
+      "actualEndedEventObserved": true,
+      "outputFPS": 24
+    }
+  },
+  "supersedes": {
+    "commit": "6f5d9047e2213cf6283e0a2f8de3856e0fc25371",
+    "provider": "豆包",
+    "source": "assets/sources/螃蟹走路-doubao.mp4",
+    "sourceSha256": "671c5a34a6b97af3965dfde98c924835365b915cb7970e0a12281288080b5c75",
+    "outputSha256": "a794074a899c3ce4f05400474bb06db76def1c5a79bd953875a455148fc8ffa4",
+    "outputFPS": 24,
+    "durationSeconds": 10.042
+  },
+  "referencePreparation": {
+    "uploadedFileName": "gpt-source-reference.png",
+    "uploadedSha256": "a7f4812f180ac52081f0896b5d7661a7bd902d5085266be1342449351a675550",
+    "description": "Same existing character image on green background used as both first and last reference."
   }
 }
