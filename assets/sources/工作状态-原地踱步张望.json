@@ -1,67 +1,128 @@
 {
   "name": "工作状态-原地踱步张望",
   "aiGenerated": true,
-  "provider": "TapNow",
+  "provider": "Jimeng",
   "model": "Seedance 2.0 Mini",
-  "source": "assets/sources/工作状态-原地踱步张望-tapnow.mp4",
-  "sourceSha256": "cc0ee08af35b46c414a51b00db6f4e0bd7c37d46e9206a9db0f4ceaeaca76409",
-  "prompt": "assets/sources/工作状态-原地踱步张望-prompt.txt",
+  "source": "assets/sources/工作状态-原地踱步张望-jimeng.mp4",
+  "sourceSha256": "38a1591af159ec2e94cd595ea6a3ab0e371bb5eb0d3c153a8bbe53ae5a853f33",
+  "prompt": "assets/sources/工作状态-原地踱步张望-jimeng-prompt.txt",
+  "promptSha256": "35a93adbb5200d6e672b33564084f449984fa187ea8ba1a80cfb430d6466658b",
   "reference": "assets/gpt-video-reference.png",
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
-  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
-  "sourceWidth": 836,
-  "sourceHeight": 480,
-  "sourceAverageFrameRate": "24/1",
+  "recipeAdaptation": "Complete ten-second waiting phases replace the five-second short clip. Generated timing is approximate; hourglass begins earlier and is locally resized/repositioned.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceNominalFrameRate": "60/1",
+  "sourceAverageFrameRate": "14460/601",
+  "sourceVideoFrames": 241,
+  "sourceVideoDurationSeconds": 10.016667,
+  "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
-  "sourceDurationSeconds": 5.041667,
+  "preparedFrames": 241,
+  "preparedDurationSeconds": 10.041666666666666,
   "output": "assets/webm/工作状态-原地踱步张望.webm",
-  "outputSha256": "dbea948a071556962cb5061ee965b56a8c444298fdcc49956004840631ded333",
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "originalRateMigration": {
-    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
-    "script": "scripts/restore-original-rate.py",
-    "inputSha256": "04ca15e3399f655f09cc497de40841f373945db252774e474a991c5acce12547",
-    "inputBytes": 4219834,
-    "outputBytes": 1215913,
-    "previousOutput": {
-      "outputFPS": 120,
-      "durationSeconds": 5.041,
-      "processing": [
-        "Pad 836x480 source to 854x480 with nine green pixels on each side; no stretching",
-        "Central extraction [171,0,512,480] preserving character coordinates; original dsh-pet HSV key",
-        "Original dsh-pet standing normalization and encoding",
-        "After the effect has disappeared, replace final 0.5s with eased bidirectional optical flow from frame 108 to the first clean standing frame.",
-        "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
-      ],
-      "quality": {
-        "frames": 605,
-        "fps": 120,
-        "contentBounds": [
-          200,
-          9,
-          440,
-          342
-        ],
-        "greenSpillFraction": 6.234037508065001e-06,
-        "loopAlphaMeanDifference": 0.050594618055555554,
-        "uniqueDecodedFrameHashes": 605,
-        "manualReviewPassed": true,
-        "reviewNotes": "Reviewed source and twelve processed frames: restrained in-place weight shifts and side glances, compact hourglass appears and fades, no body clipping; final half-second returns to the first clean standing pose using eased optical flow. Full-frame loop alpha mean difference 0.051/255."
-      }
-    },
-    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
-    "newMotionInterpolation": false,
-    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
-  },
+  "outputSha256": "05b07f353099265ad2bba272cc103ca17d726f104365de5a9d33fbb68ff773a3",
   "outputWidth": 640,
   "outputHeight": 360,
   "outputFPS": 24,
-  "durationSeconds": 5.042,
-  "processing": [
-    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
-    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
-    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  "durationSeconds": 10.042,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
   ],
+  "preparationScript": "assets/sources/工作状态-原地踱步张望-jimeng-processing.py",
+  "postprocessingScript": "scripts/finish-common-standing.py",
+  "processing": [
+    "Retain original marked VFR MP4 unchanged. Preserve all 241 decoded frames one-to-one at CFR24 using settb=1/24,setpts=N; no synthesized frames; duration increases about 25ms.",
+    "Central extraction at original coordinates and original HSV key, including dark saturated green; suppress green spill.",
+    "Only detached upper-right effect components are shrunk to 30% and moved from source centre (860,184) to (640,107); fade at 8.8-9.4s; assert all protected foreground pixels unchanged before encoding.",
+    "Original standing normalization, 640x360/24fps VP9 Alpha CRF18; no full-clip interpolation.",
+    "Fixed RGB curves calibrated against current idle, alpha unchanged before encoding; then nine-frame eased common-standing bridges without static hold."
+  ],
+  "localEffectRepair": {
+    "frames": 241,
+    "fps": 24,
+    "inputSha256": "38a1591af159ec2e94cd595ea6a3ab0e371bb5eb0d3c153a8bbe53ae5a853f33",
+    "keyedInputSha256": "87a6b08f9d34d2e5548c93996f7e7a05ffe78f00023bb6dbb42cd364a81e6285",
+    "outputSha256": "c7e35686df30ed39fd199d924fa02f7c45da03d44ca1085f7dfb7b3505308312",
+    "framesWithDetachedEffectAdjustment": 142,
+    "effectScale": 0.3,
+    "effectOriginalCentre": [
+      860,
+      184
+    ],
+    "effectTargetCentre": [
+      640,
+      107
+    ],
+    "particleFadeSeconds": [
+      8.8,
+      9.4
+    ],
+    "protectedCharacter": "Largest connected alpha>0 foreground component; all non-selected foreground pixels unchanged before encoding",
+    "effectSelection": "After 2.5s, detached components with centroid x>=790 and bottom<=330; activate only after a component exceeds 500px",
+    "characterRGBAChangesBeforeEncoding": 0,
+    "despill": "G=min(G,max(R,B))",
+    "rawTimingPreparation": "All 241 frames preserved at CFR24 using settb=1/24,setpts=N; no synthesized frames",
+    "script": "assets/sources/工作状态-原地踱步张望-jimeng-processing.py",
+    "decodedRGBAStreamSha256": "b2881997036e8e3e130475329e805684eccefe531b9c79f2f5dbaa61c03fea49",
+    "rebuildMatchesReviewedPreparation": true
+  },
+  "colourMatch": {
+    "inputSha256": "5589fd5f72cac6b752d8788fb97b57469b77eca0e5f0c38128978209a3f07e4a",
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        152.0,
+        135.0,
+        164.0
+      ],
+      [
+        176.0,
+        159.0,
+        184.0
+      ],
+      [
+        208.0,
+        193.0,
+        209.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": false,
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "manualReviewRequired": true,
+    "method": "Fixed RGB curves from opaque pale lavender material; anchors 0/64/255. Alpha and motion unchanged before encoding; apply common-standing bridges afterwards.",
+    "outputSha256": "10aff5c61b1c2b6b87370fa9c92b12a9e4e209dfa7df3dc29ac3c283295758d9"
+  },
   "commonStanding": {
     "reference": "assets/webm/待机呼吸休闲.webm",
     "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
@@ -74,31 +135,46 @@
     "estimatedMotion": true
   },
   "quality": {
-    "frames": 121,
+    "frames": 241,
     "fps": 24,
     "contentBounds": [
-      202,
-      9,
-      438,
-      341
+      195,
+      24,
+      446,
+      335
     ],
-    "greenSpillFraction": 1.814537896170327e-06,
-    "loopAlphaMeanDifference": 0.0005729166666666667,
-    "uniqueDecodedFrameHashes": 121,
+    "greenSpillFraction": 2.241030443726269e-07,
+    "loopAlphaMeanDifference": 0.05716579861111111,
+    "uniqueDecodedFrameHashes": 241,
     "format": {
       "width": 640,
       "height": 360,
       "r_frame_rate": "24/1",
-      "duration": 5.042
+      "duration": 10.042
     },
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless.",
+    "reviewNotes": "Reviewed twelve full-timeline samples, sixteen boundary samples, three times on black/white backgrounds and the idle/before/after colour comparison. Retains alternating glances, mild turns, hand clasp, small tiptoe, hourglass and neutral return. Timing is approximate: hourglass starts earlier than requested. Shrink and reposition only the detached hourglass/sparkles; character and all non-selected foreground pixels remain unchanged before effect encoding. White fluffy tail retained. Fixed RGB curves and short estimated standing bridges reduce brightness/pose mismatch; source drawing differences and minor bridge softness remain.",
     "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 23.986293546544832,
+      "observedFPS": 24.042493709812693,
       "droppedFrames": 0,
       "advancedToNextAction": true,
       "outputFPS": 24
     }
+  },
+  "supersedes": {
+    "commit": "0b939162bb0738464c7e6d83bda9b87a174bb585",
+    "provider": "TapNow",
+    "source": "assets/sources/工作状态-原地踱步张望-tapnow.mp4",
+    "sourceSha256": "cc0ee08af35b46c414a51b00db6f4e0bd7c37d46e9206a9db0f4ceaeaca76409",
+    "outputSha256": "dbea948a071556962cb5061ee965b56a8c444298fdcc49956004840631ded333",
+    "durationSeconds": 5.042,
+    "outputFPS": 24
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "referencePreparation": {
+    "uploadedFileName": "gpt-source-reference.png",
+    "uploadedSha256": "a7f4812f180ac52081f0896b5d7661a7bd902d5085266be1342449351a675550",
+    "description": "Same existing GPT character reference on green background, used for both first and last frame in Jimeng."
   }
 }
