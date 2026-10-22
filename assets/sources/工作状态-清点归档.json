@@ -1,66 +1,122 @@
 {
   "name": "工作状态-清点归档",
   "aiGenerated": true,
-  "provider": "TapNow",
+  "provider": "Seko",
   "model": "Seedance 2.0 Mini",
-  "source": "assets/sources/工作状态-清点归档-tapnow.mp4",
-  "sourceSha256": "176cfdbc88aeae562c7d6fa94300b024efdc48698fbc100f5ef4b5ea3bd30df8",
-  "prompt": "assets/sources/工作状态-清点归档-prompt.txt",
+  "source": "assets/sources/工作状态-清点归档-seko.mp4",
+  "sourceSha256": "7844135b251836cc871190056f396f374f44988fe7272d9b70b02d39bd9207cd",
+  "prompt": "assets/sources/工作状态-清点归档-seko-prompt.txt",
   "reference": "assets/gpt-video-reference.png",
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
-  "recipeAdaptation": "Complete five-second short variant preserving the action phases, rather than original ten-second timing.",
-  "sourceWidth": 836,
-  "sourceHeight": 480,
-  "sourceAverageFrameRate": "24/1",
+  "recipeAdaptation": "Complete ten-second archive phases replace the five-second short clip; generated phase timing is approximate, with earlier preparation/folding and the recipe-permitted folded-stack variant.",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceVideoFrames": 241,
+  "sourceVideoDurationSeconds": 10.041666666666666,
+  "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
-  "sourceDurationSeconds": 5.041667,
   "output": "assets/webm/工作状态-清点归档.webm",
-  "outputSha256": "a68474d7ef7584c102da4675432281120133576dc1c771d376ee3adc9e1a73aa",
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
-  "originalRateMigration": {
-    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
-    "script": "scripts/restore-original-rate.py",
-    "inputSha256": "b325fdd770a86a10b377b2ee8c06a4d877f8d52275f330dbcead2e8c1e16a593",
-    "inputBytes": 3584035,
-    "outputBytes": 1056356,
-    "previousOutput": {
-      "outputFPS": 120,
-      "durationSeconds": 5.041,
-      "processing": [
-        "Pad 836x480 source to 854x480 with nine green pixels on each side; no stretching",
-        "Central extraction [171,0,512,480] preserving character coordinates; original dsh-pet HSV key",
-        "Original dsh-pet standing normalization and encoding",
-        "White/lavender green-spill suppression; bidirectional optical-flow interpolation in premultiplied alpha; VP9 Alpha CRF 18"
-      ],
-      "quality": {
-        "frames": 605,
-        "fps": 120,
-        "contentBounds": [
-          208,
-          31,
-          431,
-          333
-        ],
-        "greenSpillFraction": 8.083979054186956e-06,
-        "loopAlphaMeanDifference": 1.5599869791666667,
-        "uniqueDecodedFrameHashes": 605,
-        "manualReviewPassed": true,
-        "reviewNotes": "Reviewed the second source take and twelve processed frames: two sheets appear in the hands, are checked and gathered at chest height, then vanish before the return to neutral. No paper leaves the frame; first rejected take was not imported. All alpha bounds and green edges pass."
-      }
-    },
-    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
-    "newMotionInterpolation": false,
-    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
-  },
+  "outputSha256": "e6344b612124a923f0a3f37a4d74994a315dff3293b194ee6c658d3e2ee6333a",
   "outputWidth": 640,
   "outputHeight": 360,
   "outputFPS": 24,
-  "durationSeconds": 5.042,
-  "processing": [
-    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
-    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
-    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding."
+  "durationSeconds": 10.042,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
   ],
+  "preparationScript": "assets/sources/工作状态-清点归档-seko-processing.py",
+  "postprocessingScript": "scripts/finish-common-standing.py",
+  "processing": [
+    "Retain marked source MP4; extract safe central region, pad at original coordinates, apply original HSV keying including dark saturated green.",
+    "Shrink only detached outer sparkle components to 60% around source (640,400) and fade at 8.4-9.4s; preserve character pixels before encoding and suppress green spill.",
+    "Original standing normalization and 640x360/24fps VP9 Alpha CRF18 encoding; no full-clip motion interpolation.",
+    "Fixed per-channel colour calibration at 1/2/4s against current idle; dark/highlight anchors, alpha unchanged before encoding.",
+    "Nine-frame eased common-standing bridges, no additional static hold."
+  ],
+  "localEffectRepair": {
+    "frames": 241,
+    "fps": 24,
+    "inputSha256": "7844135b251836cc871190056f396f374f44988fe7272d9b70b02d39bd9207cd",
+    "keyedInputSha256": "e1b6a498136dbc37b08691e1b475d75b79cf15b94a141bfe6d33260316d36449",
+    "outputSha256": "968a09ea8ea65ce0a661b0c455ba87c34010b3a498f6cc92d4cd4b526febbe56",
+    "framesWithDetachedEffectAdjustment": 31,
+    "protectedBodyRegion": [
+      420,
+      125,
+      900,
+      625
+    ],
+    "scale": 0.6,
+    "effectCentre": [
+      640,
+      400
+    ],
+    "fade": [
+      8.4,
+      9.4
+    ],
+    "characterRGBAChangesBeforeEncoding": 0,
+    "despill": "G=min(G,max(R,B))",
+    "script": "assets/sources/工作状态-清点归档-seko-processing.py",
+    "decodedFrameMD5ListSha256": "d6f9c7251bc90a7ad5e47f5ee82c378e3a11714caeb9a689a99ae57f0b821395"
+  },
+  "colourMatch": {
+    "inputSha256": "3e92647d6543f2bd8381edf659242d01912b158692201e0b0d630adbbb57ca9b",
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        155.0,
+        138.0,
+        166.0
+      ],
+      [
+        184.0,
+        167.0,
+        190.0
+      ],
+      [
+        215.0,
+        202.0,
+        216.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": false,
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "manualReviewRequired": true,
+    "method": "Fixed RGB curves from opaque pale lavender material; anchors 0/64/255. Alpha and motion unchanged before encoding; apply common-standing bridges afterwards.",
+    "outputSha256": "d2de2f246a208742b1850050d850b9ceb0a0dec7b4e0edc62e9159edc9f17c2f"
+  },
   "commonStanding": {
     "reference": "assets/webm/待机呼吸休闲.webm",
     "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
@@ -73,31 +129,46 @@
     "estimatedMotion": true
   },
   "quality": {
-    "frames": 121,
+    "frames": 241,
     "fps": 24,
     "contentBounds": [
-      207,
-      32,
-      430,
-      332
+      190,
+      46,
+      483,
+      345
     ],
-    "greenSpillFraction": 4.014216570998222e-06,
-    "loopAlphaMeanDifference": 0.0005729166666666667,
-    "uniqueDecodedFrameHashes": 121,
+    "greenSpillFraction": 1.5405724722974035e-05,
+    "loopAlphaMeanDifference": 0.05720920138888889,
+    "uniqueDecodedFrameHashes": 241,
     "format": {
       "width": 640,
       "height": 360,
       "r_frame_rate": "24/1",
-      "duration": 5.042
+      "duration": 10.042
     },
     "manualReviewPassed": true,
-    "reviewNotes": "Reviewed all sixteen boundary samples for all twenty shared-standing clips and checked retained centre action samples. Mild bridge softness and source drawing/style differences remain; arbitrary interruptions are not guaranteed seamless.",
+    "reviewNotes": "Reviewed twelve full-timeline samples, denser paper-handling samples, sixteen boundary samples and dark/white backgrounds. Keeps paper appearance, multiple inspections, folded-stack gathering, light disappearance and neutral return. Generated preparation/folding begins slightly earlier than requested; folded-stack variant is allowed by the original recipe. Detached sparkles are locally shrunk/faded; body poses are retained. Fixed RGB curves match the idle palette. Short optical-flow standing bridges are estimated, not native model poses.",
     "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 23.994515539305333,
+      "observedFPS": 23.966113030877267,
       "droppedFrames": 0,
       "advancedToNextAction": true,
       "outputFPS": 24
     }
+  },
+  "supersedes": {
+    "commit": "59ccb2a929de6f65d526a5419b4367f7f2ea073d",
+    "provider": "TapNow",
+    "source": "assets/sources/工作状态-清点归档-tapnow.mp4",
+    "sourceSha256": "176cfdbc88aeae562c7d6fa94300b024efdc48698fbc100f5ef4b5ea3bd30df8",
+    "outputSha256": "a68474d7ef7584c102da4675432281120133576dc1c771d376ee3adc9e1a73aa",
+    "durationSeconds": 5.042,
+    "outputFPS": 24
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "referencePreparation": {
+    "uploadedFileName": "gpt-source-reference.png",
+    "uploadedSha256": "a7f4812f180ac52081f0896b5d7661a7bd902d5085266be1342449351a675550",
+    "description": "Same existing GPT character reference on green background, selected as both first and last frame in Seko."
   }
 }
