@@ -1,0 +1,138 @@
+{
+  "name": "被吓一跳",
+  "aiGenerated": true,
+  "provider": "豆包",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/被吓一跳-doubao.mp4",
+  "sourceSha256": "994efee3dfacc8439e843fb0de91d9dcd497b234b0a09c296d7decfe18cef26d",
+  "prompt": "assets/sources/被吓一跳-prompt.txt",
+  "reference": "assets/gpt-video-reference.png",
+  "referencePreparation": {
+    "uploadedFileName": "gpt-source-reference.png",
+    "uploadedSha256": "a7f4812f180ac52081f0896b5d7661a7bd902d5085266be1342449351a675550",
+    "description": "Same GPT character reference on green background, uploaded in Doubao image-to-video UI. Same first/last pose requested in prompt; no separate hard last-frame control is claimed."
+  },
+  "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "sourceWidth": 1280,
+  "sourceHeight": 720,
+  "sourceFrameRate": "24/1",
+  "sourceVideoFrames": 241,
+  "sourceVideoDurationSeconds": 10.041666666666666,
+  "sourceDurationSeconds": 10.08,
+  "preparedFPS": 24,
+  "output": "assets/webm/被吓一跳.webm",
+  "outputSha256": "3322b231f7dd4b2b7d4f5d1406420965a856eb21449c2aebcd5cc8cec385de38",
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "processing": [
+    "Retain marked source MP4; extract central region at original coordinates, HSV chroma key including dark green shadows.",
+    "Original dsh-pet standing normalization; 640x360/24fps VP9 Alpha CRF18, green edge despill, no full-clip motion interpolation.",
+    "Fixed per-channel colour calibration at 1/2/4s against current idle; no frame-wise auto exposure.",
+    "Nine-frame eased common-standing bridges; no additional static hold."
+  ],
+  "processingScripts": [
+    "scripts/pipeline.py",
+    "scripts/match-colour.py",
+    "scripts/finish-common-standing.py"
+  ],
+  "colourMatch": {
+    "inputSha256": "c6fe91ecdf425e22cf4690004683c42df4e2e2da81da7bc397ca493d57e87265",
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        164.0,
+        150.0,
+        182.0
+      ],
+      [
+        196.0,
+        183.0,
+        209.0
+      ],
+      [
+        223.0,
+        212.0,
+        228.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": false,
+    "sampleSeconds": [
+      1,
+      2,
+      4
+    ],
+    "percentiles": [
+      20,
+      50,
+      80
+    ],
+    "manualReviewRequired": true,
+    "method": "Fixed RGB curves from opaque pale lavender material; anchors 0/64/255. Alpha and motion unchanged before encoding; apply common-standing bridges afterwards.",
+    "outputSha256": "652ae4ddc1eac3cd0bb17c64c600a7c0df39c6369238fcc4265ea4e2745f7f7c"
+  },
+  "commonStanding": {
+    "reference": "assets/webm/待机呼吸休闲.webm",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "bridgeFrames": 9,
+    "holdFrames": 0,
+    "fps": 24,
+    "headSeconds": 0.375,
+    "tailSeconds": 0.4166666666666667,
+    "estimatedMotion": true
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      196,
+      29,
+      451,
+      332
+    ],
+    "greenSpillFraction": 1.997159816833816e-06,
+    "loopAlphaMeanDifference": 0.0567578125,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
+    },
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve full-timeline samples, sixteen common-standing boundary samples, six enlarged tongue/relaxation samples and dark/white backgrounds. Keeps startled wide eyes, chest-height hands, raised hair tuft, tense hold, relaxation with visible tongue and neutral return. White fluffy tail stays consistent. No clipping; per-phase generated micro-timing remains approximate.",
+    "nativePlayback": {
+      "sampleSeconds": 1.8,
+      "observedFPS": 23.971457241609986,
+      "droppedFrames": 0,
+      "advancedToNextAction": true,
+      "outputFPS": 24
+    }
+  },
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md."
+}
