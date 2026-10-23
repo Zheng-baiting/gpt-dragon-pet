@@ -1,28 +1,168 @@
 {
   "name": "原地小憩沉眠",
   "aiGenerated": true,
-  "provider": "可灵 AI",
-  "model": "Kling 2.5 Turbo",
-  "source": "assets/sources/原地小憩沉眠-kling.mp4",
-  "sourceSha256": "325bab5d6e27e32894e3f11704e7155842fd17fada06dc7f3a52af5ab53b6732",
-  "prompt": "assets/sources/原地小憩沉眠-prompt.txt",
+  "provider": "Jimeng",
+  "model": "Seedance 2.0 Mini",
+  "source": "assets/sources/原地小憩沉眠-jimeng.mp4",
+  "sourceSha256": "c9a134c600695088fb46a3a1759eae015cf23e36e845bc8d1a405e50c65a32c9",
+  "prompt": "assets/sources/原地小憩沉眠-jimeng-prompt.txt",
+  "promptSha256": "a7901234399f439d4e8d8a7dc74b35fb2a69f0afaa8c18b11164ea6389d50bfd",
   "reference": "assets/gpt-video-reference.png",
   "recipe": "PC2005-cloud/dsh-pet@cc623c7e78aaab7e708f5aede783c3de01b11964",
+  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "recipeAdaptation": "Standing shallow sleep without sitting, closed eyes and small neck nod/breathing, glowing Zzz letters appear earlier than requested bubbles; neutral return retained.",
   "sourceWidth": 1280,
   "sourceHeight": 720,
-  "sourceFrameRate": "24/1",
-  "sourceAverageFrameRate": "1506250003/62760417",
-  "sourceDurationSeconds": 10.053991,
+  "sourceNominalFrameRate": "60/1",
+  "sourceAverageFrameRate": "14460/601",
+  "sourceVideoFrames": 241,
+  "sourceVideoDurationSeconds": 10.016667,
+  "sourceDurationSeconds": 10.08,
   "preparedFPS": 24,
+  "preparedFrames": 241,
+  "preparedDurationSeconds": 10.041666666666666,
   "output": "assets/webm/原地小憩沉眠.webm",
-  "outputSha256": "38970d3ba1f206e38cb86918a67aacd23e56469c4dbb2fd523763a95ab1dbfd2",
-  "preparationScript": "assets/sources/原地小憩沉眠-processing.py",
-  "usage": "Personal non-commercial fan work only; see THIRD_PARTY_NOTICES.md.",
+  "outputSha256": "fddf989bdd11344fc1c62870a0ade65c7791204c75f248117276352065b5ca1a",
+  "outputWidth": 640,
+  "outputHeight": 360,
+  "outputFPS": 24,
+  "durationSeconds": 10.042,
+  "extractionRegion": [
+    256,
+    0,
+    768,
+    720
+  ],
+  "preparationScript": "assets/sources/原地小憩沉眠-jimeng-processing.py",
+  "preparationValidation": {
+    "publicHelperPreparedSha256": "657e5ec503e470d8f88975e09010e3924bdf7dc7109581d9243ed008315ee47b",
+    "matchesReviewedPreparation": true,
+    "originalFrames": 241,
+    "preparedFrames": 241,
+    "frameMapping": "One-to-one settb=1/24,setpts=N; no duplicate/synthesized frames; approximately25ms increase."
+  },
+  "processing": [
+    "Retain original marked VFR MP4 unchanged; prepare all241 frames one-to-one at CFR24 and remove audio.",
+    "Central extraction [256,0,768,720], full-timeline raw RGB foreground bounds [438,90,940,618] within extraction. Original HSV key including dark green and white/lavender spill suppression; no green foreground props.",
+    "Original standing normalization, 640x360/24fps VP9 Alpha CRF18. Fixed RGB calibration to current idle, shared-standing nine head/ten tail frames with zero hold, then bounded fixed RGB refinement eased within existing bridges. No dynamic auto-exposure, body warp, face replacement or full-clip interpolation."
+  ],
+  "rebuildCommands": [
+    [
+      "python",
+      "assets/sources/原地小憩沉眠-jimeng-processing.py",
+      "assets/sources/原地小憩沉眠-jimeng.mp4",
+      "{folder}"
+    ],
+    [
+      "python",
+      "scripts/pipeline.py",
+      "process",
+      "原地小憩沉眠",
+      "{folder}/source-cfr24.mp4",
+      "--green",
+      "--region",
+      "256",
+      "0",
+      "768",
+      "720"
+    ],
+    [
+      "python",
+      "scripts/match-colour.py",
+      "原地小憩沉眠",
+      "work/pipeline/原地小憩沉眠/video-24fps.webm",
+      "{folder}/colour-24.webm",
+      "--calibrate"
+    ],
+    [
+      "python",
+      "scripts/finish-common-standing.py",
+      "原地小憩沉眠",
+      "--input",
+      "{folder}/colour-24.webm",
+      "--output",
+      "{folder}/final-24.webm"
+    ],
+    [
+      "python",
+      "scripts/match-colour.py",
+      "原地小憩沉眠",
+      "{folder}/final-24.webm",
+      "{folder}/final-matched-24.webm",
+      "--calibrate",
+      "--refine-existing"
+    ]
+  ],
+  "normalization": {
+    "name": "原地小憩沉眠",
+    "upstream": "dsh-pet@0.3.7",
+    "sourceFPS": 24,
+    "fps": 24,
+    "frames": 241,
+    "duration": 10.042,
+    "standing": {
+      "height": 474.3333333333333,
+      "max_y": 614.6666666666666,
+      "center_x": 636.0
+    },
+    "contentUnion": [
+      438,
+      90,
+      937,
+      615
+    ],
+    "scale": 1.8973998594518624,
+    "extractionRegion": [
+      256,
+      0,
+      768,
+      720
+    ],
+    "greenEdgeDespill": true,
+    "darkGreenShadowRemoval": true,
+    "outputWidth": 640,
+    "outputHeight": 360,
+    "manualReviewRequired": true
+  },
   "colourMatch": {
+    "inputSha256": "bb30cde23725c8e7dee9edcb0cb20fbcb9671758e3ee6f69aea9445f6287c848",
     "reference": "assets/webm/待机呼吸休闲.webm",
-    "referenceSha256": "3e1402d25959c8db860bfda2d09ed2f72af77a715b553a56a244c1830aa5e0d5",
-    "inputCommit": "47c7692456a16674e9ddf7a78135add9a1a87155",
-    "inputSha256": "19601b8e15392781ba1afc579f1dff7f2d783322820705f0ed7bdca971c2013c",
+    "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
+    "sourceQuantiles": [
+      [
+        151.0,
+        134.0,
+        163.0
+      ],
+      [
+        176.0,
+        158.0,
+        184.0
+      ],
+      [
+        206.0,
+        191.0,
+        207.0
+      ]
+    ],
+    "targetQuantiles": [
+      [
+        164.0,
+        148.0,
+        180.0
+      ],
+      [
+        196.0,
+        181.0,
+        206.0
+      ],
+      [
+        221.0,
+        209.0,
+        225.0
+      ]
+    ],
+    "preserveCommonStanding": false,
     "sampleSeconds": [
       1,
       2,
@@ -33,152 +173,10 @@
       50,
       80
     ],
-    "materialMask": "Alpha >245, min(RGB)>95, max(RGB)-min(RGB)<65, B>=R-3, G<=R+3; decoded at 640x360.",
-    "sourceQuantiles": [
-      [
-        195.0,
-        180.0,
-        211.0
-      ],
-      [
-        223.0,
-        210.0,
-        233.0
-      ],
-      [
-        243.0,
-        235.0,
-        246.0
-      ]
-    ],
-    "targetQuantiles": [
-      [
-        165.0,
-        148.0,
-        181.0
-      ],
-      [
-        196.0,
-        180.0,
-        207.0
-      ],
-      [
-        222.0,
-        208.0,
-        225.0
-      ]
-    ],
-    "curve": "Per-channel piecewise linear interpolation through (0,0), (64,64), the three material quantiles, and (255,255), rounded to uint8. One fixed curve throughout the central action.",
-    "preserveCommonStanding": false,
-    "standingBlend": "For the existing common-standing clips, identity LUT through frame 18, smoothstep over frames 18..54; reverse over frames N-55..N-19, then identity. Motion unchanged.",
-    "priorNativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 120.29317965646507,
-      "droppedFrames": 0,
-      "advancedToNextAction": true
-    },
-    "measurement": {
-      "before": [
-        [
-          195.0,
-          180.0,
-          211.0
-        ],
-        [
-          223.0,
-          210.0,
-          233.0
-        ],
-        [
-          243.0,
-          235.0,
-          246.0
-        ]
-      ],
-      "after": [
-        [
-          163.0,
-          145.0,
-          180.0
-        ],
-        [
-          192.0,
-          174.0,
-          205.0
-        ],
-        [
-          218.0,
-          205.0,
-          223.0
-        ]
-      ],
-      "beforeMedianMeanChannelDistance": 27.666666666666668,
-      "afterMedianMeanChannelDistance": 4.0
-    },
-    "script": "scripts/match-colour.py",
-    "limitations": "Matches exposure and pale white/lavender material, not character geometry or drawing style. Fixed curves do not remove generated lighting changes within an action."
+    "manualReviewRequired": true,
+    "method": "Fixed RGB curves from opaque pale lavender material; anchors 0/64/255. Alpha and motion unchanged before encoding; apply common-standing bridges afterwards.",
+    "outputSha256": "5947e84527ff8a2e8d3af7ceeb2a00a2fe28c8c65fa37ecda8aeaf40e1d7e3e2"
   },
-  "originalRateMigration": {
-    "inputCommit": "40134882c8be8a2a2ad9f0057016694a7cce9bfd",
-    "script": "scripts/restore-original-rate.py",
-    "inputSha256": "77ccdf2004881b40fafd84610ab6166647f1cecfe71882d0da083c8282e71c03",
-    "inputBytes": 17551416,
-    "outputBytes": 2108799,
-    "previousOutput": {
-      "outputWidth": 1280,
-      "outputHeight": 720,
-      "outputFPS": 120,
-      "durationSeconds": 10.041,
-      "processing": [
-        "Central extraction [256,0,768,720] retaining the character coordinates; watermarked source export retained",
-        "Original dsh-pet HSV key and standing normalization; 720p encode from the normalized master before interpolation",
-        "Remove the source audio; suppress green spill in the white/lavender edges",
-        "Bidirectional optical-flow interpolation in premultiplied alpha, VP9 Alpha CRF 18",
-        "Separate the largest connected character component from detached sleep bubbles after HSV keying, including dark green shadows. Keep the character motion, fit the original detached bubbles within 160x70 source pixels above the head, and fade them from 7s to 8.5s. Do not draw new bubbles.",
-        "After the sleep bubbles have disappeared, estimate the final 0.5s return from frame 1140 to the first clean standing pose with eased bidirectional optical flow; preserve 1205 frames.",
-        "Remove only small detached bubble ghosts touching the top edge, bottom y at most 128, maximum alpha 160, area at most 4096; retain the largest character component",
-        "Match pale white/lavender material to HD idle with a fixed per-channel curve; preserve dark outlines and white highlight anchors, motion and alpha before VP9 Alpha CRF 18 re-encoding. Retain unchanged idle endpoints in existing shared-standing bridges. See colourMatch for the prior output, calibration and rebuild parameters."
-      ],
-      "quality": {
-        "frames": 1205,
-        "fps": 120,
-        "contentBounds": [
-          387,
-          16,
-          901,
-          667
-        ],
-        "greenSpillFraction": 8.551266921604858e-06,
-        "alphaMeanAbsoluteDifferenceToPrior": 0.027707238358690642,
-        "alphaMaximumFrameMeanDifferenceToPrior": 0.048006727430555556,
-        "loopAlphaMeanDifference": 0.046793619791666664,
-        "uniqueDecodedFrameHashes": 1205,
-        "manualReviewPassed": true,
-        "reviewNotes": "Reviewed twelve full-action frames, existing shared-standing bridge samples and dark/light background composites. Exposure/pale lavender closer to HD idle, complete original action retained. Full decoded frame count, bounds, alpha comparison and green-spill checks passed. Drawing-style and shape differences remain.",
-        "nativePlayback": {
-          "sampleSeconds": 1.8,
-          "observedFPS": 119.96001332889037,
-          "droppedFrames": 0,
-          "advancedToNextAction": true,
-          "actualEndedEventObserved": true
-        }
-      },
-      "postprocessingScript": "assets/sources/原地小憩沉眠-finishing.py"
-    },
-    "selection": "Every fifth decoded frame from the reviewed 120fps clip; preserves prior colour and local motion repairs; scale to 640x360.",
-    "newMotionInterpolation": false,
-    "note": "Only the short common-standing bridges estimate poses; the centre action has no added frames."
-  },
-  "outputWidth": 640,
-  "outputHeight": 360,
-  "outputFPS": 24,
-  "durationSeconds": 10.042,
-  "processing": [
-    "Restore original 640x360/24fps from the reviewed product input identified by inputCommit and inputSha256; retain raw source unchanged.",
-    "Keep existing colour correction and local motion/effect repairs; no fivefold motion interpolation.",
-    "Short eased bidirectional-flow bridges to the same idle standing frame; no extra static hold. Centre action unchanged before VP9 encoding.",
-    "Refine existing 24fps pale white/lavender palette against current idle using one bounded fixed RGB LUT; ease colour correction across the existing nine-frame standing bridges, preserving action, frame grid and alpha before encoding. See paletteUnification for the input commit, exact LUT and measurements."
-  ],
   "commonStanding": {
     "reference": "assets/webm/待机呼吸休闲.webm",
     "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
@@ -190,59 +188,25 @@
     "script": "scripts/finish-common-standing.py",
     "estimatedMotion": true
   },
-  "quality": {
-    "frames": 241,
-    "fps": 24,
-    "format": {
-      "width": 640,
-      "height": 360,
-      "r_frame_rate": "24/1",
-      "duration": 10.042
-    },
-    "contentBounds": [
-      193,
-      15,
-      451,
-      332
-    ],
-    "greenSpillFraction": 0.0,
-    "alphaMeanAbsoluteDifferenceToPrior": 0.05965607350737667,
-    "alphaMaximumFrameMeanDifferenceToPrior": 0.08351996527777777,
-    "endpointOpaqueRGBMeanDifferences": [
-      1.3444166983334238,
-      2.1151381875441166
-    ],
-    "loopAlphaMeanDifference": 0.07626736111111111,
-    "uniqueDecodedFrameHashes": 241,
-    "manualReviewPassed": true,
-    "reviewNotes": "Colour-only acceptance: reviewed comparison sheets for all16 adjusted clips, full decoded alpha/shape correspondence, centre-action samples and endpoints. Fixed palette reduces brightness differences while retaining existing motion. Source drawing, horn/tail shape and low-resolution limitations remain; see docs/CHARACTER.md.",
-    "nativePlayback": {
-      "sampleSeconds": 1.8,
-      "observedFPS": 23.982184662821904,
-      "droppedFrames": 0,
-      "advancedToNextAction": true,
-      "outputFPS": 24
-    }
-  },
-  "paletteUnification": {
-    "inputSha256": "3f559e98be6acc686ce249d041549db0083e3954220d64bb2e796b328be93202",
+  "paletteRefinement": {
+    "inputSha256": "9ac4022927406ecfc12b3f704f94289533bbe32269c1241b444f4ebebafb1a66",
     "reference": "assets/webm/待机呼吸休闲.webm",
     "referenceSha256": "b3fbcd1444ad3fcb7bb60d7ac8306548cb0ea0430e6635f16e7e6ece577903f5",
     "sourceQuantiles": [
       [
-        162.0,
-        145.0,
-        179.0
+        167.0,
+        151.0,
+        182.0
       ],
       [
-        190.0,
-        175.0,
-        204.0
+        202.0,
+        187.0,
+        209.0
       ],
       [
-        217.0,
-        206.0,
-        222.0
+        224.0,
+        212.0,
+        226.0
       ]
     ],
     "targetQuantiles": [
@@ -275,38 +239,40 @@
     ],
     "manualReviewRequired": true,
     "method": "One fixed RGB LUT from three material samples, refined in memory with a 24/255 adjustment bound. Black/white anchors retained; RGB correction eases through existing nine-frame standing bridges. No new motion, geometry change, hold, per-frame exposure or alpha edits before encoding.",
+    "lutHex": "0000000101010202020303030404040505050606060707070808080909090a0a0a0b0b0b0c0c0c0d0d0d0e0e0e0f0f0f1010101111111212121313131414141515151616161717171818181919191a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1f2020202121212222222323232424242525252626262727272828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f3030303131313232323333333434343535353636363737373838383939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f4040404141414242424343434444444545454646464747474848484949494a4a4a4b4b4b4c4c4c4d4d4d4e4e4e4f4f4f50505051515152525253525354535455545555555656565757575858585959595a5a5a5b5b5b5c5c5c5d5d5d5e5e5e5f5f5f606060616161626262636363646464646565656666666767676868686969696a6a6a6b6b6b6c6c6c6d6d6d6e6e6e6f6f6f7070707171717272727373737474747575757675767776777877787978797a797a7b7a7b7c7b7c7d7c7d7e7d7e7f7e7f7f7f8080808181818282828383838484848585858686868787878888888989898a8a8a8b8b8b8c8c8c8d8d8d8e8e8e8f8f8f9090909191919292929393939494949595959696969797969898979999989a9a999b9b9a9c9c9b9d9d9c9e9e9d9f9f9ea0a09fa1a1a0a2a2a1a3a3a2a4a4a3a5a5a4a6a6a4a7a6a5a8a7a6a9a8a7aaa9a8abaaa9acabaaadacabadadacaeaeadafafaeb0b0afb1b1b0b2b2b1b3b3b2b4b4b2b5b4b3b6b5b4b7b6b5b8b7b6b9b8b7bab9b8bbbab9bcbbbbbdbcbcbebdbdbfbebec0bfbfc1c0c0c2c1c1c3c1c2c4c2c3c5c3c4c6c4c6c7c5c7c8c6c8c9c7c9cac9cacbcacbcccbcccdcccdcecdcecfcecfd0cfd1d1d0d2d2d1d3d3d3d4d4d4d5d5d5d6d6d6d7d7d7d8d8d8d9dad9dadbdadbdcdbdcdddcdddedededfdfdfe0e0e0e1e1e1e2e2e2e3e3e4e4e4e5e5e5e6e6e6e7e7e7e8e8e8e9e9e9eaeaebebebececedededeeeeeeefefeff0f0f0f1f1f1f2f2f2f3f3f3f4f4f4f5f5f5f6f6f7f7f7f8f8f9f9f9fafafafbfbfbfcfcfcfdfdfdfefefeffffff",
+    "lutFormat": "256x3 uint8 interleaved RGB, hexadecimal",
     "refinementQuantiles": [
       [
         [
-          162.0,
-          145.0,
-          179.0
+          167.0,
+          151.0,
+          182.0
         ],
         [
-          190.0,
-          175.0,
-          204.0
+          202.0,
+          187.0,
+          209.0
         ],
         [
-          217.0,
-          206.0,
-          222.0
+          224.0,
+          212.0,
+          226.0
         ]
       ],
       [
         [
-          163.0,
-          147.0,
-          179.0
+          166.0,
+          150.0,
+          180.0
         ],
         [
-          194.0,
-          179.0,
-          206.0
+          198.0,
+          183.0,
+          208.0
         ],
         [
-          220.0,
-          208.0,
+          222.0,
+          210.0,
           225.0
         ]
       ]
@@ -315,72 +281,81 @@
     "standingBridgeFrames": 9,
     "predictedQuantiles": [
       [
-        163.0,
-        147.0,
-        179.0
+        166.0,
+        150.0,
+        180.0
       ],
       [
-        194.0,
-        179.0,
-        206.0
+        198.0,
+        183.0,
+        208.0
       ],
       [
-        220.0,
-        208.0,
+        222.0,
+        210.0,
         225.0
       ]
     ],
-    "outputSha256": "38970d3ba1f206e38cb86918a67aacd23e56469c4dbb2fd523763a95ab1dbfd2",
+    "outputSha256": "fddf989bdd11344fc1c62870a0ade65c7791204c75f248117276352065b5ca1a",
     "measuredOutputQuantiles": [
       [
-        163.0,
-        146.0,
-        179.0
+        164.0,
+        148.0,
+        180.0
       ],
       [
-        193.0,
-        178.0,
-        205.0
+        197.0,
+        183.0,
+        207.0
       ],
       [
-        219.0,
-        207.0,
+        221.0,
+        209.0,
         224.0
       ]
+    ]
+  },
+  "quality": {
+    "frames": 241,
+    "fps": 24,
+    "contentBounds": [
+      207,
+      35,
+      490,
+      332
     ],
-    "inputCommit": "7dfa9ab8b777a9d2620a68a925ccddc8ab618b36",
-    "script": "scripts/match-colour.py",
-    "arguments": "--calibrate --refine-existing",
-    "measurement": {
-      "beforeMedianDistance": 4.666666666666667,
-      "afterMedianDistance": 2.3333333333333335,
-      "afterQuantiles": [
-        [
-          163.0,
-          146.0,
-          179.0
-        ],
-        [
-          193.0,
-          178.0,
-          205.0
-        ],
-        [
-          219.0,
-          207.0,
-          224.0
-        ]
-      ]
+    "greenSpillFraction": 3.567665533734656e-06,
+    "loopAlphaMeanDifference": 0.07929253472222222,
+    "uniqueDecodedFrameHashes": 241,
+    "format": {
+      "width": 640,
+      "height": 360,
+      "r_frame_rate": "24/1",
+      "duration": 10.042
     },
-    "priorNativePlayback": {
+    "manualReviewPassed": true,
+    "reviewNotes": "Reviewed twelve full-timeline samples, eighteen middle close samples, shared-standing boundaries, idle/old/new comparison and black/white backgrounds. Standing closed-eye dozing, gentle nod and breathing, Zzz and reopening/neutral return retained. White horns and fluffy tail closer to idle. Zzz shown as glowing letters rather than outlined bubbles, appears earlier; line softness and small face/tail variations remain. Fixed pale-material medians stable across ten sampled times (196..198,181..184,205..208). Output top35px (9.7%), bottom28px; no clipping, not full 10% all-edge margin. No local body/face repair or full-clip interpolation.",
+    "nativePlayback": {
       "sampleSeconds": 1.8,
-      "observedFPS": 23.963441818992422,
+      "observedFPS": 23.980815347721826,
       "droppedFrames": 0,
       "advancedToNextAction": true,
+      "actualEndedEventObserved": true,
       "outputFPS": 24
-    },
-    "limitations": "Colour-only correction; it does not make generated face geometry, horns, tail or line style identical.",
-    "lutHex": "0000000101010202020303030404040505050606060707070808080909090a0a0a0b0b0b0c0c0c0d0d0d0e0e0e0f0f0f1010101111111212121313131414141515151616161717171818181919191a1a1a1b1b1b1c1c1c1d1d1d1e1e1e1f1f1f2020202121212222222323232424242525252626262727272828282929292a2a2a2b2b2b2c2c2c2d2d2d2e2e2e2f2f2f3030303131313232323333333434343535353636363737373838383939393a3a3a3b3b3b3c3c3c3d3d3d3e3e3e3f3f3f4040404141414242424343434444444545454646464747474848484949494a4a4a4b4b4b4c4c4c4d4d4d4e4e4e4f4f4f505050515251525352535453545554555655565756575857585958595a595a5b5a5b5c5b5c5d5c5d5e5d5e5f5e60605f6161606262616363626464636565646666656767666868676969686a6a696b6b6a6c6c6b6d6d6c6e6e6d6f6f6e70706f717170727271737372747573757674767775777876787977797a787a7b797b7c7a7c7d7b7d7e7c7e7f7d7f807e80817f818280828381838482848583858684868785878886888987898a898a8b8a8b8c8b8c8d8c8d8e8d8e8f8e8f908f909190919291929392939493949694959795969896979997989a98999b999a9c9a9b9d9b9c9e9c9e9f9d9fa09ea0a19fa1a3a0a2a4a1a3a5a2a4a6a3a5a7a4a6a8a5a7a9a6a8aaa7a9aba8aaaca9abadaaadaeabaeafacafb1adb0b2aeb1b3afb2b4b0b3b5b1b4b6b2b5b7b3b7b7b4b8b8b5b9b9b6babab7bbbbb8bcbcb9bdbdbabebebbbfbfbcc1c0bdc2c1bec3c2bfc4c3c0c5c3c1c6c4c2c7c5c3c8c6c4c8c7c5c9c8c6cac9c7cbcac8cccbc9cdcccbcecdcccfcecdd0cfced1cfcfd2d0d0d3d1d1d4d2d2d5d3d3d6d4d4d7d5d5d7d6d6d8d7d7d9d8d8dad9d9dbdadadcdbdbdddcdcdedddddfdedee0dfdfe1e0e0e2e1e1e3e2e2e4e2e3e4e3e4e5e4e5e6e5e6e7e6e7e8e7e8e9e8e9eae9eaebeaebecebecedececeeededefeeeeefefeff0f0f0f1f1f1f2f2f2f3f3f3f4f4f4f5f5f5f6f5f6f7f6f7f8f7f8f9f8f9faf9f9fafafafbfbfbfcfcfcfdfdfdfefefeffffff",
-    "lutFormat": "256x3 uint8 interleaved RGB, hexadecimal"
+    }
+  },
+  "supersedes": {
+    "commit": "58e68e200fca10dbd6d89a57951f3a92cc72e7cb",
+    "provider": "可灵 AI",
+    "source": "assets/sources/原地小憩沉眠-kling.mp4",
+    "sourceSha256": "325bab5d6e27e32894e3f11704e7155842fd17fada06dc7f3a52af5ab53b6732",
+    "outputSha256": "38970d3ba1f206e38cb86918a67aacd23e56469c4dbb2fd523763a95ab1dbfd2",
+    "outputFPS": 24,
+    "durationSeconds": 10.042
+  },
+  "referencePreparation": {
+    "uploadedFileName": "gpt-source-reference.png",
+    "uploadedSha256": "a7f4812f180ac52081f0896b5d7661a7bd902d5085266be1342449351a675550",
+    "description": "Same existing character green-screen PNG as both first and last reference."
   }
 }
