@@ -145,3 +145,9 @@ python scripts/pipeline.py process '螃蟹走路' 'work/crab-rebuild/source-cfr2
 后续按`assets/sources/螃蟹走路.json`的`rebuildCommands`执行固定RGB校准、9帧头桥/10帧尾桥（hold=0），再在已有共同站姿候选上作一次固定LUT微调。`colourMatch`和`paletteRefinement`分别记录这两道色彩处理的输入摘要与参数，不能套用旧片的`paletteUnification`。中心动作没有新插帧、拉伸、换脸或尾部局部绘制；绒毛尾端来自新生成源本身。
 
 逐段对照完整动作与中段造型后只接入螃蟹走路，小憩候选因蹲坐和地面投影拒收。旧素材仍在Git历史，原始旧源保留。正式数量不增加；任意中途打断仍不能保证完全无痕。
+
+## 2026-10-23：重力下蹲换源
+
+第四批只接入“原地重力下蹲压缩”。原始带标记MP4、实际提示词和专用VFR准备脚本保留在`assets/sources/`；241帧、名义60/1、平均14460/601的视频通过`settb=1/24,setpts=N`逐帧映射到24fps。公开准备脚本实际重建的CFR输入与验收输入SHA相同。后续完整命令见对应来源JSON的`rebuildCommands`：原版HSV抠像、站姿归一化、640×360编码、固定RGB校准、共同站姿短桥与固定LUT微调。没有全片插帧或主体几何修复。
+
+原片暗绿色地面投影由原版HSV范围一并抠除。弹起轨迹保持原样，最高点顶部余量14像素，虽未裁切，也不能声称满足生成提示中的10%余量。最终`colourMatch`和`paletteRefinement`分别对应两次固定色彩处理，不能沿用被替换Kling片的旧调色字段。行礼候选因深蹲幅度错误未接入；正式仍22/106、19长3短。
